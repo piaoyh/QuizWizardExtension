@@ -7,7 +7,6 @@
     --font-size: 11px;
     --border-color: #d1d1d1;
     --app-bg: #ffffff;
-    --user-select: none;
 }
 
 body.theme-web {
@@ -16,109 +15,43 @@ body.theme-web {
     --active-bg: #3498db;
     --active-text: #ffffff;
     --app-bg: #f9f9f9;
-    --user-select: auto;
 }
 
-body, html {
-    margin: 0; padding: 0; height: 100%;
-    overflow: hidden; font-family: "Segoe UI", "Malgun Gothic", sans-serif;
-    background-color: var(--app-bg);
-    user-select: var(--user-select);
-    -webkit-user-select: var(--user-select);
-}
-
+body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: "Segoe UI", sans-serif; background-color: var(--app-bg); }
 #app { display: flex; flex-direction: column; height: 100vh; }
 
 .top-nav {
-    display: flex; align-items: center;
-    background-color: var(--nav-bg);
-    color: var(--nav-text);
-    height: var(--nav-height);
-    padding: 0 15px;
-    border-bottom: 1px solid var(--border-color);
-    position: relative;
+    display: flex; align-items: center; background-color: var(--nav-bg);
+    color: var(--nav-text); height: var(--nav-height); padding: 0 15px;
+    border-bottom: 1px solid var(--border-color); position: relative;
 }
 
-/* 로고: 박스 내 가운데 정렬 */
 .app-logo {
-    width: 120px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 12px;
-    margin-right: 15px;
-    white-space: nowrap;
-    flex-shrink: 0;
+    width: 120px; text-align: center; font-weight: bold; font-size: 12px;
+    margin-right: 15px; flex-shrink: 0; color: var(--nav-text);
 }
-
 body.theme-web .app-logo { color: #3498db; }
 
 .menu-bar { display: flex; height: 100%; align-items: center; }
-
-/* 하위 메뉴 컨테이너 */
-.menu-item-container {
-    position: relative;
-    height: 100%;
-}
+.menu-item-container { position: relative; height: 100%; }
 
 .menu-item {
-    background: none; border: none;
-    color: var(--nav-text);
-    padding: 0 12px; height: 100%;
-    font-size: var(--font-size);
-    cursor: pointer; outline: none;
-    display: flex; align-items: center;
+    background: none; border: none; color: var(--nav-text); padding: 0 12px;
+    height: 100%; font-size: var(--font-size); cursor: pointer; outline: none;
 }
+.menu-item.active { background-color: var(--active-bg); color: var(--active-text); font-weight: bold; }
 
-.menu-item:hover { background-color: rgba(0, 0, 0, 0.05); }
-body.theme-web .menu-item:hover { background-color: rgba(255, 255, 255, 0.1); }
-
-.menu-item.active {
-    background-color: var(--active-bg);
-    color: var(--active-text);
-    font-weight: bold;
-}
-
-body.theme-desktop .menu-item.active {
-    border-left: 1px solid var(--border-color);
-    border-right: 1px solid var(--border-color);
-}
-
-/* --- 하위 메뉴(Submenu) 스타일 --- */
 .submenu {
-    display: none;
-    position: absolute;
-    top: var(--nav-height);
-    left: 0;
-    min-width: 180px;
-    background-color: var(--nav-bg);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    z-index: 1000;
+    display: none; position: absolute; top: var(--nav-height); left: 0;
+    min-width: 180px; background-color: var(--nav-bg); border: 1px solid var(--border-color);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15); z-index: 1000;
 }
-
 .menu-item-container:hover .submenu { display: block; }
 
 .submenu-item {
-    padding: 7px 15px;
-    font-size: var(--font-size);
-    color: var(--nav-text);
-    cursor: default;
-    text-align: left;
-    white-space: nowrap;
+    padding: 7px 15px; font-size: var(--font-size); color: var(--nav-text);
+    cursor: default; text-align: left; white-space: nowrap;
 }
+.submenu-item:hover { background-color: var(--active-bg); color: var(--active-text); }
 
-.submenu-item:hover {
-    background-color: var(--active-bg);
-    color: var(--active-text);
-}
-
-#view-container { flex: 1; overflow-y: auto; padding: 25px; }
-
-/* 공통 요소 */
-textarea {
-    width: 100%; height: 250px; margin-top: 15px; padding: 10px;
-    border: 1px solid var(--border-color); font-family: monospace;
-}
-.primary-btn {
-    padding: 6px 15px; background: #3498db; color: white; border: none; border-radius: 2px; cursor: pointer;
-}
+#view-container { flex: 1; padding: 25px; }
