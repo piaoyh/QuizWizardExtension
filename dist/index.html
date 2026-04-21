@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Wizard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-desktop" oncontextmenu="return false;">
+    <div id="app">
+        <header class="top-nav">
+            <div class="app-logo">QUIZ WIZARD</div>
+            <nav class="menu-bar">
+                <div class="menu-item-container">
+                    <button class="menu-item active" data-menu="question-bank">Question Bank</button>
+                    <div class="submenu">
+                        <div class="submenu-item" data-action="new">New</div>
+                        <div class="submenu-item" data-action="open">Open</div>
+                        <div class="submenu-item" data-action="edit">Edit</div>
+                        <div class="submenu-item" data-action="save">Save</div>
+                        <div class="submenu-item" data-action="save-as">Save as</div>
+                        <div class="submenu-item" data-action="optimize">Optimize</div>
+                    </div>
+                </div>
+
+                <div class="menu-item-container">
+                    <button class="menu-item" data-menu="exam-setting">Exam Setting</button>
+                    <div class="submenu">
+                        <div class="submenu-item" data-action="load-bank">Load a question bank</div>
+                        <div class="submenu-item" data-action="load-students">Load a student list</div>
+                        <div class="submenu-item" data-action="change-scope">Change a scope</div>
+                        <div class="submenu-item" data-action="save-paper">Save exam paper</div>
+                    </div>
+                </div>
+
+                <div class="menu-item-container">
+                    <button class="menu-item" data-menu="student-list">Student List</button>
+                    <div class="submenu">
+                        <div class="submenu-item" data-action="open">Open</div>
+                        <div class="submenu-item" data-action="edit">Edit</div>
+                        <div class="submenu-item" data-action="save">Save</div>
+                        <div class="submenu-item" data-action="save-as">Save as</div>
+                    </div>
+                </div>
+
+                <div class="menu-item-container">
+                    <button class="menu-item" data-menu="self-study">Self-study</button>
+                    <div class="submenu">
+                        <div class="submenu-item" data-action="load-bank">Load a question bank</div>
+                        <div class="submenu-item" data-action="change-scope">Change a scope</div>
+                        <div class="submenu-item" data-action="change-grading">Change a grading method</div>
+                        <div class="submenu-item" data-action="start">Start</div>
+                    </div>
+                </div>
+
+                <div class="menu-item-container">
+                    <button class="menu-item" data-menu="settings">Settings</button>
+                    <div class="submenu">
+                        <div class="submenu-item" data-action="path-bank">Question Bank path</div>
+                        <div class="submenu-item" data-action="path-student">Student List path</div>
+                        <div class="submenu-item" data-action="theme">Theme</div>
+                        <div class="submenu-item" data-action="font">Font</div>
+                        <div class="submenu-item" data-action="lang">Language</div>
+                    </div>
+                </div>
+
+                <div class="menu-item-container">
+                    <button class="menu-item" data-menu="information">Information</button>
+                    <div class="submenu">
+                        <div class="submenu-item" data-action="help">Help</div>
+                        <div class="submenu-item" data-action="info-soft">Software Info</div>
+                        <div class="submenu-item" data-action="info-copy">Copyright Info</div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <main id="view-container"></main>
+    </div>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
