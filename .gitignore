@@ -1,5 +1,6 @@
 target/
 src/types/
+node_modules/
 .gemini_tmp/
 .vscode/
 .idea/

@@ -4,7 +4,7 @@ export const translations: Record<SupportedLang, any> = {
     ko: {
         menus: {
             "question-bank": "문제 은행",
-            "exam-setting": "시험 설정",
+            "exam-setting": "시험문제 만들기",
             "student-list": "학생 명단",
             "self-study": "자기 주도 학습",
             "settings": "설정",
@@ -18,32 +18,27 @@ export const translations: Record<SupportedLang, any> = {
             "qb-save": "저장",
             "qb-save-as": "다른 이름으로 저장",
             "qb-optimize": "최적화",
-
             // Exam Setting 전용 액션
             "ex-load-bank": "문제 은행 불러오기",
             "ex-load-students": "학생 명단 불러오기",
             "ex-change-scope": "범위 변경",
             "ex-save-paper": "시험지 저장",
-
             // Student List 전용 액션
-            "sl-open": "명단 열기",
-            "sl-edit": "명단 편집",
-            "sl-save": "명단 저장",
-            "sl-save-as": "명단 다른 이름으로 저장",
-
+            "sl-open": "열기",
+            "sl-edit": "편집",
+            "sl-save": "저장",
+            "sl-save-as": "다른 이름으로 저장",
             // Self-study 전용 액션
             "ss-load-bank": "문제 은행 불러오기",
             "ss-change-scope": "학습 범위 변경",
-            "ss-change-grading": "채점 방식 변경",
+            "ss-change-grading-method": "채점 방식 변경",
             "ss-start": "시작",
-
             // Settings 전용 액션
-            "st-path-bank": "문제 은행 경로",
-            "st-path-student": "학생 명단 경로",
-            "st-theme": "테마",
-            "st-font": "글꼴",
-            "st-lang": "언어",
-
+            "st-path-bank": "문제 은행 기본 경로 설정",
+            "st-path-student": "학생 명단 기본 경로 설정",
+            "st-theme": "테마 변경",
+            "st-font": "기본 글꼴 설정",
+            "st-lang": "언어 설정",
             // Information 전용 액션
             "in-help": "도움말",
             "in-info-soft": "소프트웨어 정보",
@@ -76,7 +71,7 @@ export const translations: Record<SupportedLang, any> = {
             "sl-save-as": "Save as",
             "ss-load-bank": "Load a question bank",
             "ss-change-scope": "Change a scope",
-            "ss-change-grading": "Change a grading method",
+            "ss-change-grading-method": "Change a grading method",
             "ss-start": "Start",
             "st-path-bank": "Question Bank path",
             "st-path-student": "Student List path",
@@ -114,7 +109,7 @@ export const translations: Record<SupportedLang, any> = {
             "sl-save-as": "Сохранить как",
             "ss-load-bank": "Загрузить банк вопросов",
             "ss-change-scope": "Изменить объём",
-            "ss-change-grading": "Изменить метод оценки",
+            "ss-change-grading-method": "Изменить метод оценки",
             "ss-start": "Начать",
             "st-path-bank": "Путь к банку вопросов",
             "st-path-student": "Путь к списку студентов",
