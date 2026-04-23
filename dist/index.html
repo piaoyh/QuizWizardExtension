@@ -82,6 +82,49 @@
             </main>
     </div>
 
+    <!-- 언어 설정 대화상자 추가 -->
+    <dialog id="lang-dialog" class="modal">
+        <div class="modal-content">
+            <h3 id="lang-dialog-title">언어 설정 / Language Settings</h3>
+            <div class="radio-group">
+                <label><input type="radio" name="lang" value="ko"> 한국어 (Korean)</label>
+                <label><input type="radio" name="lang" value="en"> English</label>
+                <label><input type="radio" name="lang" value="ru"> Русский (Russian)</label>
+            </div>
+            <div class="modal-actions">
+                <button id="lang-cancel-btn">취소</button>
+                <button id="lang-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 테마 설정 대화상자 추가 -->
+    <dialog id="theme-dialog" class="modal">
+        <div class="modal-content">
+            <h3 id="theme-dialog-title">테마 설정 / Theme Settings</h3>
+            <div class="radio-group">
+                <label><input type="radio" name="theme" value="theme-desktop"> 데스크탑 앱 스타일 (Desktop Style)</label>
+                <label><input type="radio" name="theme" value="theme-web"> 웹 스타일 (Web Style)</label>
+            </div>
+            <div class="modal-actions">
+                <button id="theme-cancel-btn">취소</button>
+                <button id="theme-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 답안지 제출 확인 대화상자 추가 -->
+    <dialog id="submit-confirm-dialog" class="modal">
+        <div class="modal-content">
+            <h3 id="submit-dialog-title">답안지 제출 / Submit Exam</h3>
+            <p id="submit-dialog-msg" style="font-size: 13px; margin: 20px 0;">정말로 답안지를 제출하시겠습니까? 제출 후에는 수정할 수 없습니다.</p>
+            <div class="modal-actions">
+                <button id="submit-cancel-btn">취소</button>
+                <button id="submit-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
     <script type="module" src="main.js"></script>
 </body>
 </html>

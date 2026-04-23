@@ -2,6 +2,7 @@
     --nav-height: 32px;
     --nav-bg: #f3f3f3;
     --nav-text: #333333;
+    --main-text: #333333;
     --active-bg: #ffffff;
     --active-text: #0078d4;
     --font-size: 11px;
@@ -12,12 +13,13 @@
 body.theme-web {
     --nav-bg: #2c3e50;
     --nav-text: #ecf0f1;
+    --main-text: #2c3e50;
     --active-bg: #3498db;
     --active-text: #ffffff;
     --app-bg: #f9f9f9;
 }
 
-body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: "Segoe UI", sans-serif; background-color: var(--app-bg); }
+body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: "Segoe UI", sans-serif; background-color: var(--app-bg); color: var(--main-text); }
 #app { display: flex; flex-direction: column; height: 100vh; }
 
 .top-nav {
@@ -54,4 +56,309 @@ body.theme-web .app-logo { color: #3498db; }
 }
 .submenu-item:hover { background-color: var(--active-bg); color: var(--active-text); }
 
-#view-container { flex: 1; padding: 25px; }
+#view-container { flex: 1; padding: 10px 25px; overflow: hidden; display: flex; flex-direction: column; }
+
+/* Question Editor Styles */
+.question-list-container {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-top: 10px;
+}
+
+/* 스크롤바 스타일 */
+.question-list-container::-webkit-scrollbar { width: 8px; }
+.question-list-container::-webkit-scrollbar-track { background: var(--nav-bg); }
+.question-list-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+.question-list-container::-webkit-scrollbar-thumb:hover { background: var(--active-text); }
+
+.question-item {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 25px;
+    background: var(--active-bg);
+}
+
+.q-main-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.q-number {
+    font-weight: bold;
+    min-width: 25px;
+    padding-top: 8px;
+}
+
+.q-group-input {
+    width: 45px; /* 숫자 3개 정도 너비 */
+    height: 30px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 0 5px;
+}
+
+.q-text-area {
+    flex: 1;
+    height: 70px; /* 대략 3줄 높이 */
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 8px;
+    font-family: inherit;
+    font-size: 12px;
+    resize: vertical;
+}
+
+.choice-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 35px; /* 문제 번호와 그룹 입력칸만큼 들여쓰기 */
+    margin-bottom: 5px;
+}
+
+.choice-check {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.choice-input {
+    flex: 1;
+    height: 28px;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 0 8px;
+    font-size: 12px;
+}
+
+/* Student List Styles */
+.student-item {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    background: var(--active-bg);
+    display: inline-flex; /* 내용에 맞게 너비 조절 */
+    min-width: 100%;      /* 최소한 부모 너비만큼은 차지 */
+    box-sizing: border-box;
+    align-items: center;
+    gap: 12px;
+}
+
+.question-list-container {
+    flex: 1;
+    overflow: auto; /* 세로뿐만 아니라 가로 스크롤도 허용 */
+    padding-right: 10px;
+    margin-top: 10px;
+}
+
+.sl-label {
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.sl-input {
+    width: 110px; /* 약 15자 정도 너비 */
+    height: 26px;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 0 8px;
+    font-size: 12px;
+}
+
+/* Self-study Styles */
+.ss-container {
+    display: flex;
+    flex: 1;
+    gap: 20px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.ss-main-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ss-sidebar {
+    width: 100px;
+    background: var(--nav-bg);
+    border-left: 1px solid var(--border-color);
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ss-sidebar-btn {
+    width: 100%;
+    padding: 8px 0;
+    font-size: 11px;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: var(--active-bg);
+    color: var(--main-text);
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body.theme-web .ss-sidebar-btn {
+    background: #e1f5fe; /* 연한 파란색 */
+    color: #01579b;
+}
+
+.ss-sidebar-btn.active {
+    background: var(--active-text) !important;
+    color: #000000 !important; /* 선택 시 글자색을 검은색으로 고정 */
+    font-weight: bold;
+}
+
+.ss-nav-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.ss-nav-btn {
+    padding: 3px 15px;
+    cursor: pointer;
+    background: var(--nav-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-weight: bold;
+    color: var(--nav-text); /* 기본 텍스트 색상 */
+}
+
+body.theme-web .ss-nav-btn {
+    color: #ffffff; /* 웹 테마에서 화살표를 흰색으로 */
+}
+
+/* 웹 테마에서 문제 번호 흰색으로 */
+body.theme-web .q-number {
+    color: #ffffff;
+}
+
+/* Self-study Specific Styles */
+#ss-card-container input:disabled, 
+#ss-card-container textarea:disabled {
+    background-color: #ffffff !important;
+    color: var(--main-text) !important;
+    border-color: var(--border-color) !important;
+    cursor: default;
+}
+
+#ss-card-container .q-text-area {
+    flex: 1; /* 그룹 입력창이 없으므로 왼쪽 끝까지 확장됨 */
+}
+
+/* Disabled & Readonly Styles */
+.question-item.readonly-mode {
+    background: var(--active-bg);
+    border-color: var(--border-color);
+}
+
+input:disabled, textarea:disabled {
+    background-color: #f0f0f0 !important;
+    color: #888888 !important;
+    border-color: #dcdcdc !important;
+    cursor: not-allowed;
+}
+
+.choice-check:disabled {
+    filter: grayscale(1) opacity(0.6);
+    accent-color: #888888; /* 체크 표시 색상을 회색으로 고정 */
+    cursor: not-allowed;
+}
+
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--active-text);
+    padding-bottom: 5px;
+}
+
+.view-header h2 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.view-actions button {
+    padding: 3px 12px;
+    font-size: 11px;
+}
+
+/* Modal Styles */
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.modal {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    background: var(--app-bg);
+    color: var(--main-text);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    width: 300px;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    font-size: 15px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.radio-group label {
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-actions button {
+    padding: 6px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: var(--nav-bg);
+    color: var(--nav-text);
+    border-radius: 4px;
+}
+
+.modal-actions button#lang-confirm-btn, .modal-actions button#theme-confirm-btn, .modal-actions button#submit-confirm-btn {
+    background-color: #0078d4;
+    color: #ffffff;
+    border: 1px solid #005a9e;
+    font-weight: bold;
+}
+
+.modal-actions button:hover {
+    opacity: 0.9;
+    filter: brightness(1.1);
+}
