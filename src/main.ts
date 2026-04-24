@@ -333,6 +333,8 @@ class QuizWizardApp {
         const langData = translations[this.currentLang] || translations['ko'];
         const title = langData.actions['ss-viewing'] || 'Taking an Exam';
         const submitBtnText = langData.actions['ss-submit-paper'] || 'Submit';
+        const prevBtnText = langData.actions['ss-prev-question'] || '<-';
+        const nextBtnText = langData.actions['ss-next-question'] || '->';
 
         // 컨테이너 레이아웃 (메인 뷰 + 사이드바)
         this.container.innerHTML = `
@@ -341,8 +343,8 @@ class QuizWizardApp {
                     <div class="view-header">
                         <h2>${title}</h2>
                         <div class="ss-nav-controls">
-                            <button class="ss-nav-btn" id="ss-prev-btn">&lt;-</button>
-                            <button class="ss-nav-btn" id="ss-next-btn">-&gt;</button>
+                            <button class="ss-nav-btn" id="ss-prev-btn">${prevBtnText}</button>
+                            <button class="ss-nav-btn" id="ss-next-btn">${nextBtnText}</button>
                         </div>
                         <div class="view-actions">
                             <button id="ss-submit-btn">${submitBtnText}</button>
