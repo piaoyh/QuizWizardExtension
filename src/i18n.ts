@@ -18,6 +18,9 @@ export const translations: Record<SupportedLang, any> = {
             "qb-save": "저장",
             "qb-save-as": "다른 이름으로 저장",
             "qb-optimize": "최적화",
+            "qb-insert": "->V<- 문제 삽입",
+            "qb-up": "위로",
+            "qb-down": "아래로",
             "qb-editing": "문제 은행 편집 중",
             "ex-editing": "시험 문제 출제 중",
             "ss-viewing": "시험 중",
@@ -33,11 +36,16 @@ export const translations: Record<SupportedLang, any> = {
             "sl-save": "저장",
             "sl-save-as": "다른 이름으로 저장",
             "sl-editing": "학생 명단 편집 중",
+            "sl-select-all": "모두 선택",
+            "sl-invert-selection": "선택 반전",
+            "sl-remove-selected": "- 학생 제외",
             "sl-first-name": "이름:",
             "sl-patronymic": "부칭:",
             "sl-last-name": "성:",
             "sl-id": "학번:",
             // Self-study 전용 액션
+            "ss-prev-question": "이전",
+            "ss-next-question": "다음",
             "ss-load-bank": "문제 은행 불러오기",
             "ss-change-scope": "학습 범위 변경",
             "ss-change-grading-method": "채점 방식 변경",
@@ -51,7 +59,10 @@ export const translations: Record<SupportedLang, any> = {
             // Information 전용 액션
             "in-help": "도움말",
             "in-info-soft": "소프트웨어 정보",
-            "in-info-copy": "저작권 정보"
+            "in-info-copy": "저작권 정보",
+            // 플레이스홀더
+            "ph-question": "문제를 입력하세요...",
+            "ph-choice": "선택지 {n} 입력..."
         }
     },
     en: {
@@ -70,6 +81,9 @@ export const translations: Record<SupportedLang, any> = {
             "qb-save": "Save",
             "qb-save-as": "Save as",
             "qb-optimize": "Optimize",
+            "qb-insert": "->V<- Insert",
+            "qb-up": "Up",
+            "qb-down": "Down",
             "qb-editing": "Editing Question Bank",
             "ex-editing": "Setting up Exam Paper",
             "ex-load-bank": "Load a question bank",
@@ -81,12 +95,15 @@ export const translations: Record<SupportedLang, any> = {
             "sl-save": "Save",
             "sl-save-as": "Save as",
             "sl-editing": "Editing Student List",
+            "sl-select-all": "Select All",
+            "sl-invert-selection": "Invert Selection",
+            "sl-remove-selected": "- Remove Students",
             "sl-first-name": "First Name:",
             "sl-patronymic": "Patronymic:",
             "sl-last-name": "Last Name:",
-            "ss-id": "ID:",
-            "ss-prev-question": "Previous Question",
-            "ss-next-question": "Next Question",
+            "sl-id": "ID:",
+            "ss-prev-question": "Prev",
+            "ss-next-question": "Next",
             "ss-load-bank": "Load a question bank",
             "ss-change-scope": "Change a scope",
             "ss-change-grading-method": "Change a grading method",
@@ -98,7 +115,9 @@ export const translations: Record<SupportedLang, any> = {
             "st-lang": "Language",
             "in-help": "Help",
             "in-info-soft": "Software Info",
-            "in-info-copy": "Copyright Info"
+            "in-info-copy": "Copyright Info",
+            "ph-question": "Enter the question here...",
+            "ph-choice": "Enter choice {n}..."
         }
     },
     ru: {
@@ -117,6 +136,9 @@ export const translations: Record<SupportedLang, any> = {
             "qb-save": "Сохранить",
             "qb-save-as": "Сохранить как",
             "qb-optimize": "Оптимизировать",
+            "qb-insert": "->V<- Вставить",
+            "qb-up": "Вверх",
+            "qb-down": "Вниз",
             "qb-editing": "Редактирование банка вопросов",
             "ex-editing": "Подготовка экзаменационного листа",
             "ss-viewing": "Экзамен",
@@ -130,12 +152,15 @@ export const translations: Record<SupportedLang, any> = {
             "sl-save": "Сохранить",
             "sl-save-as": "Сохранить как",
             "sl-editing": "Редактирование списка студентов",
+            "sl-select-all": "Выбрать все",
+            "sl-invert-selection": "Инвертировать",
+            "sl-remove-selected": "- Удалить студентов",
             "sl-first-name": "Имя:",
             "sl-patronymic": "Отчество:",
             "sl-last-name": "Фамилия:",
             "sl-id": "ID:",
-            "ss-prev-question": "Предыдущий вопрос",
-            "ss-next-question": "Следующий вопрос",
+            "ss-prev-question": "Пред.",
+            "ss-next-question": "След.",
             "ss-load-bank": "Загрузить банк вопросов",
             "ss-change-scope": "Изменить объём",
             "ss-change-grading-method": "Изменить метод оценки",
@@ -147,7 +172,9 @@ export const translations: Record<SupportedLang, any> = {
             "st-lang": "Язык",
             "in-help": "Справка",
             "in-info-soft": "О программе",
-            "in-info-copy": "Авторские права"
+            "in-info-copy": "Авторские права",
+            "ph-question": "Введите вопрос здесь...",
+            "ph-choice": "Введите вариант {n}..."
         }
     }
 };
