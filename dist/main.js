@@ -18,6 +18,10 @@ class QuizWizardApp {
     userAnswers = [];
     // 현재 포커스된 문제의 인덱스 (0-based, 문제은행/학생명단 편집용)
     focusedQuestionIndex = null;
+    // 현재 포커스된 선택지의 인덱스 (0-based)
+    focusedChoiceIndex = null;
+    // 문제은행 편집 모드 ('question' 또는 'choice')
+    editorMode = 'question';
     constructor() {
         this.container = document.getElementById('view-container');
         this.initApp();
@@ -564,6 +568,33 @@ class QuizWizardApp {
      */
     handleAction(action) {
         console.log(`Action executing: ${action}`);
+        // [추가] 액션 접두사에 따라 해당하는 주메뉴 작업공간으로 자동 전환
+        const prefixMap = {
+            'qb-': 'question-bank',
+            'ex-': 'exam-setting',
+            'sl-': 'student-list',
+            'ss-': 'self-study',
+            'st-': 'settings',
+            'in-': 'information'
+        };
+        for (const [prefix, menu] of Object.entries(prefixMap)) {
+            if (action.startsWith(prefix)) {
+                if (this.currentMenu !== menu) {
+                    // 주메뉴 버튼 활성화 상태 업데이트
+                    const menuButtons = document.querySelectorAll('.menu-item');
+                    menuButtons.forEach(btn => {
+                        if (btn.dataset.menu === menu) {
+                            btn.classList.add('active');
+                        }
+                        else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    this.renderView(menu);
+                }
+                break;
+            }
+        }
         switch (action) {
             /* --- Question Bank (문제은행) --- */
             case 'qb-new':
@@ -683,22 +714,44 @@ class QuizWizardApp {
         }
         const langData = translations[this.currentLang] || translations['ko'];
         const title = langData.actions['qb-editing'] || 'Editing';
-        const addBtnText = this.currentLang === 'ko' ? "+ 문제 추가" : (this.currentLang === 'ru' ? "+ Добавить вопрос" : "+ Add Question");
-        const removeBtnText = this.currentLang === 'ko' ? "- 문제 삭제" : (this.currentLang === 'ru' ? "- Удалить вопрос" : "- Remove Question");
-        const insertBtnText = langData.actions['qb-insert'] || '->V<- Insert';
         const fileInfoHtml = this.question_bank_file_name
             ? `<span class="file-info-label">[ ${this.question_bank_file_name} ]</span>`
             : '';
+        // 버튼 텍스트 및 모드별 버튼 구성
+        const toggleBtnText = langData.actions['qb-toggle'] || '토글';
+        let actionButtonsHtml = "";
+        if (this.editorMode === 'question') {
+            const addBtnText = langData.actions['qb-add-question'] || "+ 문제 추가";
+            const removeBtnText = langData.actions['qb-remove-question'] || "- 문제 삭제";
+            const insertBtnText = langData.actions['qb-insert'] || '->V<- 문제 삽입';
+            actionButtonsHtml = `
+                <input type="number" id="insert-pos-left" style="width: 40px; text-align: center;" min="1">
+                <span style="margin: 0 5px;">:</span>
+                <input type="number" id="insert-pos-right" style="width: 40px; text-align: center;" min="2">
+                <button id="insert-question-btn" style="margin-right: 10px; margin-left: 5px;">${insertBtnText}</button>
+                <button id="add-question-btn" style="margin-right: 5px;">${addBtnText}</button>
+                <button id="remove-question-btn" style="margin-right: 5px;">${removeBtnText}</button>
+            `;
+        }
+        else {
+            const addBtnText = langData.actions['qb-add-choice'] || "+ 선택지 추가";
+            const removeBtnText = langData.actions['qb-remove-choice'] || "- 선택지 삭제";
+            const insertBtnText = langData.actions['qb-insert-choice'] || '->V<- 선택지 삽입';
+            actionButtonsHtml = `
+                <input type="number" id="insert-choice-pos-left" style="width: 40px; text-align: center;" min="1">
+                <span style="margin: 0 5px;">:</span>
+                <input type="number" id="insert-choice-pos-right" style="width: 40px; text-align: center;" min="2">
+                <button id="insert-choice-btn" style="margin-right: 10px; margin-left: 5px;">${insertBtnText}</button>
+                <button id="add-choice-btn" style="margin-right: 5px;">${addBtnText}</button>
+                <button id="remove-choice-btn" style="margin-right: 5px;">${removeBtnText}</button>
+            `;
+        }
         let html = `
             <div class="view-header">
                 <h2>${title}${fileInfoHtml}</h2>
                 <div class="view-actions">
-                    <input type="number" id="insert-pos-left" style="width: 40px; text-align: center;" min="1">
-                    <span style="margin: 0 5px;">:</span>
-                    <input type="number" id="insert-pos-right" style="width: 40px; text-align: center;" min="2">
-                    <button id="insert-question-btn" style="margin-right: 10px; margin-left: 5px;">${insertBtnText}</button>
-                    <button id="add-question-btn" style="margin-right: 5px;">${addBtnText}</button>
-                    <button id="remove-question-btn">${removeBtnText}</button>
+                    ${actionButtonsHtml}
+                    <button id="toggle-editor-mode-btn" style="margin-left: 5px;">${toggleBtnText}</button>
                 </div>
             </div>
             <div class="question-list-container" id="question-list">
@@ -709,6 +762,8 @@ class QuizWizardApp {
         });
         html += `</div>`;
         this.container.innerHTML = html;
+        // 토글 버튼 이벤트 바인딩
+        document.getElementById('toggle-editor-mode-btn')?.addEventListener('click', () => this.toggleEditorMode());
         // 문제 카드 포커스 이벤트 설정
         const listContainer = document.getElementById('question-list');
         if (listContainer) {
@@ -719,8 +774,23 @@ class QuizWizardApp {
                     item.classList.add('focused');
                     this.focusedQuestionIndex = idx;
                 };
-                item.addEventListener('click', setFocus);
-                item.addEventListener('focusin', setFocus);
+                // 카드 내의 클릭/포커스 이벤트를 통합 관리
+                const handleFocus = (e) => {
+                    const target = e.target;
+                    // 선택지 입력창이 아닌 곳에 포커스가 가거나 클릭되면 선택지 포커스 인덱스 초기화
+                    if (!target.classList.contains('choice-input')) {
+                        this.focusedChoiceIndex = null;
+                    }
+                    setFocus();
+                };
+                item.addEventListener('click', handleFocus);
+                item.addEventListener('focusin', handleFocus);
+                // 선택지 입력창들에 대한 개별 포커스 이벤트 (인덱스 저장)
+                item.querySelectorAll('.choice-input').forEach((input, cIdx) => {
+                    input.addEventListener('focus', () => {
+                        this.focusedChoiceIndex = cIdx;
+                    });
+                });
                 // 만약 이전에 포커스된 인덱스였다면 클래스 복구
                 if (this.focusedQuestionIndex === idx) {
                     item.classList.add('focused');
@@ -740,45 +810,56 @@ class QuizWizardApp {
                 this.moveQuestionDown(idx);
             });
         });
-        // 입력창 동기화 로직
-        const leftInput = document.getElementById('insert-pos-left');
-        const rightInput = document.getElementById('insert-pos-right');
-        if (leftInput && rightInput) {
-            leftInput.addEventListener('input', () => {
-                const val = parseInt(leftInput.value);
-                if (!isNaN(val)) {
-                    rightInput.value = (val + 1).toString();
-                }
-            });
-            rightInput.addEventListener('input', () => {
-                const val = parseInt(rightInput.value);
-                if (!isNaN(val)) {
-                    leftInput.value = (val - 1).toString();
-                }
-            });
-        }
-        // 삽입 버튼 이벤트 바인딩
-        const insertBtn = document.getElementById('insert-question-btn');
-        if (insertBtn) {
-            insertBtn.addEventListener('click', () => {
+        // 입력창 동기화 로직 및 버튼 이벤트 바인딩 (모드에 따라 다름)
+        if (this.editorMode === 'question') {
+            const leftInput = document.getElementById('insert-pos-left');
+            const rightInput = document.getElementById('insert-pos-right');
+            if (leftInput && rightInput) {
+                leftInput.addEventListener('input', () => {
+                    const val = parseInt(leftInput.value);
+                    if (!isNaN(val))
+                        rightInput.value = (val + 1).toString();
+                });
+                rightInput.addEventListener('input', () => {
+                    const val = parseInt(rightInput.value);
+                    if (!isNaN(val))
+                        leftInput.value = (val - 1).toString();
+                });
+            }
+            document.getElementById('insert-question-btn')?.addEventListener('click', () => {
                 const pos = parseInt(rightInput.value);
-                if (!isNaN(pos)) {
+                if (!isNaN(pos))
                     this.insertQuestion(pos);
-                }
-                else {
+                else
                     alert("삽입할 위치(번호)를 입력해 주세요.");
-                }
             });
+            document.getElementById('add-question-btn')?.addEventListener('click', () => this.addNewQuestion());
+            document.getElementById('remove-question-btn')?.addEventListener('click', () => this.removeFocusedQuestion());
         }
-        // 문제 추가 버튼 이벤트 바인딩 (기존 리스너 제거 효과를 위해 새로 생성)
-        const addBtn = document.getElementById('add-question-btn');
-        if (addBtn) {
-            addBtn.addEventListener('click', () => this.addNewQuestion());
-        }
-        // 문제 삭제 버튼 이벤트 바인딩
-        const removeBtn = document.getElementById('remove-question-btn');
-        if (removeBtn) {
-            removeBtn.addEventListener('click', () => this.removeFocusedQuestion());
+        else {
+            const leftInput = document.getElementById('insert-choice-pos-left');
+            const rightInput = document.getElementById('insert-choice-pos-right');
+            if (leftInput && rightInput) {
+                leftInput.addEventListener('input', () => {
+                    const val = parseInt(leftInput.value);
+                    if (!isNaN(val))
+                        rightInput.value = (val + 1).toString();
+                });
+                rightInput.addEventListener('input', () => {
+                    const val = parseInt(rightInput.value);
+                    if (!isNaN(val))
+                        leftInput.value = (val - 1).toString();
+                });
+            }
+            document.getElementById('insert-choice-btn')?.addEventListener('click', () => {
+                const pos = parseInt(rightInput.value);
+                if (!isNaN(pos))
+                    this.insertChoice(pos);
+                else
+                    alert("삽입할 위치(번호)를 입력해 주세요.");
+            });
+            document.getElementById('add-choice-btn')?.addEventListener('click', () => this.addNewChoice());
+            document.getElementById('remove-choice-btn')?.addEventListener('click', () => this.removeFocusedChoice());
         }
         // 현재 선택된 메뉴 강조 업데이트
         document.querySelectorAll('.menu-item').forEach(btn => {
@@ -799,6 +880,121 @@ class QuizWizardApp {
                 el.style.height = el.scrollHeight + 'px';
             });
         });
+    }
+    /** 에디터 모드를 전환합니다 (문제 편집 <=> 선택지 편집) */
+    toggleEditorMode() {
+        this.saveCurrentQuestionsToState();
+        this.editorMode = this.editorMode === 'question' ? 'choice' : 'question';
+        this.initializeQuestionBankWorkspace(false, true);
+    }
+    /** 현재 포커스된 문제에 새로운 선택지를 추가합니다. */
+    addNewChoice() {
+        const idx = this.focusedQuestionIndex;
+        if (idx === null || !this.questionsData[idx]) {
+            alert(this.currentLang === 'ko' ? "선택지를 추가할 문제를 선택해 주세요." : "Please select a question to add a choice.");
+            return;
+        }
+        this.saveCurrentQuestionsToState();
+        const newChoice = { text: '', correct: false };
+        this.questionsData[idx].choices.push(newChoice);
+        // 새 선택지로 포커스 이동 준비
+        this.focusedChoiceIndex = this.questionsData[idx].choices.length - 1;
+        this.initializeQuestionBankWorkspace(false, true);
+        // 추가된 선택지로 포커스 및 스크롤
+        setTimeout(() => {
+            const list = document.getElementById('question-list');
+            const targetQuestion = list?.children[idx];
+            if (targetQuestion) {
+                const choices = targetQuestion.querySelectorAll('.choice-input');
+                const lastChoice = choices[choices.length - 1];
+                lastChoice?.focus();
+                lastChoice?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }, 50);
+    }
+    /** 현재 포커스된 문제의 선택지를 삭제합니다. (포커스가 있는 선택지 대상) */
+    removeFocusedChoice() {
+        const qIdx = this.focusedQuestionIndex;
+        const cIdx = this.focusedChoiceIndex;
+        if (qIdx === null || !this.questionsData[qIdx]) {
+            alert(this.currentLang === 'ko' ? "문제를 먼저 선택해 주세요." : "Please select a question.");
+            return;
+        }
+        if (cIdx === null || !this.questionsData[qIdx].choices[cIdx]) {
+            alert(this.currentLang === 'ko' ? "삭제할 선택지를 지정해 주세요." : "Please specify the choice to delete.");
+            return;
+        }
+        this.saveCurrentQuestionsToState();
+        const choices = this.questionsData[qIdx].choices;
+        const targetChoice = choices[cIdx];
+        if (!targetChoice)
+            return; // TS18048 방지
+        // 내용이 있는지 확인
+        const hasContent = targetChoice.text.trim().length > 0;
+        let shouldDelete = false;
+        if (hasContent) {
+            const confirmMsg = this.currentLang === 'ko' ? "내용이 있는 선택지입니다. 정말 삭제하시겠습니까?" : "This choice has content. Are you sure you want to delete it?";
+            if (confirm(confirmMsg)) {
+                shouldDelete = true;
+            }
+        }
+        else {
+            shouldDelete = true;
+        }
+        if (shouldDelete) {
+            choices.splice(cIdx, 1);
+            // 삭제 후 포커스 인덱스 조정
+            if (choices.length === 0) {
+                this.focusedChoiceIndex = null;
+            }
+            else if (cIdx >= choices.length) {
+                this.focusedChoiceIndex = choices.length - 1;
+            }
+            // (중간 삭제 시에는 cIdx 유지하여 다음 선택지가 포커스됨)
+            this.initializeQuestionBankWorkspace(false, true);
+            // 삭제 후 남은 선택지에 포커스 자동 이동
+            if (this.focusedChoiceIndex !== null) {
+                setTimeout(() => {
+                    const list = document.getElementById('question-list');
+                    const targetQuestion = list?.children[qIdx];
+                    const choiceInputs = targetQuestion?.querySelectorAll('.choice-input');
+                    if (choiceInputs && choiceInputs[this.focusedChoiceIndex]) {
+                        choiceInputs[this.focusedChoiceIndex].focus();
+                    }
+                }, 50);
+            }
+        }
+    }
+    /** 현재 포커스된 문제의 지정된 위치에 선택지를 삽입합니다. */
+    insertChoice(targetPos) {
+        const qIdx = this.focusedQuestionIndex;
+        if (qIdx === null || !this.questionsData[qIdx]) {
+            alert(this.currentLang === 'ko' ? "선택지를 삽입할 문제를 선택해 주세요." : "Please select a question.");
+            return;
+        }
+        this.saveCurrentQuestionsToState();
+        const choices = this.questionsData[qIdx].choices;
+        const newChoice = { text: '', correct: false };
+        if (targetPos > choices.length) {
+            choices.push(newChoice);
+            this.focusedChoiceIndex = choices.length - 1;
+        }
+        else {
+            choices.splice(targetPos - 1, 0, newChoice);
+            this.focusedChoiceIndex = targetPos - 1;
+        }
+        this.initializeQuestionBankWorkspace(false, true);
+        // 삽입된 위치로 포커스 및 스크롤
+        setTimeout(() => {
+            const list = document.getElementById('question-list');
+            const targetQuestion = list?.children[qIdx];
+            if (targetQuestion) {
+                const choiceInputs = targetQuestion.querySelectorAll('.choice-input');
+                const targetInput = choiceInputs[this.focusedChoiceIndex];
+                targetInput?.focus();
+                targetInput?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }, 50);
     }
     /** 포커스된 문제 삭제 */
     removeFocusedQuestion() {
@@ -1040,8 +1236,7 @@ class QuizWizardApp {
                     ${groupHtml}
                     <textarea class="q-text-area" placeholder="${phQuestion}" ${readonlyAttr} ${disabled}>${text}</textarea>
                 </div>
-                ${[0, 1, 2, 3].map(i => {
-            const c = data?.choices[i] || { text: '', correct: false };
+                ${(data?.choices || []).map((c, i) => {
             const phChoice = phChoiceBase.replace('{n}', (i + 1).toString());
             // 정답 표시 여부 결정
             const isChecked = useUserAnswers ? (qUserAnswers[i] || false) : c.correct;
