@@ -81,13 +81,14 @@ export class ChoiceAnswer {
      * ```
      * @param {string} text
      * @param {boolean} is_correct
-     * @returns {ChoiceAnswer}
      */
-    static new(text, is_correct) {
+    constructor(text, is_correct) {
         const ptr0 = passStringToWasm0(text, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.choiceanswer_new(ptr0, len0, is_correct);
-        return ChoiceAnswer.__wrap(ret);
+        this.__wbg_ptr = ret >>> 0;
+        ChoiceAnswerFinalization.register(this, this.__wbg_ptr, this);
+        return this;
     }
 }
 if (Symbol.dispose) ChoiceAnswer.prototype[Symbol.dispose] = ChoiceAnswer.prototype.free;
@@ -181,6 +182,27 @@ export class ControlTower {
         return ret >>> 0;
     }
     /**
+     * Retrieves the group number for a given question number from the QBank.
+     *
+     * If the QBank is not loaded or the question number is out of bounds,
+     * it returns `0`.
+     *
+     * # Arguments
+     * * `question_number` - The index of the question to retrieve the group for (1-based).
+     *
+     * # Returns
+     * - The group number for the specified question if the QBank is loaded
+     *   and the question number is valid.
+     * - `0` if the QBank is not loaded or the question number is invalid.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_group(1), 0);
+     * // After loading a QBank with a question at index 0 that belongs to group 1
+     * // assert_eq!(control_tower.get_group(1), 1);
+     * ```
      * @param {number} question_number
      * @returns {number}
      */
@@ -250,6 +272,59 @@ export class ControlTower {
         return ret >>> 0;
     }
     /**
+     * Retrieves the name and ID of a student by their 1-based index from the SBank.
+     *
+     * If the SBank is not loaded or the student number is out of bounds,
+     * it returns a tuple of two empty strings.
+     *
+     * # Arguments
+     * * `student_number` - The 1-based index of the student to retrieve.
+     *
+     * # Returns
+     * - A tuple containing the name and ID of the student if the SBank is
+     *   loaded and the student number is valid.
+     * - A tuple of two empty strings if the SBank is not loaded or the student
+     *   number is invalid.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_student(1), NameId::new(String::new(), String::new()));
+     * // After loading an SBank with a student at index 0 with name "Alice" and ID "s123"
+     * // assert_eq!(control_tower.get_student(1), NameId::new("Alice".to_string(), "s123".to_string()));
+     * ```
+     * @param {number} student_number
+     * @returns {NameId}
+     */
+    get_student(student_number) {
+        const ret = wasm.controltower_get_student(this.__wbg_ptr, student_number);
+        return NameId.__wrap(ret);
+    }
+    /**
+     * Retrieves the number of students in the student bank (SBank).
+     *
+     * If the SBank is not loaded, it returns 0.
+     *
+     * # Returns
+     * - The number of students in the SBank if it is loaded and has students.
+     * - `0` if the SBank has no students or is not loaded.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_student_length(), 0);
+     * // After loading an SBank with 30 students
+     * // assert_eq!(control_tower.get_student_length(), 30);
+     * ```
+     * @returns {number}
+     */
+    get_student_length() {
+        const ret = wasm.controltower_get_student_length(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
      * Creates a new instance of `ControlTower` with default values.
      *
      * The `question_db` and `student_db` fields are initialized
@@ -274,6 +349,124 @@ export class ControlTower {
         this.__wbg_ptr = ret >>> 0;
         ControlTowerFinalization.register(this, this.__wbg_ptr, this);
         return this;
+    }
+    /**
+     * Adds a new student to the end of the SBank using the provided `NameId`.
+     *
+     * If the SBank is not loaded, this method does nothing.
+     *
+     * # Arguments
+     * * `name_id` - A `NameId` containing the name and ID of the student to add.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.push_student(NameId::new("Alice".to_string(), "s123".to_string()));
+     * // After loading an SBank, the student "Alice" with ID "s123" should be added to the end of the SBank.
+     * ```
+     * @param {NameId} name_id
+     */
+    push_student(name_id) {
+        _assertClass(name_id, NameId);
+        var ptr0 = name_id.__destroy_into_raw();
+        wasm.controltower_push_student(this.__wbg_ptr, ptr0);
+    }
+    /**
+     * Removes a student from the SBank by their 1-based index.
+     *
+     * If the SBank is not loaded or the student number is out of bounds,
+     * it returns `false`. Otherwise, it removes the student and returns `true`.
+     *
+     * # Arguments
+     * * `student_number` - The 1-based index of the student to remove.
+     *
+     * # Returns
+     * - `true` if the student was successfully removed.
+     * - `false` if the SBank is not loaded or the student number is invalid.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * assert_eq!(control_tower.remove_student(1), false);
+     * // After loading an SBank with a student at index 0
+     * // assert_eq!(control_tower.remove_student(1), true);
+     * ```
+     * @param {number} student_number
+     * @returns {boolean}
+     */
+    remove_student(student_number) {
+        const ret = wasm.controltower_remove_student(this.__wbg_ptr, student_number);
+        return ret !== 0;
+    }
+    /**
+     * Sets the text and correctness flag of a specific choice for a given question number
+     * in the QBank.
+     *
+     * If the QBank is not loaded, the question number is out of bounds,
+     * or the choice number is out of bounds, it returns `false`. Otherwise,
+     * it updates the choice and returns `true`.
+     *
+     * # Arguments
+     * * `question_number` - The index of the question to set the choice for (1-based).
+     * * `choice_number` - The index of the choice to set (1-based).
+     * * `choice_answer` - A `ChoiceAnswer` instance containing the new text
+     *   and correctness flag for the specified choice.
+     *
+     * # Returns
+     * - `true` if the choice was successfully updated.
+     * - `false` if the QBank is not loaded, the question number is invalid,
+     *   or the choice number is invalid.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.set_choice(1, 1, ChoiceAnswer::new("4".to_string(), true)), false);
+     * // After loading a QBank with a question at index 0 that has a choice at index 0
+     * // assert_eq!(control_tower.set_choice(1, 1, ChoiceAnswer::new("4".to_string(), true)), true);
+     * ```
+     * @param {number} question_number
+     * @param {number} choice_number
+     * @param {ChoiceAnswer} choice_answer
+     * @returns {boolean}
+     */
+    set_choice(question_number, choice_number, choice_answer) {
+        _assertClass(choice_answer, ChoiceAnswer);
+        var ptr0 = choice_answer.__destroy_into_raw();
+        const ret = wasm.controltower_set_choice(this.__wbg_ptr, question_number, choice_number, ptr0);
+        return ret !== 0;
+    }
+    /**
+     * Sets the group number for a given question number in the QBank.
+     *
+     * If the QBank is not loaded or the question number is out of bounds,
+     * it returns `false`. Otherwise, it updates the group number and returns `true`.
+     *
+     * # Arguments
+     * * `question_number` - The index of the question to set the group for (1-based).
+     * * `group` - The new group number to set for the specified question.
+     *
+     * # Returns
+     * - `true` if the group number was successfully updated.
+     * - `false` if the QBank is not loaded or the question number is invalid.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.set_group(1, 1), false);
+     * // After loading a QBank with a question at index 0
+     * // assert_eq!(control_tower.set_group(1, 1), true);
+     * ```
+     * @param {number} question_number
+     * @param {number} group
+     * @returns {boolean}
+     */
+    set_group(question_number, group) {
+        const ret = wasm.controltower_set_group(this.__wbg_ptr, question_number, group);
+        return ret !== 0;
     }
     /**
      * Loads the question bank (QBank) from a byte slice
@@ -319,6 +512,37 @@ export class ControlTower {
         }
     }
     /**
+     * Sets the question text for a given question number in the QBank.
+     * If the QBank is not loaded or the question number is out of bounds,
+     * it returns `false`. Otherwise, it updates the question text and returns `true`.
+     *
+     * # Arguments
+     * * `question_number` - The index of the question to set (1-based).
+     * * `txt` - The new question text to set for the specified question.
+     *
+     * # Returns
+     * - `true` if the question text was successfully updated.
+     * - `false` if the QBank is not loaded or the question number is invalid.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.set_question(1, "What is 2+2?".to_string()), false);
+     * // After loading a QBank with a question at index 0
+     * // assert_eq!(control_tower.set_question(1, "What is 2+2?".to_string()), true);
+     * ```
+     * @param {number} question_number
+     * @param {string} txt
+     * @returns {boolean}
+     */
+    set_question(question_number, txt) {
+        const ptr0 = passStringToWasm0(txt, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_set_question(this.__wbg_ptr, question_number, ptr0, len0);
+        return ret !== 0;
+    }
+    /**
      * Loads the student bank (SBank) from a byte slice
      * containing SQLite database data.
      *
@@ -361,11 +585,75 @@ export class ControlTower {
             throw takeFromExternrefTable0(ret[0]);
         }
     }
+    /**
+     * Sets the name and ID of a student by their 1-based index in the SBank.
+     *
+     * If the SBank is not loaded or the student number is out of bounds,
+     * it returns `false`. Otherwise, it updates the student's name and ID and returns `true`.
+     *
+     * # Arguments
+     * * `student_number` - The 1-based index of the student to set.
+     * * `name_id` - A `NameId` containing the new name and ID for the student.
+     *
+     * # Returns
+     * - `true` if the student's name and ID were successfully updated.
+     * - `false` if the SBank is not loaded or the student number is invalid.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.set_student(1, NameId::new("Alice".to_string(), "s123".to_string())), false);
+     * // After loading an SBank with a student at index 0
+     * // assert_eq!(control_tower.set_student(1, NameId::new("Alice".to_string(), "s123".to_string())), true);
+     * ```
+     * @param {number} student_number
+     * @param {NameId} name_id
+     * @returns {boolean}
+     */
+    set_student(student_number, name_id) {
+        _assertClass(name_id, NameId);
+        var ptr0 = name_id.__destroy_into_raw();
+        const ret = wasm.controltower_set_student(this.__wbg_ptr, student_number, ptr0);
+        return ret !== 0;
+    }
+    /**
+     * Writes the question bank (QBank) to a byte vector containing SQLite
+     * database data.
+     *
+     * This method creates an in-memory SQLite database, writes the QBank to it,
+     * and then saves the database to a byte vector.
+     *
+     * # Returns
+     * - `Ok(Vec<u8>)` containing the SQLite database data on success
+     * - `Err(ErrorMessage)` describing the failure on error.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * match control_tower.write_qbank_to_bytes_in_sqlite()
+     * {
+     *     Ok(data) => println!("QBank written to bytes successfully, size: {}", data.len()),
+     *     Err(e) => println!("Failed to write QBank to bytes: {:?}", e),
+     * }
+     * ```
+     * @returns {Uint8Array}
+     */
+    write_sbank_to_bytes_in_sqlite() {
+        const ret = wasm.controltower_write_sbank_to_bytes_in_sqlite(this.__wbg_ptr);
+        if (ret[3]) {
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v1;
+    }
 }
 if (Symbol.dispose) ControlTower.prototype[Symbol.dispose] = ControlTower.prototype.free;
 
 /**
- * @enum {0 | 1 | 2 | 3 | 4 | 5}
+ * @enum {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7}
  */
 export const ErrorMessage = Object.freeze({
     FailedToOpenQBank: 0, "0": "FailedToOpenQBank",
@@ -374,7 +662,135 @@ export const ErrorMessage = Object.freeze({
     FailedToOpenSExcel: 3, "3": "FailedToOpenSExcel",
     FailedToRecevieQBankFromMemory: 4, "4": "FailedToRecevieQBankFromMemory",
     FailedToRecevieSBankFromMemory: 5, "5": "FailedToRecevieSBankFromMemory",
+    FailedToWriteQBankToMemory: 6, "6": "FailedToWriteQBankToMemory",
+    FailedToWriteSBankToMemory: 7, "7": "FailedToWriteSBankToMemory",
 });
+
+export class NameId {
+    static __wrap(ptr) {
+        ptr = ptr >>> 0;
+        const obj = Object.create(NameId.prototype);
+        obj.__wbg_ptr = ptr;
+        NameIdFinalization.register(obj, obj.__wbg_ptr, obj);
+        return obj;
+    }
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        NameIdFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_nameid_free(ptr, 0);
+    }
+    /**
+     * Retrieves the ID from the `NameId` instance.
+     *
+     * # Returns
+     * A `String` containing the ID.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::NameId;
+     * let name_id = NameId::new("Alice".to_string(), "s123".to_string());
+     * assert_eq!(name_id.get_id(), "s123");
+     * ```
+     * @returns {string}
+     */
+    get_id() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.nameid_get_id(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * Retrieves the name from the `NameId` instance.
+     *
+     * # Returns
+     * A `String` containing the name.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::NameId;
+     * let name_id = NameId::new("Alice".to_string(), "s123".to_string());
+     * assert_eq!(name_id.get_name(), "Alice");
+     * ```
+     * @returns {string}
+     */
+    get_name() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.nameid_get_name(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * Creates a new `NameId` instance.
+     *
+     * # Arguments
+     * * `name` - The name associated with the ID.
+     * * `id` - The ID associated with the name.
+     *
+     * # Output
+     * `Self` - A new instance of `NameId`.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::NameId;
+     * let name_id = NameId::new("Alice".to_string(), "s123".to_string());
+     * assert_eq!(name_id.get_name(), "Alice");
+     * assert_eq!(name_id.get_id(), "s123");
+     * ```
+     * @param {string} name
+     * @param {string} id
+     */
+    constructor(name, id) {
+        const ptr0 = passStringToWasm0(name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.nameid_new(ptr0, len0, ptr1, len1);
+        this.__wbg_ptr = ret >>> 0;
+        NameIdFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * Creates a new empty `NameId` instance.
+     *
+     * # Arguments
+     * * `name` - The name associated with the ID.
+     * * `id` - The ID associated with the name.
+     *
+     * # Output
+     * `Self` - A new instance of `NameId`.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::NameId;
+     * let name_id = NameId::new_empty();
+     * assert_eq!(name_id.get_name(), "");
+     * assert_eq!(name_id.get_id(), "");
+     * ```
+     * @returns {NameId}
+     */
+    static new_empty() {
+        const ret = wasm.nameid_new_empty();
+        return NameId.__wrap(ret);
+    }
+}
+if (Symbol.dispose) NameId.prototype[Symbol.dispose] = NameId.prototype.free;
 
 /**
  * @param {string} input_data
@@ -487,11 +903,20 @@ const ChoiceAnswerFinalization = (typeof FinalizationRegistry === 'undefined')
 const ControlTowerFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_controltower_free(ptr >>> 0, 1));
+const NameIdFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_nameid_free(ptr >>> 0, 1));
 
 function addToExternrefTable0(obj) {
     const idx = wasm.__externref_table_alloc();
     wasm.__wbindgen_externrefs.set(idx, obj);
     return idx;
+}
+
+function _assertClass(instance, klass) {
+    if (!(instance instanceof klass)) {
+        throw new Error(`expected instance of ${klass.name}`);
+    }
 }
 
 function getArrayU8FromWasm0(ptr, len) {

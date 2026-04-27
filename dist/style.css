@@ -240,6 +240,15 @@ body.theme-web .sl-label {
     font-size: 12px;
 }
 
+.sl-full-name-input {
+    width: 350px;
+    height: 26px;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 0 8px;
+    font-size: 12px;
+}
+
 /* Self-study Styles */
 .ss-container {
     display: flex;

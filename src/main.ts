@@ -1,6 +1,6 @@
 import { translations } from './i18n.js';
 import type { SupportedLang } from './i18n.js'; // type 키워드 추가
-import init, { ControlTower } from './pkg/qrate_wasm.js';
+import init, { ControlTower, NameId } from './pkg/qrate_wasm.js';
 
 type AppTheme = 'theme-web' | 'theme-desktop';
 
@@ -11,9 +11,7 @@ interface QuestionState {
 }
 
 interface StudentState {
-    firstName: string;
-    patronymic: string;
-    lastName: string;
+    fullName: string;
     studentId: string;
     selected: boolean;
 }
@@ -26,6 +24,7 @@ class QuizWizardApp {
     private currentMenu: string = '';// [추가] 선택된 문제은행 파일의 경로를 저장할 필드
     private question_bank_file_name: string = '';
     private student_list_file_name: string = '';
+    private student_list_handle: any = null; // [추가] 학생 명단 파일 핸들 저장
     
     // 편집 중인 문제 데이터를 저장하는 배열
     private questionsData: QuestionState[] = [];
@@ -222,7 +221,7 @@ class QuizWizardApp {
         // 초기화 또는 데이터가 없는 경우 10명의 빈 학생 생성
         if (forceReset || this.studentsData.length === 0) {
             this.studentsData = Array.from({ length: 10 }, () => ({
-                firstName: '', patronymic: '', lastName: '', studentId: '', selected: false
+                fullName: '', studentId: '', selected: false
             }));
             if (forceReset) this.student_list_file_name = '';
         }
@@ -311,12 +310,8 @@ class QuizWizardApp {
         return `
             <div class="student-item">
                 <input type="checkbox" class="choice-check" ${data.selected ? 'checked' : ''}>
-                <div class="sl-label">${langData.actions['sl-first-name']}</div>
-                <input type="text" class="sl-input sl-fn" value="${data.firstName}">
-                <div class="sl-label">${langData.actions['sl-patronymic']}</div>
-                <input type="text" class="sl-input sl-pa" value="${data.patronymic}">
-                <div class="sl-label">${langData.actions['sl-last-name']}</div>
-                <input type="text" class="sl-input sl-ln" value="${data.lastName}">
+                <div class="sl-label">${langData.actions['sl-full-name']}</div>
+                <input type="text" class="sl-fullname sl-full-name-input" value="${data.fullName}">
                 <div class="sl-label">${langData.actions['sl-id']}</div>
                 <input type="text" class="sl-input sl-id" value="${data.studentId}">
             </div>
@@ -326,7 +321,7 @@ class QuizWizardApp {
     /** 새로운 학생 추가 */
     private addNewStudent() {
         this.saveCurrentStudentsToState();
-        const newStudent: StudentState = { firstName: '', patronymic: '', lastName: '', studentId: '', selected: false };
+        const newStudent: StudentState = { fullName: '', studentId: '', selected: false };
         this.studentsData.push(newStudent);
         
         const container = document.getElementById('student-list-container');
@@ -346,18 +341,14 @@ class QuizWizardApp {
 
         const newData: StudentState[] = [];
         container.querySelectorAll('.student-item').forEach(item => {
-            const fnInput = item.querySelector('.sl-fn') as HTMLInputElement;
-            const paInput = item.querySelector('.sl-pa') as HTMLInputElement;
-            const lnInput = item.querySelector('.sl-ln') as HTMLInputElement;
+            const fullNameInput = item.querySelector('.sl-fullname') as HTMLInputElement;
             const idInput = item.querySelector('.sl-id') as HTMLInputElement;
             const check = item.querySelector('.choice-check') as HTMLInputElement;
 
-            if (fnInput && paInput && lnInput && idInput && check) {
+            if (fullNameInput && idInput && check) {
                 newData.push({
                     selected: check.checked,
-                    firstName: fnInput.value,
-                    patronymic: paInput.value,
-                    lastName: lnInput.value,
+                    fullName: fullNameInput.value,
                     studentId: idInput.value
                 });
             }
@@ -1562,20 +1553,37 @@ class QuizWizardApp {
             });
 
             // 2. 파일 핸들 및 이름 저장
+            this.student_list_handle = handle;
             this.student_list_file_name = handle.name;
             
             // 3. 파일 객체 얻기 및 WASM 전달
             const file = await handle.getFile();
             const buffer = await file.arrayBuffer();
             this.control_tower.set_sbank_from_bytes_in_sqlite(new Uint8Array(buffer));
-            
+
+            // [추가] WASM 엔진으로부터 모든 학생 데이터 추출
+            const sLen = this.control_tower.get_student_length();
+            const newData: StudentState[] = [];
+
+            for (let i = 0; i < sLen; i++) {
+                const nameIdObj = this.control_tower.get_student(i + 1);
+                newData.push({
+                    fullName: nameIdObj.get_name(),
+                    studentId: nameIdObj.get_id(),
+                    selected: false
+                });
+            }
+
+            // 추출된 데이터가 있으면 반영, 없으면 빈 배열
+            this.studentsData = newData;
+
             // [수정] 현재 메뉴에 맞는 작업공간 유지 (파일 이름이 헤더에 나타남)
             if (this.currentMenu === 'exam-setting') {
                 this.initializeExamSettingWorkspace();
             } else {
-                this.initializeStudentListWorkspace(false);
+                // 학생명단 작업공간인 경우, skipSave=true로 호출하여 방금 로드한 데이터를 보호하며 UI 갱신
+                this.initializeStudentListWorkspace(false, true);
             }
-
         } catch (err: any) {
             if (err.name !== 'AbortError') {
                 console.error("파일 접근 오류:", err);
@@ -1583,8 +1591,83 @@ class QuizWizardApp {
         }
     }
     private editStudentList() { console.log("editStudentList() 호출됨"); }
-    private saveStudentList() { console.log("saveStudentList() 호출됨"); }
-    private saveAsStudentList() { console.log("saveAsStudentList() 호출됨"); }
+    private async saveStudentList() {
+        // 1. 현재 화면의 모든 입력 내용을 먼저 배열에 저장
+        this.saveCurrentStudentsToState();
+
+        // 2. WASM ControlTower 데이터 갱신
+        const oldLen = this.control_tower.get_student_length();
+        const newLen = this.studentsData.length;
+
+        // 기존 데이터 업데이트 및 새 데이터 추가
+        for (let i = 0; i < newLen; i++) {
+            const student = this.studentsData[i];
+            if (!student) continue; // TS18048 방지
+
+            // NameId 생성자 사용 (#[wasm_bindgen(constructor)] 반영)
+            const nameId = new NameId(student.fullName, student.studentId);
+            
+            if (i < oldLen) {
+                this.control_tower.set_student(i + 1, nameId);
+            } else {
+                this.control_tower.push_student(nameId);
+            }
+        }
+
+        // 남는 데이터 삭제 (뒤에서부터 삭제)
+        if (oldLen > newLen) {
+            for (let i = oldLen; i > newLen; i--) {
+                this.control_tower.remove_student(i);
+            }
+        }
+
+        // 3. 파일로 저장
+        try {
+            const bytes = this.control_tower.write_sbank_to_bytes_in_sqlite();
+            
+            if (this.student_list_handle) {
+                const writable = await this.student_list_handle.createWritable();
+                await writable.write(bytes);
+                await writable.close();
+                alert(this.currentLang === 'ko' ? "파일이 성공적으로 저장되었습니다." : "File saved successfully.");
+            } else {
+                // 핸들이 없으면 다른 이름으로 저장 호출
+                this.saveAsStudentList();
+            }
+        } catch (err: any) {
+            console.error("학생 명단 저장 중 오류 발생:", err);
+            alert(`저장 중 오류가 발생했습니다: ${err.message || err}`);
+        }
+
+        console.log("학생 명단 데이터가 WASM 엔진 및 파일에 성공적으로 저장되었습니다.");
+    }
+    private async saveAsStudentList() {
+        try {
+            const descriptions = {
+                ko: 'SQLite 학생 명단 데이터베이스',
+                en: 'SQLite Student List Database',
+                ru: 'База данных списка студентов SQLite'
+            };
+
+            const handle = await (window as any).showSaveFilePicker({
+                suggestedName: this.student_list_file_name || 'students.sbdb',
+                types: [{
+                    description: descriptions[this.currentLang] || descriptions.en,
+                    accept: { 'application/x-sqlite3': ['.sbdb'] }
+                }]
+            });
+
+            this.student_list_handle = handle;
+            this.student_list_file_name = handle.name;
+            
+            // 데이터 수집 후 저장 실행
+            await this.saveStudentList();
+        } catch (err: any) {
+            if (err.name !== 'AbortError') {
+                console.error("다른 이름으로 저장 중 오류 발생:", err);
+            }
+        }
+    }
 
     /* 시험 및 학습 관련 함수군 */
     private setExamScope() { console.log("setExamScope() 호출됨"); }
