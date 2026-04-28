@@ -409,6 +409,23 @@ export class ControlTower {
         return this;
     }
     /**
+     * Optimizes the question bank (QBank) by calling its `optimize` method.
+     *
+     * If the QBank is not loaded, this method does nothing.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.optimize_qbank();
+     * // After loading a QBank, it will be optimized
+     * control_tower.optimize_qbank();
+     * ```
+     */
+    optimize_qbank() {
+        wasm.controltower_optimize_qbank(this.__wbg_ptr);
+    }
+    /**
      * Pushes an empty question to the QBank.
      *
      * # Examples
@@ -479,6 +496,26 @@ export class ControlTower {
         wasm.controltower_push_student(this.__wbg_ptr, ptr0);
     }
     /**
+     * Removes a question from the QBank by its 1-based index.
+     *
+     * If the QBank is not loaded or the question number is out of bounds,
+     * it returns `false`. Otherwise, it removes the question and returns `true`.
+     *
+     * # Arguments
+     * * `question_number` - The 1-based index of the question to remove.
+     *
+     * # Returns
+     * - `true` if the question was successfully removed.
+     * - `false` if the QBank is not loaded or the question number is invalid.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.remove_question(1), false);
+     * // After loading a QBank with a question at index 0
+     * // assert_eq!(control_tower.remove_question(1), true);
+     * ```
      * @param {number} question_number
      * @returns {boolean}
      */

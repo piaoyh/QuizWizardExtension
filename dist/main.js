@@ -1346,45 +1346,7 @@ class QuizWizardApp {
             const buffer = await file.arrayBuffer();
             // WASM 엔진에 데이터 전달 (SQLite 형식)
             this.control_tower.set_qbank_from_bytes_in_sqlite(new Uint8Array(buffer));
-            // 1. WASM 엔진으로부터 모든 문제 데이터 추출
-            const qLen = this.control_tower.get_question_length();
-            const newData = [];
-            for (let i = 0; i < qLen; i++) {
-                const choicesLen = this.control_tower.get_choices_length(i + 1);
-                const choices = [];
-                for (let j = 0; j < choicesLen; j++) {
-                    const choiceObj = this.control_tower.get_choice(i + 1, j + 1);
-                    choices.push({
-                        text: choiceObj.get_text(),
-                        correct: choiceObj.is_correct()
-                    });
-                }
-                newData.push({
-                    group: this.control_tower.get_group(i + 1).toString(),
-                    text: this.control_tower.get_question(i + 1),
-                    choices: choices
-                });
-            }
-            // 2. 문제 카드가 데이터 개수에 맞게 자동 조정되도록 questionsData 교체
-            // (데이터가 0개면 기본 10개를 유지하거나 비울 수 있으나, 여기서는 로드된 데이터를 우선함)
-            if (newData.length > 0) {
-                this.questionsData = newData;
-            }
-            else {
-                // 데이터가 없는 경우 빈 상태로 초기화
-                this.questionsData = [];
-            }
-            // [수정] 현재 메뉴에 맞는 작업공간 유지 및 리렌더링 (UI가 데이터 길이에 맞게 자동 갱신됨)
-            if (this.currentMenu === 'exam-setting') {
-                this.initializeExamSettingWorkspace();
-            }
-            else if (this.currentMenu === 'self-study') {
-                this.initializeSelfStudyWorkspace();
-            }
-            else {
-                // 문제은행 작업공간인 경우, skipSave=true로 호출하여 방금 로드한 데이터를 보호하며 UI 갱신
-                this.initializeQuestionBankWorkspace(false, true);
-            }
+            this.putQuestionBankToWorkspace();
         }
         catch (err) {
             if (err.name !== 'AbortError') {
@@ -1392,6 +1354,52 @@ class QuizWizardApp {
                 alert(`파일을 여는 중 오류가 발생했습니다: ${err.message || err}`);
             }
         }
+    }
+    putQuestionBankToWorkspace() {
+        // 1. WASM 엔진으로부터 모든 문제 데이터 추출
+        const newData = this.convertQBank2QuestionData();
+        // 2. 문제 카드가 데이터 개수에 맞게 자동 조정되도록 questionsData 교체
+        // (데이터가 0개면 기본 10개를 유지하거나 비울 수 있으나, 여기서는 로드된 데이터를 우선함)
+        if (newData.length > 0) {
+            this.questionsData = newData;
+        }
+        else {
+            // 데이터가 없는 경우 빈 상태로 초기화
+            this.questionsData = [];
+        }
+        // [수정] 현재 메뉴에 맞는 작업공간 유지 및 리렌더링 (UI가 데이터 길이에 맞게 자동 갱신됨)
+        if (this.currentMenu === 'exam-setting') {
+            this.initializeExamSettingWorkspace();
+        }
+        else if (this.currentMenu === 'self-study') {
+            this.initializeSelfStudyWorkspace();
+        }
+        else {
+            // 문제은행 작업공간인 경우, skipSave=true로 호출하여 방금 로드한 데이터를 보호하며 UI 갱신
+            this.initializeQuestionBankWorkspace(false, true);
+        }
+    }
+    convertQBank2QuestionData() {
+        const qLen = this.control_tower.get_question_length();
+        const newData = [];
+        for (let i = 0; i < qLen; i++) {
+            const choicesLen = this.control_tower.get_choices_length(i + 1);
+            const choices = [];
+            for (let j = 0; j < choicesLen; j++) {
+                const choiceObj = this.control_tower.get_choice(i + 1, j + 1);
+                choices.push({
+                    text: choiceObj.get_text(),
+                    correct: choiceObj.is_correct()
+                });
+            }
+            newData.push({
+                group: this.control_tower.get_group(i + 1).toString(),
+                text: this.control_tower.get_question(i + 1),
+                choices: choices
+            });
+        }
+        console.log("convertQBank2QuestionData() 호출됨");
+        return newData;
     }
     editQuestionBank() { console.log("editQuestionBank() 호출됨"); }
     async saveQuestionBank() {
@@ -1429,58 +1437,8 @@ class QuizWizardApp {
     }
     async performQuestionBankSave(handle) {
         try {
-            // 현재 화면의 데이터를 questionsData 배열로 추출
-            this.saveCurrentQuestionsToState();
-            // 1. WASM ControlTower 데이터 갱신
-            const oldQLen = this.control_tower.get_question_length();
-            const newQLen = this.questionsData.length;
-            // 문제 데이터 업데이트 및 추가
-            for (let i = 0; i < newQLen; i++) {
-                const q = this.questionsData[i];
-                if (!q)
-                    continue; // TS18048 방지
-                const qIdx = i + 1; // 1-based index
-                if (i < oldQLen) {
-                    // 기존 문제 업데이트
-                    this.control_tower.set_question(qIdx, q.text);
-                    this.control_tower.set_group(qIdx, parseInt(q.group) || 0);
-                }
-                else {
-                    // 새 문제 추가
-                    this.control_tower.push_an_empty_question();
-                    this.control_tower.set_question(qIdx, q.text);
-                    this.control_tower.set_group(qIdx, parseInt(q.group) || 0);
-                }
-                // 선택지 처리
-                const oldCLen = this.control_tower.get_choices_length(qIdx);
-                const newCLen = q.choices.length;
-                for (let j = 0; j < newCLen; j++) {
-                    const c = q.choices[j];
-                    if (!c)
-                        continue; // TS18048 방지
-                    const cIdx = j + 1;
-                    const choiceMark = new ChoiceMark(c.text, c.correct);
-                    if (j < oldCLen) {
-                        this.control_tower.set_choice(qIdx, cIdx, choiceMark);
-                    }
-                    else {
-                        this.control_tower.push_choice(qIdx, c.text, c.correct);
-                    }
-                }
-                // 남는 선택지 삭제 (WASM에 remove_choice가 있는지 확인 필요, 없으면 빈 값으로 채우거나 대응)
-                // 만약 remove_choice가 없다면 일단 놔두거나 주인님께 여쭤봐야 함. 
-                // d.ts에 remove_choice가 없으므로 일단 업데이트만 진행합니다.
-            }
-            // 남는 문제 삭제 (뒤에서부터 삭제)
-            if (oldQLen > newQLen) {
-                for (let i = oldQLen; i > newQLen; i--) {
-                    this.control_tower.remove_question(i);
-                }
-            }
-            // 모든 문제에 대해 카테고리 재결정
-            for (let i = 0; i < newQLen; i++) {
-                this.control_tower.determine_category(i + 1);
-            }
+            // 1. WASM ControlTower 데이터 갱신 - 현재 화면의 입력값들을 questionsData 배열에 저장하고, 이를 WASM 엔진에 반영
+            this.extractQuestionDataFromWorkspace();
             // 2. WASM 엔진으로부터 SQLite 포맷의 바이트 열 추출
             const bytes = this.control_tower.write_qbank_to_bytes_in_sqlite();
             // 3. 파일 시스템 writable을 사용하여 데이터 저장
@@ -1496,7 +1454,66 @@ class QuizWizardApp {
             throw err;
         }
     }
-    optimizeQuestionBank() { console.log("optimizeQuestionBank() 호출됨"); }
+    extractQuestionDataFromWorkspace() {
+        // 현재 화면의 데이터를 questionsData 배열로 추출
+        this.saveCurrentQuestionsToState();
+        // WASM ControlTower 데이터 갱신
+        const oldQLen = this.control_tower.get_question_length();
+        const newQLen = this.questionsData.length;
+        // 문제 데이터 업데이트 및 추가
+        for (let i = 0; i < newQLen; i++) {
+            const q = this.questionsData[i];
+            if (!q)
+                continue; // TS18048 방지
+            const qIdx = i + 1; // 1-based index
+            if (i < oldQLen) {
+                // 기존 문제 업데이트
+                this.control_tower.set_question(qIdx, q.text);
+                this.control_tower.set_group(qIdx, parseInt(q.group) || 0);
+            }
+            else {
+                // 새 문제 추가
+                this.control_tower.push_an_empty_question();
+                this.control_tower.set_question(qIdx, q.text);
+                this.control_tower.set_group(qIdx, parseInt(q.group) || 0);
+            }
+            // 선택지 처리
+            const oldCLen = this.control_tower.get_choices_length(qIdx);
+            const newCLen = q.choices.length;
+            for (let j = 0; j < newCLen; j++) {
+                const c = q.choices[j];
+                if (!c)
+                    continue; // TS18048 방지
+                const cIdx = j + 1;
+                const choiceMark = new ChoiceMark(c.text, c.correct);
+                if (j < oldCLen) {
+                    this.control_tower.set_choice(qIdx, cIdx, choiceMark);
+                }
+                else {
+                    this.control_tower.push_choice(qIdx, c.text, c.correct);
+                }
+            }
+            // 남는 선택지 삭제 (WASM에 remove_choice가 있는지 확인 필요, 없으면 빈 값으로 채우거나 대응)
+            // 만약 remove_choice가 없다면 일단 놔두거나 주인님께 여쭤봐야 함. 
+            // d.ts에 remove_choice가 없으므로 일단 업데이트만 진행합니다.
+        }
+        // 남는 문제 삭제 (뒤에서부터 삭제)
+        if (oldQLen > newQLen) {
+            for (let i = oldQLen; i > newQLen; i--) {
+                this.control_tower.remove_question(i);
+            }
+        }
+        // 모든 문제에 대해 카테고리 재결정
+        for (let i = 0; i < newQLen; i++) {
+            this.control_tower.determine_category(i + 1);
+        }
+    }
+    optimizeQuestionBank() {
+        this.extractQuestionDataFromWorkspace();
+        this.control_tower.optimize_qbank();
+        this.putQuestionBankToWorkspace();
+        this.initializeQuestionBankWorkspace(false, true);
+    }
     /* 학생 명단 관련 함수군 */
     newStudentList() {
         this.initializeStudentListWorkspace(true);
