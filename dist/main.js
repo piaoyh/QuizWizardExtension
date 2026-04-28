@@ -320,6 +320,9 @@ class QuizWizardApp {
         this.currentQuestionIndex = 0;
         const langData = translations[this.currentLang] || translations['ko'];
         const title = langData.actions['ss-viewing'] || 'Taking an Exam';
+        const fileInfoHtml = this.question_bank_file_name
+            ? `<span class="file-info-label">[ ${this.question_bank_file_name} ]</span>`
+            : '';
         const submitBtnText = langData.actions['ss-submit-paper'] || 'Submit';
         const prevBtnText = langData.actions['ss-prev-question'] || '<-';
         const nextBtnText = langData.actions['ss-next-question'] || '->';
@@ -328,7 +331,7 @@ class QuizWizardApp {
             <div class="ss-container">
                 <div class="ss-main-view">
                     <div class="view-header">
-                        <h2>${title}</h2>
+                        <h2>${title}${fileInfoHtml}</h2>
                         <div class="ss-nav-controls">
                             <button class="ss-nav-btn" id="ss-prev-btn">${prevBtnText}</button>
                             <button class="ss-nav-btn" id="ss-next-btn">${nextBtnText}</button>
@@ -745,7 +748,10 @@ class QuizWizardApp {
         }
         let html = `
             <div class="view-header">
-                <h2>${title}${fileInfoHtml}</h2>
+                <div class="view-header-left">
+                    <h2>${title}</h2>
+                    ${fileInfoHtml}
+                </div>
                 <div class="view-actions">
                     ${actionButtonsHtml}
                     <button id="toggle-editor-mode-btn" style="margin-left: 5px;">${toggleBtnText}</button>
@@ -1271,10 +1277,16 @@ class QuizWizardApp {
         this.currentMenu = 'exam-setting';
         const langData = translations[this.currentLang] || translations['ko'];
         const title = langData.actions['ex-editing'] || 'Setting up Exam Paper';
+        const qbFileInfoHtml = this.question_bank_file_name
+            ? `<span class="file-info-label">[ ${this.question_bank_file_name} ]</span>`
+            : '';
+        const sbFileInfoHtml = this.student_list_file_name
+            ? `<span class="file-info-label">[ ${this.student_list_file_name} ]</span>`
+            : '';
         // 밴드(헤더) 영역
         let html = `
             <div class="view-header">
-                <h2>${title}</h2>
+                <h2>${title}${qbFileInfoHtml}${sbFileInfoHtml}</h2>
             </div>
             <div class="question-list-container" id="question-list">
         `;
