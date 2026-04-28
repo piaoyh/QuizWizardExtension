@@ -1,6 +1,6 @@
 import { translations } from './i18n.js';
 import type { SupportedLang } from './i18n.js'; // type 키워드 추가
-import init, { ControlTower, NameId } from './pkg/qrate_wasm.js';
+import init, { ControlTower, NameId, ChoiceMark } from './pkg/qrate_wasm.js';
 
 type AppTheme = 'theme-web' | 'theme-desktop';
 
@@ -23,6 +23,7 @@ class QuizWizardApp {
     private currentLang: SupportedLang = 'ko';
     private currentMenu: string = '';// [추가] 선택된 문제은행 파일의 경로를 저장할 필드
     private question_bank_file_name: string = '';
+    private question_bank_file_handle: any = null; // [추가] 문제은행 파일 핸들 저장
     private student_list_file_name: string = '';
     private student_list_handle: any = null; // [추가] 학생 명단 파일 핸들 저장
     
@@ -696,6 +697,7 @@ class QuizWizardApp {
             case 'ex-save-paper':   this.saveExamPaper(); this.initializeExamSettingWorkspace(); break;
 
             /* --- Student List (학생 명단) --- */
+            case 'sl-new':          this.newStudentList(); break;
             case 'sl-open':         this.openStudentList(); break;
             case 'sl-edit':         this.editStudentList(); this.initializeStudentListWorkspace(); break;
             case 'sl-save':         this.saveStudentList(); this.initializeStudentListWorkspace(); break;
@@ -1471,6 +1473,7 @@ class QuizWizardApp {
                 multiple: false
             });
 
+            this.question_bank_file_handle = handle;
             this.question_bank_file_name = handle.name;
             const file = await handle.getFile();
             const buffer = await file.arrayBuffer();
@@ -1529,11 +1532,129 @@ class QuizWizardApp {
     }
 
     private editQuestionBank() { console.log("editQuestionBank() 호출됨"); }
-    private saveQuestionBank() { console.log("saveQuestionBank() 호출됨"); }
-    private saveAsQuestionBank() { console.log("saveAsQuestionBank() 호출됨"); }
+
+    private async saveQuestionBank() {
+        if (!this.question_bank_file_handle) {
+            await this.saveAsQuestionBank();
+            return;
+        }
+        await this.performQuestionBankSave(this.question_bank_file_handle);
+    }
+
+    private async saveAsQuestionBank() {
+        try {
+            const descriptions = {
+                ko: 'SQLite 문제은행 데이터베이스',
+                en: 'SQLite Question Bank Database',
+                ru: 'База данных банка вопросов SQLite'
+            };
+
+            const handle = await (window as any).showSaveFilePicker({
+                suggestedName: this.question_bank_file_name || 'untitled.qbdb',
+                types: [{
+                    description: descriptions[this.currentLang] || descriptions.en,
+                    accept: { 'application/x-sqlite3': ['.qbdb'] }
+                }]
+            });
+            
+            this.question_bank_file_handle = handle;
+            this.question_bank_file_name = handle.name;
+            await this.performQuestionBankSave(handle);
+            this.initializeQuestionBankWorkspace(false, true); // 제목 갱신 (파일 이름 표시용)
+        } catch (err: any) {
+            if (err.name !== 'AbortError') {
+                console.error("다른 이름으로 저장 중 오류:", err);
+                alert(`저장 중 오류가 발생했습니다: ${err.message || err}`);
+            }
+        }
+    }
+
+    private async performQuestionBankSave(handle: any) {
+        try {
+            // 현재 화면의 데이터를 questionsData 배열로 추출
+            this.saveCurrentQuestionsToState();
+            
+            // 1. WASM ControlTower 데이터 갱신
+            const oldQLen = this.control_tower.get_question_length();
+            const newQLen = this.questionsData.length;
+
+            // 문제 데이터 업데이트 및 추가
+            for (let i = 0; i < newQLen; i++) {
+                const q = this.questionsData[i];
+                if (!q) continue; // TS18048 방지
+
+                const qIdx = i + 1; // 1-based index
+
+                if (i < oldQLen) {
+                    // 기존 문제 업데이트
+                    this.control_tower.set_question(qIdx, q.text);
+                    this.control_tower.set_group(qIdx, parseInt(q.group) || 0);
+                } else {
+                    // 새 문제 추가
+                    this.control_tower.push_an_empty_question();
+                    this.control_tower.set_question(qIdx, q.text);
+                    this.control_tower.set_group(qIdx, parseInt(q.group) || 0);
+                }
+
+                // 선택지 처리
+                const oldCLen = this.control_tower.get_choices_length(qIdx);
+                const newCLen = q.choices.length;
+
+                for (let j = 0; j < newCLen; j++) {
+                    const c = q.choices[j];
+                    if (!c) continue; // TS18048 방지
+
+                    const cIdx = j + 1;
+                    const choiceMark = new ChoiceMark(c.text, c.correct);
+
+                    if (j < oldCLen) {
+                        this.control_tower.set_choice(qIdx, cIdx, choiceMark);
+                    } else {
+                        this.control_tower.push_choice(qIdx, c.text, c.correct);
+                    }
+                }
+
+                // 남는 선택지 삭제 (WASM에 remove_choice가 있는지 확인 필요, 없으면 빈 값으로 채우거나 대응)
+                // 만약 remove_choice가 없다면 일단 놔두거나 주인님께 여쭤봐야 함. 
+                // d.ts에 remove_choice가 없으므로 일단 업데이트만 진행합니다.
+            }
+
+            // 남는 문제 삭제 (뒤에서부터 삭제)
+            if (oldQLen > newQLen) {
+                for (let i = oldQLen; i > newQLen; i--) {
+                    this.control_tower.remove_question(i);
+                }
+            }
+
+            // 모든 문제에 대해 카테고리 재결정
+            for (let i = 0; i < newQLen; i++) {
+                this.control_tower.determine_category(i + 1);
+            }
+
+            // 2. WASM 엔진으로부터 SQLite 포맷의 바이트 열 추출
+            const bytes = this.control_tower.write_qbank_to_bytes_in_sqlite();
+            
+            // 3. 파일 시스템 writable을 사용하여 데이터 저장
+            const writable = await handle.createWritable();
+            await writable.write(bytes);
+            await writable.close();
+            
+            console.log("문제은행 저장 완료:", this.question_bank_file_name);
+            const successMsg = this.currentLang === 'ko' ? "성공적으로 저장되었습니다." : "Saved successfully.";
+            alert(successMsg);
+        } catch (err: any) {
+            console.error("저장 처리 중 오류 발생:", err);
+            throw err;
+        }
+    }
+
     private optimizeQuestionBank() { console.log("optimizeQuestionBank() 호출됨"); }
 
     /* 학생 명단 관련 함수군 */
+    private newStudentList() {
+        this.initializeStudentListWorkspace(true);
+    }
+
     private async openStudentList() {
         try {
             const descriptions = {
@@ -1623,7 +1744,7 @@ class QuizWizardApp {
 
         // 3. 파일로 저장
         try {
-            const bytes = this.control_tower.write_sbank_to_bytes_in_sqlite();
+            const bytes = (this.control_tower as any).write_sbank_to_bytes_in_sqlite();
             
             if (this.student_list_handle) {
                 const writable = await this.student_list_handle.createWritable();

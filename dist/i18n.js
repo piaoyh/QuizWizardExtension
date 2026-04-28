@@ -2,7 +2,7 @@ export const translations = {
     ko: {
         menus: {
             "question-bank": "문제 은행",
-            "exam-setting": "시험문제 만들기",
+            "exam-setting": "시험 문제 출제",
             "student-list": "학생 명단",
             "self-study": "자기 주도 학습",
             "settings": "설정",
@@ -35,6 +35,7 @@ export const translations = {
             "ex-change-scope": "범위 변경",
             "ex-save-paper": "시험지 저장",
             // Student List 전용 액션
+            "sl-new": "새로 만들기",
             "sl-open": "열기",
             "sl-edit": "편집",
             "sl-save": "저장",
@@ -98,6 +99,7 @@ export const translations = {
             "ex-load-students": "Load a student list",
             "ex-change-scope": "Change a scope",
             "ex-save-paper": "Save exam paper",
+            "sl-new": "New",
             "sl-open": "Open",
             "sl-edit": "Edit",
             "sl-save": "Save",
@@ -159,6 +161,7 @@ export const translations = {
             "ex-load-students": "Загрузить список студентов",
             "ex-change-scope": "Изменить объём",
             "ex-save-paper": "Сохранить экзаменационный лист",
+            "sl-new": "Создать",
             "sl-open": "Открыть",
             "sl-edit": "Редактировать",
             "sl-save": "Сохранить",

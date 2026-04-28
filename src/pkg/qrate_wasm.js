@@ -1,22 +1,22 @@
 /* @ts-self-types="./qrate_wasm.d.ts" */
 
-export class ChoiceAnswer {
+export class ChoiceMark {
     static __wrap(ptr) {
         ptr = ptr >>> 0;
-        const obj = Object.create(ChoiceAnswer.prototype);
+        const obj = Object.create(ChoiceMark.prototype);
         obj.__wbg_ptr = ptr;
-        ChoiceAnswerFinalization.register(obj, obj.__wbg_ptr, obj);
+        ChoiceMarkFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-        ChoiceAnswerFinalization.unregister(this);
+        ChoiceMarkFinalization.unregister(this);
         return ptr;
     }
     free() {
         const ptr = this.__destroy_into_raw();
-        wasm.__wbg_choiceanswer_free(ptr, 0);
+        wasm.__wbg_choicemark_free(ptr, 0);
     }
     /**
      * Retrieves the text of the choice answer.
@@ -36,7 +36,7 @@ export class ChoiceAnswer {
         let deferred1_0;
         let deferred1_1;
         try {
-            const ret = wasm.choiceanswer_get_text(this.__wbg_ptr);
+            const ret = wasm.choicemark_get_text(this.__wbg_ptr);
             deferred1_0 = ret[0];
             deferred1_1 = ret[1];
             return getStringFromWasm0(ret[0], ret[1]);
@@ -59,7 +59,7 @@ export class ChoiceAnswer {
      * @returns {boolean}
      */
     is_correct() {
-        const ret = wasm.choiceanswer_is_correct(this.__wbg_ptr);
+        const ret = wasm.choicemark_is_correct(this.__wbg_ptr);
         return ret !== 0;
     }
     /**
@@ -85,13 +85,13 @@ export class ChoiceAnswer {
     constructor(text, is_correct) {
         const ptr0 = passStringToWasm0(text, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.choiceanswer_new(ptr0, len0, is_correct);
+        const ret = wasm.choicemark_new(ptr0, len0, is_correct);
         this.__wbg_ptr = ret >>> 0;
-        ChoiceAnswerFinalization.register(this, this.__wbg_ptr, this);
+        ChoiceMarkFinalization.register(this, this.__wbg_ptr, this);
         return this;
     }
 }
-if (Symbol.dispose) ChoiceAnswer.prototype[Symbol.dispose] = ChoiceAnswer.prototype.free;
+if (Symbol.dispose) ChoiceMark.prototype[Symbol.dispose] = ChoiceMark.prototype.free;
 
 export class ControlTower {
     __destroy_into_raw() {
@@ -103,6 +103,34 @@ export class ControlTower {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_controltower_free(ptr, 0);
+    }
+    /**
+     * Determines the category for a given question number in the QBank.
+     *
+     * This method uses the `determine_category` function of the QBank to
+     * determine the category for the specified question.
+     *
+     * # Arguments
+     * * `question_number` - The 1-based index of the question for which to determine the category.
+     *
+     * # Returns
+     * * `true` if the category was successfully determined and set.
+     * * `false` if the question number is out of bounds or the QBank is not loaded.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.push_an_empty_question();
+     * control_tower.determine_category(1);
+     * assert!(control_tower.get_category(1), 4);
+     * ```
+     * @param {number} question_number
+     * @returns {boolean}
+     */
+    determine_category(question_number) {
+        const ret = wasm.controltower_determine_category(this.__wbg_ptr, question_number);
+        return ret !== 0;
     }
     /**
      * @returns {Uint8Array}
@@ -117,11 +145,41 @@ export class ControlTower {
         return v1;
     }
     /**
+     * Retrieves the category number for a given question number from the QBank.
+     *
+     * If the QBank is not loaded or the question number is out of bounds,
+     * it returns `0`.
+     *
+     * # Arguments
+     * * `question_number` - The index of the question to retrieve the category for (1-based).
+     *
+     * # Returns
+     * - The category number for the specified question if the QBank is loaded
+     *   and the question number is valid.
+     * - `0` if the QBank is not loaded or the question number is invalid.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_category(1), 0);
+     * // After loading a QBank with a question at index 0 that belongs to category
+     * // assert_eq!(control_tower.get_category(1), 1);
+     * // for single answer of multiple-choice
+     * ```
+     * @param {number} question_number
+     * @returns {number}
+     */
+    get_category(question_number) {
+        const ret = wasm.controltower_get_category(this.__wbg_ptr, question_number);
+        return ret;
+    }
+    /**
      * Retrieves the text of a specific choice for a given question number
      * from the QBank.
      *
      *  If the QBank is not loaded, the question number is out of bounds,
-     *  or the choice number is out of bounds, it returns a `ChoiceAnswer`
+     *  or the choice number is out of bounds, it returns a `ChoiceMark`
      * instance with an empty text and `false` correctness flag.
      *
      * # Arguments
@@ -129,28 +187,28 @@ export class ControlTower {
      * * `choice_number` - The index of the choice to retrieve (1-based).
      *
      * # Returns
-     * A `ChoiceAnswer` instance containing the text and correctness flag of
+     * A `ChoiceMark` instance containing the text and correctness flag of
      * the specified choice.
      * - If the QBank is not loaded, the question number is invalid,
      *   or the choice number is invalid,
-     *   it returns a `ChoiceAnswer` instance with an empty text and
+     *   it returns a `ChoiceMark` instance with an empty text and
      *   `false` correctness flag.
      *
      * # Examples
      * ```
      * use qrate_wasm::ControlTower;
      * let control_tower = ControlTower::new();
-     * assert_eq!(control_tower.get_choice(1, 1), ChoiceAnswer::new(String::new(), false));
+     * assert_eq!(control_tower.get_choice(1, 1), ChoiceMark::new(String::new(), false));
      * // After loading a QBank with a question at index 0 that has a choice at index 0 with text "4"
-     * // assert_eq!(control_tower.get_choice(1, 1), ChoiceAnswer::new("4".to_string(), true));
+     * // assert_eq!(control_tower.get_choice(1, 1), ChoiceMark::new("4".to_string(), true));
      * ```
      * @param {number} question_number
      * @param {number} choice_number
-     * @returns {ChoiceAnswer}
+     * @returns {ChoiceMark}
      */
     get_choice(question_number, choice_number) {
         const ret = wasm.controltower_get_choice(this.__wbg_ptr, question_number, choice_number);
-        return ChoiceAnswer.__wrap(ret);
+        return ChoiceMark.__wrap(ret);
     }
     /**
      * Retrieves the number of choices for a given question number from the QBank.
@@ -351,6 +409,54 @@ export class ControlTower {
         return this;
     }
     /**
+     * Pushes an empty question to the QBank.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.push_an_empty_question();
+     * assert_eq!(control_tower.get_question_length(), 1);
+     * ```
+     */
+    push_an_empty_question() {
+        wasm.controltower_push_an_empty_question(this.__wbg_ptr);
+    }
+    /**
+     * Adds a new choice to a specific question in the QBank.
+     *
+     * If the QBank is not loaded or the question number is out of bounds,
+     * it returns `false`. Otherwise, it adds the choice and returns `true`.
+     *
+     * # Arguments
+     * * `question_number` - The index of the question to add the choice to (1-based).
+     * * `choice` - The text of the new choice.
+     * * `answer` - The correctness flag for the new choice.
+     *
+     * # Returns
+     * - `true` if the choice was successfully added.
+     * - `false` if the QBank is not loaded or the question number is invalid.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.push_choice(1, "4".to_string(), true), false);
+     * // After loading a QBank with a question at index 0
+     * // assert_eq!(control_tower.push_choice(1, "4".to_string(), true), true);
+     * ```
+     * @param {number} question_number
+     * @param {string} choice
+     * @param {boolean} answer
+     * @returns {boolean}
+     */
+    push_choice(question_number, choice, answer) {
+        const ptr0 = passStringToWasm0(choice, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_push_choice(this.__wbg_ptr, question_number, ptr0, len0, answer);
+        return ret !== 0;
+    }
+    /**
      * Adds a new student to the end of the SBank using the provided `NameId`.
      *
      * If the SBank is not loaded, this method does nothing.
@@ -371,6 +477,14 @@ export class ControlTower {
         _assertClass(name_id, NameId);
         var ptr0 = name_id.__destroy_into_raw();
         wasm.controltower_push_student(this.__wbg_ptr, ptr0);
+    }
+    /**
+     * @param {number} question_number
+     * @returns {boolean}
+     */
+    remove_question(question_number) {
+        const ret = wasm.controltower_remove_question(this.__wbg_ptr, question_number);
+        return ret !== 0;
     }
     /**
      * Removes a student from the SBank by their 1-based index.
@@ -401,6 +515,36 @@ export class ControlTower {
         return ret !== 0;
     }
     /**
+     * Sets the category number for a given question number in the QBank.
+     *
+     * If the QBank is not loaded or the question number is out of bounds,
+     * it returns `false`. Otherwise, it updates the category number and returns `true`.
+     *
+     * # Arguments
+     * * `question_number` - The index of the question to set the category for (1-based).
+     * * `category` - The new category number to set for the specified question.
+     *
+     * # Returns
+     * - `true` if the category number was successfully updated.
+     * - `false` if the QBank is not loaded or the question number is invalid.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.set_category(1, 1), false);
+     * // After loading a QBank with a question at index 0
+     * // assert_eq!(control_tower.set_category(1, 1), true);
+     * ```
+     * @param {number} question_number
+     * @param {number} category
+     * @returns {boolean}
+     */
+    set_category(question_number, category) {
+        const ret = wasm.controltower_set_category(this.__wbg_ptr, question_number, category);
+        return ret !== 0;
+    }
+    /**
      * Sets the text and correctness flag of a specific choice for a given question number
      * in the QBank.
      *
@@ -411,7 +555,7 @@ export class ControlTower {
      * # Arguments
      * * `question_number` - The index of the question to set the choice for (1-based).
      * * `choice_number` - The index of the choice to set (1-based).
-     * * `choice_answer` - A `ChoiceAnswer` instance containing the new text
+     * * `choice_answer` - A `ChoiceMark` instance containing the new text
      *   and correctness flag for the specified choice.
      *
      * # Returns
@@ -423,17 +567,17 @@ export class ControlTower {
      * ```
      * use qrate_wasm::ControlTower;
      * let control_tower = ControlTower::new();
-     * assert_eq!(control_tower.set_choice(1, 1, ChoiceAnswer::new("4".to_string(), true)), false);
+     * assert_eq!(control_tower.set_choice(1, 1, ChoiceMark::new("4".to_string(), true)), false);
      * // After loading a QBank with a question at index 0 that has a choice at index 0
-     * // assert_eq!(control_tower.set_choice(1, 1, ChoiceAnswer::new("4".to_string(), true)), true);
+     * // assert_eq!(control_tower.set_choice(1, 1, ChoiceMark::new("4".to_string(), true)), true);
      * ```
      * @param {number} question_number
      * @param {number} choice_number
-     * @param {ChoiceAnswer} choice_answer
+     * @param {ChoiceMark} choice_answer
      * @returns {boolean}
      */
     set_choice(question_number, choice_number, choice_answer) {
-        _assertClass(choice_answer, ChoiceAnswer);
+        _assertClass(choice_answer, ChoiceMark);
         var ptr0 = choice_answer.__destroy_into_raw();
         const ret = wasm.controltower_set_choice(this.__wbg_ptr, question_number, choice_number, ptr0);
         return ret !== 0;
@@ -555,7 +699,7 @@ export class ControlTower {
      *
      * # Arguments
      * * `data` - A byte slice containing the SQLite database data
-     *  for the student bank
+     *   for the student bank
      *
      * # Returns
      * - `Ok(())` on success
@@ -636,6 +780,38 @@ export class ControlTower {
      * {
      *     Ok(data) => println!("QBank written to bytes successfully, size: {}", data.len()),
      *     Err(e) => println!("Failed to write QBank to bytes: {:?}", e),
+     * }
+     * ```
+     * @returns {Uint8Array}
+     */
+    write_qbank_to_bytes_in_sqlite() {
+        const ret = wasm.controltower_write_qbank_to_bytes_in_sqlite(this.__wbg_ptr);
+        if (ret[3]) {
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v1;
+    }
+    /**
+     * Writes the student bank (SBank) to a byte vector containing SQLite
+     * database data.
+     *
+     * This method creates an in-memory SQLite database, writes the SBank to it,
+     * and then saves the database to a byte vector.
+     *
+     * # Returns
+     * - `Ok(Vec<u8>)` containing the SQLite database data on success
+     * - `Err(ErrorMessage)` describing the failure on error.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * match control_tower.write_sbank_to_bytes_in_sqlite()
+     * {
+     *     Ok(data) => println!("SBank written to bytes successfully, size: {}", data.len()),
+     *     Err(e) => println!("Failed to write SBank to bytes: {:?}", e),
      * }
      * ```
      * @returns {Uint8Array}
@@ -897,9 +1073,9 @@ function __wbg_get_imports() {
     };
 }
 
-const ChoiceAnswerFinalization = (typeof FinalizationRegistry === 'undefined')
+const ChoiceMarkFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_choiceanswer_free(ptr >>> 0, 1));
+    : new FinalizationRegistry(ptr => wasm.__wbg_choicemark_free(ptr >>> 0, 1));
 const ControlTowerFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_controltower_free(ptr >>> 0, 1));
