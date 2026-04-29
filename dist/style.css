@@ -56,6 +56,12 @@ body.theme-web .app-logo { color: #3498db; }
 }
 .submenu-item:hover { background-color: var(--active-bg); color: var(--active-text); }
 
+.submenu-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 #view-container { flex: 1; padding: 10px 25px; overflow: hidden; display: flex; flex-direction: column; }
 
 /* Question Editor Styles */

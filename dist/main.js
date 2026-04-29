@@ -22,6 +22,8 @@ class QuizWizardApp {
     focusedQuestionIndex = null;
     // 현재 포커스된 선택지의 인덱스 (0-based)
     focusedChoiceIndex = null;
+    // 시험 출제 범위 설정
+    scopeSettings = { start: 1, end: 0, count: 0 };
     // 문제은행 편집 모드 ('question' 또는 'choice')
     editorMode = 'question';
     constructor() {
@@ -51,8 +53,22 @@ class QuizWizardApp {
         this.initLanguageDialog(); // 대화상자 이벤트 초기화
         this.initThemeDialog(); // 테마 대화상자 이벤트 초기화
         this.initSubmitDialog(); // 제출 확인 대화상자 이벤트 초기화
+        this.initScopeDialog(); // 범위 설정 대화상자 이벤트 초기화
         // 앱 시작 시 문제은행 편집 작업영역으로 시작
         this.initializeQuestionBankWorkspace();
+        this.updateMenuActivation();
+    }
+    /** 메뉴 활성화 상태 업데이트 */
+    updateMenuActivation() {
+        const scopeMenu = document.querySelector('[data-action="ex-change-scope"]');
+        if (scopeMenu) {
+            if (this.question_bank_file_handle) {
+                scopeMenu.classList.remove('disabled');
+            }
+            else {
+                scopeMenu.classList.add('disabled');
+            }
+        }
     }
     /**
      * 답안지 제출 확인 대화상자 초기화
@@ -123,8 +139,45 @@ class QuizWizardApp {
             dialog.close();
         });
     }
-    /**
-     * i18n 데이터를 기반으로 모든 HTML 요소의 텍스트 갱신
+    initScopeDialog() {
+        const dialog = document.getElementById('scope-dialog');
+        const confirmBtn = document.getElementById('scope-confirm-btn');
+        const cancelBtn = document.getElementById('scope-cancel-btn');
+        if (!dialog || !confirmBtn || !cancelBtn)
+            return;
+        confirmBtn.addEventListener('click', () => {
+            const startInput = document.getElementById('scope-start');
+            const endInput = document.getElementById('scope-end');
+            const countInput = document.getElementById('scope-count');
+            this.scopeSettings = {
+                start: parseInt(startInput.value) || 1,
+                end: parseInt(endInput.value) || this.questionsData.length,
+                count: parseInt(countInput.value) || 0
+            };
+            dialog.close();
+            this.initializeExamSettingWorkspace();
+        });
+        cancelBtn.addEventListener('click', () => {
+            dialog.close();
+        });
+    }
+    /** 범위 설정 대화상자를 엽니다. */
+    setExamScope() {
+        const dialog = document.getElementById('scope-dialog');
+        if (!dialog)
+            return;
+        const startInput = document.getElementById('scope-start');
+        const endInput = document.getElementById('scope-end');
+        const countInput = document.getElementById('scope-count');
+        // 초기값 설정
+        startInput.value = "1";
+        endInput.value = this.questionsData.length.toString();
+        // 중복 없는 그룹 번호 개수 계산
+        const groups = new Set(this.questionsData.map(q => q.group).filter(g => g.trim() !== ''));
+        countInput.value = groups.size.toString();
+        dialog.showModal();
+    }
+    /** i18n 데이터를 기반으로 모든 HTML 요소의 텍스트 갱신
      */
     updateUILanguage() {
         const langData = translations[this.currentLang];
@@ -187,7 +240,7 @@ class QuizWizardApp {
         }
         const langData = translations[this.currentLang] || translations['ko'];
         const title = langData.actions['sl-editing'] || 'Editing Student List';
-        const addBtnText = this.currentLang === 'ko' ? "+ 학생 추가" : (this.currentLang === 'ru' ? "+ Добавить студента" : "+ Add Student");
+        const addBtnText = this.currentLang === 'ko' ? "+ 학생 추가" : (this.currentLang === 'ru' ? "+ Добавить студента" : (this.currentLang === 'ky' ? "+ Студент кошуу" : "+ Add Student"));
         const selectAllText = langData.actions['sl-select-all'] || 'Select All';
         const invertText = langData.actions['sl-invert-selection'] || 'Invert';
         const removeText = langData.actions['sl-remove-selected'] || '- Remove';
@@ -247,7 +300,7 @@ class QuizWizardApp {
         const beforeCount = this.studentsData.length;
         this.studentsData = this.studentsData.filter(s => !s.selected);
         if (this.studentsData.length === beforeCount) {
-            alert(this.currentLang === 'ko' ? "삭제할 학생을 선택해 주세요." : "Please select students to remove.");
+            alert(this.currentLang === 'ko' ? "삭제할 학생을 선택해 주세요." : (this.currentLang === 'ky' ? "Өчүрүү үчүн студенттерди тандаңыз." : "Please select students to remove."));
             return;
         }
         this.initializeStudentListWorkspace(false, true);
@@ -481,22 +534,33 @@ class QuizWizardApp {
         const submitTitle = document.getElementById('submit-dialog-title');
         if (submitTitle)
             submitTitle.textContent = langData.actions['ss-submit-paper'];
+        const scopeTitle = document.getElementById('scope-dialog-title');
+        if (scopeTitle)
+            scopeTitle.textContent = langData.actions['st-scope-title'];
+        const scopeGuide = document.getElementById('scope-guide');
+        if (scopeGuide)
+            scopeGuide.textContent = langData.actions['st-scope-guide'];
+        const scopeCountLabel = document.getElementById('scope-count-label');
+        if (scopeCountLabel)
+            scopeCountLabel.textContent = langData.actions['st-scope-count-label'];
         const submitMsg = document.getElementById('submit-dialog-msg');
         if (submitMsg) {
             const msgs = {
                 ko: "정말로 답안지를 제출하시겠습니까? 제출 후에는 수정할 수 없습니다.",
                 en: "Are you sure you want to submit your answers? You cannot edit them after submission.",
-                ru: "Вы уверены, что хотите сдать ответы? После сдачи редактирование будет невозможно."
+                ru: "Вы уверены, что хотите сдать ответы? После сдачи редактирование будет невозможно.",
+                ky: "Чын эле жоопторду тапшырууну каалайсызбы? Тапшыргандан кийин аларды түзөтүү мүмкүн эмес."
             };
             submitMsg.textContent = msgs[this.currentLang] || msgs.en;
         }
         // 라디오 버튼 라벨 갱신 (언어)
-        const fixedLangLabels = ["한국어", "English", "Русский"];
+        const fixedLangLabels = ["한국어", "English", "Русский", "Кыргызча"];
         // 테마 목록은 현재 언어 설정을 따름
         const themeLabels = {
             ko: ["데스크탑 앱 스타일", "웹 스타일"],
             en: ["Desktop App Style", "Web Style"],
-            ru: ["Стиль рабочего стола", "Веб-стиль"]
+            ru: ["Стиль рабочего стола", "Веб-стиль"],
+            ky: ["Иш тактасынын стили", "Веб стили"]
         };
         const currentThemeLabels = themeLabels[this.currentLang] || themeLabels.en;
         const langDialog = document.getElementById('lang-dialog');
@@ -525,7 +589,8 @@ class QuizWizardApp {
         const btnLabels = {
             ko: { ok: "확인", cancel: "취소" },
             en: { ok: "OK", cancel: "Cancel" },
-            ru: { ok: "OK", cancel: "Отмена" }
+            ru: { ok: "OK", cancel: "Отмена" },
+            ky: { ok: "OK", cancel: "Жокко чыгаруу" }
         };
         const btnText = btnLabels[this.currentLang] || btnLabels.en;
         document.querySelectorAll('.modal-actions button').forEach(btn => {
@@ -600,8 +665,8 @@ class QuizWizardApp {
             case 'qb-open':
                 this.openQuestionBank();
                 break; // 추가됨
-            case 'qb-edit':
-                this.editQuestionBank();
+            case 'qb-stat':
+                this.statQuestionBank();
                 break; // 추가됨
             case 'qb-save':
                 this.saveQuestionBank();
@@ -621,11 +686,9 @@ class QuizWizardApp {
                 break;
             case 'ex-change-scope':
                 this.setExamScope();
-                this.initializeExamSettingWorkspace();
                 break;
             case 'ex-save-paper':
                 this.saveExamPaper();
-                this.initializeExamSettingWorkspace();
                 break;
             /* --- Student List (학생 명단) --- */
             case 'sl-new':
@@ -894,7 +957,7 @@ class QuizWizardApp {
     addNewChoice() {
         const idx = this.focusedQuestionIndex;
         if (idx === null || !this.questionsData[idx]) {
-            alert(this.currentLang === 'ko' ? "선택지를 추가할 문제를 선택해 주세요." : "Please select a question to add a choice.");
+            alert(this.currentLang === 'ko' ? "선택지를 추가할 문제를 선택해 주세요." : (this.currentLang === 'ky' ? "Вариант кошуу үчүн суроону тандаңыз." : "Please select a question to add a choice."));
             return;
         }
         this.saveCurrentQuestionsToState();
@@ -920,11 +983,11 @@ class QuizWizardApp {
         const qIdx = this.focusedQuestionIndex;
         const cIdx = this.focusedChoiceIndex;
         if (qIdx === null || !this.questionsData[qIdx]) {
-            alert(this.currentLang === 'ko' ? "문제를 먼저 선택해 주세요." : "Please select a question.");
+            alert(this.currentLang === 'ko' ? "문제를 먼저 선택해 주세요." : (this.currentLang === 'ky' ? "Алгач суроону тандаңыз." : "Please select a question."));
             return;
         }
         if (cIdx === null || !this.questionsData[qIdx].choices[cIdx]) {
-            alert(this.currentLang === 'ko' ? "삭제할 선택지를 지정해 주세요." : "Please specify the choice to delete.");
+            alert(this.currentLang === 'ko' ? "삭제할 선택지를 지정해 주세요." : (this.currentLang === 'ky' ? "Өчүрүлө турган вариантты белгилеңиз." : "Please specify the choice to delete."));
             return;
         }
         this.saveCurrentQuestionsToState();
@@ -936,7 +999,7 @@ class QuizWizardApp {
         const hasContent = targetChoice.text.trim().length > 0;
         let shouldDelete = false;
         if (hasContent) {
-            const confirmMsg = this.currentLang === 'ko' ? "내용이 있는 선택지입니다. 정말 삭제하시겠습니까?" : "This choice has content. Are you sure you want to delete it?";
+            const confirmMsg = this.currentLang === 'ko' ? "내용이 있는 선택지입니다. 정말 삭제하시겠습니까?" : (this.currentLang === 'ky' ? "Бул вариантта маалымат бар. Чын эле өчүрүүнү каалайсызбы?" : "This choice has content. Are you sure you want to delete it?");
             if (confirm(confirmMsg)) {
                 shouldDelete = true;
             }
@@ -972,7 +1035,7 @@ class QuizWizardApp {
     insertChoice(targetPos) {
         const qIdx = this.focusedQuestionIndex;
         if (qIdx === null || !this.questionsData[qIdx]) {
-            alert(this.currentLang === 'ko' ? "선택지를 삽입할 문제를 선택해 주세요." : "Please select a question.");
+            alert(this.currentLang === 'ko' ? "선택지를 삽입할 문제를 선택해 주세요." : (this.currentLang === 'ky' ? "Вариант киргизүү үчүн суроону тандаңыз." : "Please select a question."));
             return;
         }
         this.saveCurrentQuestionsToState();
@@ -1003,7 +1066,7 @@ class QuizWizardApp {
     removeFocusedQuestion() {
         if (this.focusedQuestionIndex === null) {
             const msg = this.currentLang === 'ko' ? "삭제할 문제를 선택해 주세요." :
-                (this.currentLang === 'ru' ? "Выберите вопрос для удаления." : "Please select a question to remove.");
+                (this.currentLang === 'ru' ? "Выберите вопрос для удаления." : (this.currentLang === 'ky' ? "Өчүрүү үчүн суроону тандаңыз." : "Please select a question to remove."));
             alert(msg);
             return;
         }
@@ -1022,6 +1085,9 @@ class QuizWizardApp {
             }
             else if (this.currentLang === 'ru') {
                 confirmMsg = "Этот вопрос содержит данные. Вы уверены, что хотите его удалить?";
+            }
+            else if (this.currentLang === 'ky') {
+                confirmMsg = "Бул суроодо маалымат бар. Чын эле өчүрүүнү каалайсызбы?";
             }
             else {
                 confirmMsg = "This question has content. Are you sure you want to delete it?";
@@ -1290,9 +1356,13 @@ class QuizWizardApp {
             </div>
             <div class="question-list-container" id="question-list">
         `;
+        // 범위 설정에 따른 데이터 필터링 (인덱스 기준)
+        const startIdx = this.scopeSettings.start > 0 ? this.scopeSettings.start - 1 : 0;
+        const endIdx = this.scopeSettings.end > 0 ? this.scopeSettings.end : this.questionsData.length;
+        const filteredQuestions = this.questionsData.slice(startIdx, endIdx);
         // 편집 중인 문제 리스트를 읽기 전용으로 표시
-        this.questionsData.forEach((q, i) => {
-            html += this.createQuestionItemHtml(i + 1, q, true); // readOnly = true
+        filteredQuestions.forEach((q, i) => {
+            html += this.createQuestionItemHtml(startIdx + i + 1, q, true); // readOnly = true
         });
         html += `</div>`;
         this.container.innerHTML = html;
@@ -1311,12 +1381,12 @@ class QuizWizardApp {
         let path = "";
         if (this.currentMenu === 'question-bank' || this.currentMenu === 'exam-setting' || this.currentMenu === 'self-study') {
             title = langData.menus["question-bank"];
-            label = this.currentLang === 'ko' ? "선택된 문제은행 파일 경로" : (this.currentLang === 'ru' ? "Путь к выбранному файлу банка вопросов" : "Selected Question Bank File Path");
+            label = this.currentLang === 'ko' ? "선택된 문제은행 파일 경로" : (this.currentLang === 'ru' ? "Путь к выбранному файлу банка вопросов" : (this.currentLang === 'ky' ? "Тандалган суроолор банкынын файлынын жолу" : "Selected Question Bank File Path"));
             path = this.question_bank_file_name;
         }
         else if (this.currentMenu === 'student-list') {
             title = langData.menus["student-list"];
-            label = this.currentLang === 'ko' ? "선택된 학생 명단 파일 경로" : (this.currentLang === 'ru' ? "Путь к выбранному файлу списка студентов" : "Selected Student List File Path");
+            label = this.currentLang === 'ko' ? "선택된 학생 명단 파일 경로" : (this.currentLang === 'ru' ? "Путь к выбранному файлу списка студентов" : (this.currentLang === 'ky' ? "Тандалган студенттер тизмесинин файлынын жолу" : "Selected Student List File Path"));
             path = this.student_list_file_name;
         }
         this.container.innerHTML = `
@@ -1328,21 +1398,26 @@ class QuizWizardApp {
                     <strong>${label}:</strong> 
                     <code style="color: #d63384;">${path}</code>
                 </div>
-                <p>${this.currentLang === 'ko' ? "파일이 성공적으로 선택되었습니다." : (this.currentLang === 'ru' ? "Файл успешно выбран." : "File successfully selected.")}</p>
+                <p>${this.currentLang === 'ko' ? "파일이 성공적으로 선택되었습니다." : (this.currentLang === 'ru' ? "Файл успешно выбран." : (this.currentLang === 'ky' ? "Файл ийгиликтүү тандалды." : "File successfully selected."))}</p>
             </div>
         `;
     }
     /* 문제은행 관련 함수군 */
     newQuestionBank() {
         // qb-new 선택 시에만 싹 비우고 초기화
+        this.question_bank_file_handle = null;
+        this.question_bank_file_name = '';
+        this.scopeSettings = { start: 1, end: 0, count: 0 };
         this.initializeQuestionBankWorkspace(true);
+        this.updateMenuActivation();
     }
     async openQuestionBank() {
         try {
             const descriptions = {
                 ko: 'SQLite 문제은행 데이터베이스',
                 en: 'SQLite Question Bank Database',
-                ru: 'База данных банка вопросов SQLite'
+                ru: 'База данных банка вопросов SQLite',
+                ky: 'SQLite суроолор банкынын маалымат базасы'
             };
             const [handle] = await window.showOpenFilePicker({
                 types: [{
@@ -1359,6 +1434,7 @@ class QuizWizardApp {
             // WASM 엔진에 데이터 전달 (SQLite 형식)
             this.control_tower.set_qbank_from_bytes_in_sqlite(new Uint8Array(buffer));
             this.putQuestionBankToWorkspace();
+            this.updateMenuActivation();
         }
         catch (err) {
             if (err.name !== 'AbortError') {
@@ -1413,7 +1489,7 @@ class QuizWizardApp {
         console.log("convertQBank2QuestionData() 호출됨");
         return newData;
     }
-    editQuestionBank() { console.log("editQuestionBank() 호출됨"); }
+    statQuestionBank() { console.log("statQuestionBank() 호출됨"); }
     async saveQuestionBank() {
         if (!this.question_bank_file_handle) {
             await this.saveAsQuestionBank();
@@ -1426,7 +1502,8 @@ class QuizWizardApp {
             const descriptions = {
                 ko: 'SQLite 문제은행 데이터베이스',
                 en: 'SQLite Question Bank Database',
-                ru: 'База данных банка вопросов SQLite'
+                ru: 'База данных банка вопросов SQLite',
+                ky: 'SQLite суроолор банкынын маалымат базасы'
             };
             const handle = await window.showSaveFilePicker({
                 suggestedName: this.question_bank_file_name || 'untitled.qbdb',
@@ -1458,7 +1535,7 @@ class QuizWizardApp {
             await writable.write(bytes);
             await writable.close();
             console.log("문제은행 저장 완료:", this.question_bank_file_name);
-            const successMsg = this.currentLang === 'ko' ? "성공적으로 저장되었습니다." : "Saved successfully.";
+            const successMsg = this.currentLang === 'ko' ? "성공적으로 저장되었습니다." : (this.currentLang === 'ky' ? "Ийгиликтүү сакталды." : "Saved successfully.");
             alert(successMsg);
         }
         catch (err) {
@@ -1535,7 +1612,8 @@ class QuizWizardApp {
             const descriptions = {
                 ko: 'SQLite 학생 명단 데이터베이스',
                 en: 'SQLite Student List Database',
-                ru: 'База данных списка студентов SQLite'
+                ru: 'База данных списка студентов SQLite',
+                ky: 'SQLite студенттер тизмесинин маалымат базасы'
             };
             // 1. 파일 선택창 호출 (.sbdb 확장자)
             const [handle] = await window.showOpenFilePicker({
@@ -1615,7 +1693,7 @@ class QuizWizardApp {
                 const writable = await this.student_list_handle.createWritable();
                 await writable.write(bytes);
                 await writable.close();
-                alert(this.currentLang === 'ko' ? "파일이 성공적으로 저장되었습니다." : "File saved successfully.");
+                alert(this.currentLang === 'ko' ? "파일이 성공적으로 저장되었습니다." : (this.currentLang === 'ky' ? "Файл ийгиликтүү сакталды." : "File saved successfully."));
             }
             else {
                 // 핸들이 없으면 다른 이름으로 저장 호출
@@ -1633,7 +1711,8 @@ class QuizWizardApp {
             const descriptions = {
                 ko: 'SQLite 학생 명단 데이터베이스',
                 en: 'SQLite Student List Database',
-                ru: 'База данных списка студентов SQLite'
+                ru: 'База данных списка студентов SQLite',
+                ky: 'SQLite студенттер тизмесинин маалымат базасы'
             };
             const handle = await window.showSaveFilePicker({
                 suggestedName: this.student_list_file_name || 'students.sbdb',
@@ -1654,7 +1733,6 @@ class QuizWizardApp {
         }
     }
     /* 시험 및 학습 관련 함수군 */
-    setExamScope() { console.log("setExamScope() 호출됨"); }
     saveExamPaper() { console.log("saveExamPaper() 호출됨"); }
     setGradingMethod() { console.log("setGradingMethod() 호출됨"); }
     startSelfstudy() { console.log("startSelfstudy() 호출됨"); }

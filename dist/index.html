@@ -18,10 +18,10 @@
                     <div class="submenu">
                         <div class="submenu-item" data-action="qb-new"></div>
                         <div class="submenu-item" data-action="qb-open"></div>
-                        <div class="submenu-item" data-action="qb-edit"></div>
                         <div class="submenu-item" data-action="qb-save"></div>
                         <div class="submenu-item" data-action="qb-save-as"></div>
                         <div class="submenu-item" data-action="qb-optimize"></div>
+                        <div class="submenu-item" data-action="qb-stat"></div>
                     </div>
                 </div>
 
@@ -30,7 +30,7 @@
                     <div class="submenu">
                         <div class="submenu-item" data-action="ex-load-bank"></div>
                         <div class="submenu-item" data-action="ex-load-students"></div>
-                        <div class="submenu-item" data-action="ex-change-scope"></div>
+                        <div class="submenu-item disabled" data-action="ex-change-scope"></div>
                         <div class="submenu-item" data-action="ex-save-paper"></div>
                     </div>
                 </div>
@@ -91,6 +91,7 @@
                 <label><input type="radio" name="lang" value="ko"> 한국어 (Korean)</label>
                 <label><input type="radio" name="lang" value="en"> English</label>
                 <label><input type="radio" name="lang" value="ru"> Русский (Russian)</label>
+                <label><input type="radio" name="lang" value="ky"> Кыргызча (Kyrgyz)</label>
             </div>
             <div class="modal-actions">
                 <button id="lang-cancel-btn">취소</button>
@@ -122,6 +123,29 @@
             <div class="modal-actions">
                 <button id="submit-cancel-btn">취소</button>
                 <button id="submit-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 범위 설정 대화상자 추가 -->
+    <dialog id="scope-dialog" class="modal">
+        <div class="modal-content">
+            <h3 id="scope-dialog-title">범위 설정</h3>
+            <div style="margin-bottom: 15px; font-size: 13px;">
+                <p id="scope-guide">출제범위와 문항수를 정해 주세요.</p>
+            </div>
+            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 5px;">
+                <input type="number" id="scope-start" style="width: 3.5em; text-align: center;" min="1">
+                <span>~</span>
+                <input type="number" id="scope-end" style="width: 3.5em; text-align: center;" min="1">
+            </div>
+            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 5px;">
+                <label id="scope-count-label" for="scope-count">문항수:</label>
+                <input type="number" id="scope-count" style="width: 3.5em; text-align: center;" min="1">
+            </div>
+            <div class="modal-actions">
+                <button id="scope-cancel-btn">취소</button>
+                <button id="scope-confirm-btn">확인</button>
             </div>
         </div>
     </dialog>
