@@ -105,6 +105,44 @@ export class ControlTower {
         wasm.__wbg_controltower_free(ptr, 0);
     }
     /**
+     * Clears the question bank (QBank) by setting it to `None` and resetting
+     * the `question_db` to `AbstractDB::None`.
+     *
+     * After calling this method, the QBank will be unloaded and any associated
+     * database will be reset.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.clear_qbank();
+     * assert!(control_tower.qbank.is_none());
+     * assert!(matches!(control_tower.question_db, AbstractDB::None));
+     * ```
+     */
+    clear_qbank() {
+        wasm.controltower_clear_qbank(this.__wbg_ptr);
+    }
+    /**
+     * Clears the student bank (SBank) by setting it to `None` and resetting
+     * the `student_db` to `AbstractDB::None`.
+     *
+     * After calling this method, the SBank will be unloaded and any associated
+     * database will be reset.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.clear_sbank();
+     * assert!(control_tower.sbank.is_none());
+     * assert!(matches!(control_tower.student_db, AbstractDB::None));
+     * ```
+     */
+    clear_sbank() {
+        wasm.controltower_clear_sbank(this.__wbg_ptr);
+    }
+    /**
      * Determines the category for a given question number in the QBank.
      *
      * This method uses the `determine_category` function of the QBank to
@@ -131,6 +169,93 @@ export class ControlTower {
     determine_category(question_number) {
         const ret = wasm.controltower_determine_category(this.__wbg_ptr, question_number);
         return ret !== 0;
+    }
+    /**
+     * Generates a shuffled exam in DOCX format based on the questions
+     * in the QBank and the students in the SBank.
+     *
+     * This method creates a `Generator` instance using the loaded QBank and
+     * SBank, and then calls the `export_shuffled_exams_in_docx()` method of
+     * the generator to generate the exam in DOCX format. The generated exam
+     * is returned as a byte vector.
+     *
+     * If the QBank or SBank is not loaded, it returns `FailedToGenerateExam`.
+     *
+     * # Arguments
+     * * `start` - The starting group number for the exam generation.
+     * * `end` - The ending group number for the exam generation.
+     * * `number_of_questions` - The number of questions to select
+     *   for each student.
+     *
+     * # Returns
+     * - A `Result` containing a byte vector with the generated exam
+     *   in DOCX format if the QBank and SBank are loaded.
+     * - `ErrorMessage::FailedToGenerateExam` if the QBank or SBank is not loaded.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * if let Ok(exam_data) = control_tower.generate_exam_in_docx(1, 5, 10)
+     *     { println!("Exam generated successfully, size: {}", exam_data.len()); }
+     * else
+     *     { println!("Failed to generate exam: QBank or SBank not loaded"); }
+     * ```
+     * @param {number} start
+     * @param {number} end
+     * @param {number} number_of_questions
+     * @returns {Uint8Array}
+     */
+    generate_exam_in_docx(start, end, number_of_questions) {
+        const ret = wasm.controltower_generate_exam_in_docx(this.__wbg_ptr, start, end, number_of_questions);
+        if (ret[3]) {
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v1;
+    }
+    /**
+     * Generates a shuffled exam in plain text format based on the questions
+     * in the QBank and the students in the SBank.
+     *
+     * This method creates a `Generator` instance using the loaded QBank and
+     * SBank, and then calls the `export_shuffled_exams_in_txt()` method of
+     * the generator to generate the exam in text format. The generated exam
+     * is returned as a byte vector.
+     *
+     * If the QBank or SBank is not loaded, it returns an empty byte vector.
+     *
+     * # Arguments
+     * * `start` - The starting group number for the exam generation.
+     * * `end` - The ending group number for the exam generation.
+     * * `selected` - The number of questions to select for each student.
+     *
+     * # Returns
+     * - A byte vector containing the generated exam in plain text format
+     *   if the QBank and SBank are loaded.
+     * - An empty byte vector if the QBank or SBank is not loaded.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * let exam_data = control_tower.generate_exam_in_txt(1, 5, 10);
+     * if exam_data.is_empty()
+     *     { println!("Failed to generate exam: QBank or SBank not loaded"); }
+     * else
+     *     { println!("Exam generated successfully, size: {}", exam_data.len()); }
+     * ```
+     * @param {number} start
+     * @param {number} end
+     * @param {number} selected
+     * @returns {Uint8Array}
+     */
+    generate_exam_in_txt(start, end, selected) {
+        const ret = wasm.controltower_generate_exam_in_txt(this.__wbg_ptr, start, end, selected);
+        var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v1;
     }
     /**
      * @returns {Uint8Array}
@@ -269,6 +394,74 @@ export class ControlTower {
         return ret;
     }
     /**
+     * @returns {number}
+     */
+    get_header_categories_length() {
+        const ret = wasm.controltower_get_header_categories_length(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
+     * @param {number} index
+     * @returns {string}
+     */
+    get_header_category(index) {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.controltower_get_header_category(this.__wbg_ptr, index);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    get_id() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.controltower_get_id(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    get_name() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.controltower_get_name(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    get_notice() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.controltower_get_notice(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
      * Retrieves the question text for a given question number from the QBank.
      *
      * If the QBank is not loaded or the question number is out of bounds,
@@ -383,6 +576,21 @@ export class ControlTower {
         return ret >>> 0;
     }
     /**
+     * @returns {string}
+     */
+    get_title() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.controltower_get_title(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
      * Creates a new instance of `ControlTower` with default values.
      *
      * The `question_db` and `student_db` fields are initialized
@@ -426,6 +634,23 @@ export class ControlTower {
         wasm.controltower_optimize_qbank(this.__wbg_ptr);
     }
     /**
+     * Optimizes the student bank (SBank) by calling its `optimize` method.
+     *
+     * If the SBank is not loaded, this method does nothing.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.optimize_sbank();
+     * // After loading an SBank, it will be optimized
+     * control_tower.optimize_sbank();
+     * ```
+     */
+    optimize_sbank() {
+        wasm.controltower_optimize_sbank(this.__wbg_ptr);
+    }
+    /**
      * Pushes an empty question to the QBank.
      *
      * # Examples
@@ -438,6 +663,24 @@ export class ControlTower {
      */
     push_an_empty_question() {
         wasm.controltower_push_an_empty_question(this.__wbg_ptr);
+    }
+    /**
+     * Pushes an empty student (with empty name and ID) to the end of the SBank.
+     *
+     * If the SBank is not loaded, this method initializes a new SBank and adds
+     * the empty student to it.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.push_an_empty_student();
+     * assert_eq!(control_tower.get_student_length(), 1);
+     * assert_eq!(control_tower.get_student(1), NameId::new_empty());
+     * ```
+     */
+    push_an_empty_student() {
+        wasm.controltower_push_an_empty_student(this.__wbg_ptr);
     }
     /**
      * Adds a new choice to a specific question in the QBank.
@@ -650,6 +893,39 @@ export class ControlTower {
         return ret !== 0;
     }
     /**
+     * @param {number} index
+     * @param {string} category
+     */
+    set_header_category(index, category) {
+        const ptr0 = passStringToWasm0(category, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.controltower_set_header_category(this.__wbg_ptr, index, ptr0, len0);
+    }
+    /**
+     * @param {string} id
+     */
+    set_id(id) {
+        const ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.controltower_set_id(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
+     * @param {string} name
+     */
+    set_name(name) {
+        const ptr0 = passStringToWasm0(name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.controltower_set_name(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
+     * @param {string} notice
+     */
+    set_notice(notice) {
+        const ptr0 = passStringToWasm0(notice, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.controltower_set_notice(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
      * Loads the question bank (QBank) from a byte slice
      * containing SQLite database data.
      *
@@ -799,6 +1075,14 @@ export class ControlTower {
         return ret !== 0;
     }
     /**
+     * @param {string} title
+     */
+    set_title(title) {
+        const ptr0 = passStringToWasm0(title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.controltower_set_title(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
      * Writes the question bank (QBank) to a byte vector containing SQLite
      * database data.
      *
@@ -866,17 +1150,18 @@ export class ControlTower {
 if (Symbol.dispose) ControlTower.prototype[Symbol.dispose] = ControlTower.prototype.free;
 
 /**
- * @enum {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7}
+ * @enum {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8}
  */
 export const ErrorMessage = Object.freeze({
     FailedToOpenQBank: 0, "0": "FailedToOpenQBank",
     FailedToOpenSBank: 1, "1": "FailedToOpenSBank",
     FailedToOpenQExcel: 2, "2": "FailedToOpenQExcel",
     FailedToOpenSExcel: 3, "3": "FailedToOpenSExcel",
-    FailedToRecevieQBankFromMemory: 4, "4": "FailedToRecevieQBankFromMemory",
-    FailedToRecevieSBankFromMemory: 5, "5": "FailedToRecevieSBankFromMemory",
+    FailedToReceiveQBankFromMemory: 4, "4": "FailedToReceiveQBankFromMemory",
+    FailedToReceiveSBankFromMemory: 5, "5": "FailedToReceiveSBankFromMemory",
     FailedToWriteQBankToMemory: 6, "6": "FailedToWriteQBankToMemory",
     FailedToWriteSBankToMemory: 7, "7": "FailedToWriteSBankToMemory",
+    FailedToGenerateExam: 8, "8": "FailedToGenerateExam",
 });
 
 export class NameId {

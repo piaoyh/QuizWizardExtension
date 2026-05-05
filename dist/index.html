@@ -1,3 +1,13 @@
+<!--
+Copyright 2026. PARK Youngho. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your option.
+This file may not be copied, modified, or distributed
+except according to those terms.
+-->
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -22,6 +32,7 @@
                         <div class="submenu-item" data-action="qb-save-as"></div>
                         <div class="submenu-item" data-action="qb-optimize"></div>
                         <div class="submenu-item" data-action="qb-stat"></div>
+                        <div class="submenu-item" data-action="qb-edit-header"></div>
                     </div>
                 </div>
 
@@ -30,7 +41,7 @@
                     <div class="submenu">
                         <div class="submenu-item" data-action="ex-load-bank"></div>
                         <div class="submenu-item" data-action="ex-load-students"></div>
-                        <div class="submenu-item disabled" data-action="ex-change-scope"></div>
+                        <div class="submenu-item disabled" data-action="ex-set-scope"></div>
                         <div class="submenu-item" data-action="ex-save-paper"></div>
                     </div>
                 </div>
@@ -40,9 +51,9 @@
                     <div class="submenu">
                         <div class="submenu-item" data-action="sl-new"></div>
                         <div class="submenu-item" data-action="sl-open"></div>
-                        <div class="submenu-item" data-action="sl-edit"></div>
                         <div class="submenu-item" data-action="sl-save"></div>
                         <div class="submenu-item" data-action="sl-save-as"></div>
+                        <div class="submenu-item" data-action="sl-optimize"></div>
                     </div>
                 </div>
 
@@ -50,8 +61,8 @@
                     <button class="menu-item" data-menu="self-study"></button>
                     <div class="submenu">
                         <div class="submenu-item" data-action="ss-load-bank"></div>
-                        <div class="submenu-item" data-action="ss-change-scope"></div>
-                        <div class="submenu-item" data-action="ss-change-grading-method"></div>
+                        <div class="submenu-item" data-action="ss-set-scope"></div>
+                        <div class="submenu-item" data-action="ss-set-grading-method"></div>
                         <div class="submenu-item" data-action="ss-start"></div>
                     </div>
                 </div>
@@ -73,6 +84,7 @@
                         <div class="submenu-item" data-action="in-help"></div>
                         <div class="submenu-item" data-action="in-info-soft"></div>
                         <div class="submenu-item" data-action="in-info-copy"></div>
+                        <div class="submenu-item" data-action="in-info-license"></div>
                     </div>
                 </div>
 
@@ -127,6 +139,30 @@
         </div>
     </dialog>
 
+    <!-- 새 문제은행 생성 확인 대화상자 추가 -->
+    <dialog id="confirm-new-qb-dialog" class="modal">
+        <div class="modal-content">
+            <h3 id="qb-new-confirm-title"></h3>
+            <p id="qb-new-confirm-msg" style="font-size: 13px; margin: 20px 0;"></p>
+            <div class="modal-actions">
+                <button id="qb-new-no-btn">아니요</button>
+                <button id="qb-new-yes-btn">예</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 새 학생명단 생성 확인 대화상자 추가 -->
+    <dialog id="confirm-new-sl-dialog" class="modal">
+        <div class="modal-content">
+            <h3 id="sl-confirm-new-title"></h3>
+            <p id="sl-confirm-new-msg" style="font-size: 13px; margin: 20px 0;"></p>
+            <div class="modal-actions">
+                <button id="sl-confirm-new-no-btn">아니요</button>
+                <button id="sl-confirm-new-yes-btn">예</button>
+            </div>
+        </div>
+    </dialog>
+
     <!-- 범위 설정 대화상자 추가 -->
     <dialog id="scope-dialog" class="modal">
         <div class="modal-content">
@@ -146,6 +182,28 @@
             <div class="modal-actions">
                 <button id="scope-cancel-btn">취소</button>
                 <button id="scope-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 저작권 정보 대화상자 -->
+    <dialog id="in-info-copy-dialog">
+        <div class="modal-content">
+            <h3 id="in-info-copy-title">저작권 정보</h3>
+            <p id="in-info-copy-msg" style="text-align: center; margin: 20px 0;"></p>
+            <div class="modal-actions">
+                <button id="in-info-copy-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 라이센스 정보 대화상자 -->
+    <dialog id="in-info-license-dialog">
+        <div class="modal-content">
+            <h3 id="in-info-license-title">라이센스 정보</h3>
+            <p id="in-info-license-msg" style="text-align: center; margin: 20px 0; font-size: 13px;"></p>
+            <div class="modal-actions">
+                <button id="in-info-license-confirm-btn">확인</button>
             </div>
         </div>
     </dialog>
