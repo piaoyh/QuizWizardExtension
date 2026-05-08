@@ -418,7 +418,7 @@ class QuizWizardApp {
                     <button id="sl-remove-btn" style="margin-left: 5px;">${removeText}</button>
                 </div>
             </div>
-            <div class="question-list-container" id="student-list-container">
+            <div class="student-list-container" id="student-list-container">
         `;
 
         // 학생 리스트 생성
@@ -485,13 +485,16 @@ class QuizWizardApp {
     /** 하나의 학생 항목 HTML 생성 */
     private createStudentItemHtml(data: StudentState): string {
         const langData = translations[this.currentLang];
+        const phName = langData.actions['ph-sl-name'] || '성명을 입력하세요.';
+        const phId = langData.actions['ph-sl-id'] || '학번을 입력하세요.';
+
         return `
             <div class="student-item">
                 <input type="checkbox" class="choice-check" ${data.selected ? 'checked' : ''}>
                 <div class="sl-label">${langData.actions['sl-full-name']}</div>
-                <input type="text" class="sl-fullname sl-full-name-input" value="${data.fullName}">
+                <input type="text" class="sl-fullname sl-full-name-input" value="${data.fullName}" placeholder="${phName}">
                 <div class="sl-label">${langData.actions['sl-id']}</div>
-                <input type="text" class="sl-input sl-id" value="${data.studentId}">
+                <input type="text" class="sl-input sl-id" value="${data.studentId}" placeholder="${phId}">
             </div>
         `;
     }
@@ -585,7 +588,7 @@ class QuizWizardApp {
                             <button id="ss-submit-btn">${submitBtnText}</button>
                         </div>
                     </div>
-                    <div class="question-list-container" id="ss-card-container">
+                    <div class="student-list-container" id="ss-card-container">
                         <!-- 현재 한 문제만 표시됨 -->
                     </div>
                 </div>
@@ -867,6 +870,12 @@ class QuizWizardApp {
 
         for (const [prefix, menu] of Object.entries(prefixMap)) {
             if (action.startsWith(prefix)) {
+                // [수정] 대화상자만 띄우는 액션들은 뷰 전환을 건너뜁니다.
+                if (action === 'in-info-copy' || action === 'in-info-license' || 
+                    action === 'st-theme' || action === 'st-lang') {
+                    break;
+                }
+                
                 if (this.currentMenu !== menu) {
                     // 주메뉴 버튼 활성화 상태 업데이트
                     const menuButtons = document.querySelectorAll('.menu-item');
@@ -890,6 +899,7 @@ class QuizWizardApp {
             case 'qb-stat':         this.statQuestionBank(); break;               // 추가됨
             case 'qb-save':         this.saveQuestionBank(); break;               // 추가됨
             case 'qb-save-as':      this.saveAsQuestionBank(); break;             // 추가됨
+            case 'qb-edit-question-bank': this.renderView('question-bank'); break; // [추가]
             case 'qb-edit-header':  /* renderView에서 처리됨 */ break;
             case 'qb-optimize':     this.optimizeQuestionBank(); break;           // 추가됨
 
@@ -905,6 +915,7 @@ class QuizWizardApp {
             case 'sl-optimize':     this.optimizeStudentList(); break;
             case 'sl-save':         this.saveStudentList(); break;
             case 'sl-save-as':      this.saveAsStudentList(); break;
+            case 'sl-edit-student-list': this.renderView('student-list'); break; // [추가]
 
             /* --- Self-study (자기 주도 학습) --- */
             case 'ss-load-bank':    this.openQuestionBank(); break;               // 추가됨 (공용 함수 사용)
@@ -1017,7 +1028,7 @@ class QuizWizardApp {
                     <button id="toggle-editor-mode-btn" style="margin-left: 5px;">${toggleBtnText}</button>
                 </div>
             </div>
-            <div class="question-list-container" id="question-list">
+            <div class="student-list-container" id="student-list">
         `;
 
         this.questionsData.forEach((q, i) => {
@@ -1032,7 +1043,7 @@ class QuizWizardApp {
         document.getElementById('toggle-editor-mode-btn')?.addEventListener('click', () => this.toggleEditorMode());
 
         // 문제 카드 포커스 이벤트 설정
-        const listContainer = document.getElementById('question-list');
+        const listContainer = document.getElementById('student-list');
         if (listContainer) {
             const items = listContainer.querySelectorAll('.question-item');
             items.forEach((item, idx) => {
@@ -1193,6 +1204,11 @@ class QuizWizardApp {
         const labelId = langData.actions['qb-header-id'] || 'ID:';
         const labelNotice = langData.actions['qb-header-notice'] || '주의:';
 
+        const phTitle = langData.actions['ph-header-title'] || '시험제목을 입력하세요.';
+        const defaultName = langData.actions['ph-header-name'] || '이름';
+        const defaultId = langData.actions['ph-header-id'] || '학번';
+        const defaultNotice = langData.actions['ph-header-notice-text'] || '';
+
         let html = `
             <div class="view-header">
                 <h2>${title}</h2>
@@ -1201,22 +1217,23 @@ class QuizWizardApp {
                 <div class="header-card">
                     <div class="header-row">
                         <div class="header-label">${labelTitle}</div>
-                        <input type="text" id="header-title" class="header-input header-input-title" value="${headerTitle}" maxlength="50">
+                        <input type="text" id="header-title" class="header-input header-input-title" value="${headerTitle}" placeholder="${phTitle}">
                     </div>
                     <div class="header-row">
                         <div class="header-label">${labelName}</div>
-                        <input type="text" id="header-name" class="header-input header-input-name" value="${headerName}" maxlength="20">
+                        <input type="text" id="header-name" class="header-input header-input-name" value="${headerName || defaultName}">
                         <div class="header-label" style="margin-left: 20px;">${labelId}</div>
-                        <input type="text" id="header-id" class="header-input header-input-id" value="${headerId}" maxlength="10">
+                        <input type="text" id="header-id" class="header-input header-input-id" value="${headerId || defaultId}">
                     </div>
                     <div class="header-row">
         `;
 
         for (let i = 1; i <= 4; i++) {
             const labelCat = (langData.actions['qb-header-category'] || '카테고리 {n}:').replace('{n}', i.toString());
+            const defaultCat = langData.actions[`ph-header-cat-${i}`] || `Type ${String.fromCharCode(64 + i)}`;
             html += `
                 <div class="header-label">${labelCat}</div>
-                <input type="text" id="header-cat-${i}" class="header-input header-input-category" value="${headerCats[i-1]}" maxlength="10">
+                <input type="text" id="header-cat-${i}" class="header-input header-input-category" value="${headerCats[i-1] || defaultCat}">
             `;
         }
 
@@ -1224,7 +1241,7 @@ class QuizWizardApp {
                     </div>
                     <div class="header-row" style="align-items: flex-start;">
                         <div class="header-label">${labelNotice}</div>
-                        <textarea id="header-notice" class="header-input header-textarea-notice" maxlength="2000">${headerNotice}</textarea>
+                        <textarea id="header-notice" class="header-input header-textarea-notice">${headerNotice || defaultNotice}</textarea>
                     </div>
                 </div>
             </div>
@@ -1286,7 +1303,7 @@ class QuizWizardApp {
 
         // 추가된 선택지로 포커스 및 스크롤
         setTimeout(() => {
-            const list = document.getElementById('question-list');
+            const list = document.getElementById('student-list');
             const targetQuestion = list?.children[idx] as HTMLElement;
             if (targetQuestion) {
                 const choices = targetQuestion.querySelectorAll('.choice-input');
@@ -1348,7 +1365,7 @@ class QuizWizardApp {
             // 삭제 후 남은 선택지에 포커스 자동 이동
             if (this.focusedChoiceIndex !== null) {
                 setTimeout(() => {
-                    const list = document.getElementById('question-list');
+                    const list = document.getElementById('student-list');
                     const targetQuestion = list?.children[qIdx] as HTMLElement;
                     const choiceInputs = targetQuestion?.querySelectorAll('.choice-input');
                     if (choiceInputs && choiceInputs[this.focusedChoiceIndex!]) {
@@ -1385,7 +1402,7 @@ class QuizWizardApp {
 
         // 삽입된 위치로 포커스 및 스크롤
         setTimeout(() => {
-            const list = document.getElementById('question-list');
+            const list = document.getElementById('student-list');
             const targetQuestion = list?.children[qIdx] as HTMLElement;
             if (targetQuestion) {
                 const choiceInputs = targetQuestion.querySelectorAll('.choice-input');
@@ -1456,7 +1473,7 @@ class QuizWizardApp {
             // 삭제 후 포커스된 위치로 자동 스크롤
             if (this.focusedQuestionIndex !== null) {
                 setTimeout(() => {
-                    const list = document.getElementById('question-list');
+                    const list = document.getElementById('student-list');
                     const target = list?.children[this.focusedQuestionIndex!] as HTMLElement;
                     target?.scrollIntoView({ behavior: 'auto', block: 'center' });
                 }, 50);
@@ -1488,7 +1505,7 @@ class QuizWizardApp {
         this.initializeQuestionBankWorkspace(false, true);
 
         // 5. 새 문제로 즉시 이동
-        const list = document.getElementById('question-list');
+        const list = document.getElementById('student-list');
         if (list) {
             const newElement = list.lastElementChild as HTMLElement;
             if (newElement) {
@@ -1531,7 +1548,7 @@ class QuizWizardApp {
         this.initializeQuestionBankWorkspace(false, true);
 
         // 6. 삽입된 위치로 즉시 이동
-        const list = document.getElementById('question-list');
+        const list = document.getElementById('student-list');
         if (list) {
             const targetElement = list.children[targetPos - 1] as HTMLElement;
             if (targetElement) {
@@ -1557,7 +1574,7 @@ class QuizWizardApp {
 
         if (qCurrent && qAbove) {
             // [추가] 현재 스크롤 위치 저장
-            const listContainer = document.getElementById('question-list');
+            const listContainer = document.getElementById('student-list');
             const savedScrollTop = listContainer ? listContainer.scrollTop : 0;
 
             // 배열의 두 원소를 직접 맞바꿉니다. (내용과 그룹 번호가 통째로 바뀜)
@@ -1569,7 +1586,7 @@ class QuizWizardApp {
             this.initializeQuestionBankWorkspace(false, true);
             
             // [수정] 스크롤 위치 복구 후 부드럽게 이동
-            const newList = document.getElementById('question-list');
+            const newList = document.getElementById('student-list');
             if (newList) {
                 newList.scrollTop = savedScrollTop;
                 (newList.children[j] as HTMLElement)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1591,7 +1608,7 @@ class QuizWizardApp {
 
         if (qCurrent && qBelow) {
             // [추가] 현재 스크롤 위치 저장
-            const listContainer = document.getElementById('question-list');
+            const listContainer = document.getElementById('student-list');
             const savedScrollTop = listContainer ? listContainer.scrollTop : 0;
 
             // 배열의 두 원소를 직접 맞바꿉니다.
@@ -1603,7 +1620,7 @@ class QuizWizardApp {
             this.initializeQuestionBankWorkspace(false, true);
 
             // [수정] 스크롤 위치 복구 후 부드럽게 이동
-            const newList = document.getElementById('question-list');
+            const newList = document.getElementById('student-list');
             if (newList) {
                 newList.scrollTop = savedScrollTop;
                 (newList.children[j] as HTMLElement)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1613,7 +1630,7 @@ class QuizWizardApp {
 
     /** 현재 화면의 입력값들을 questionsData 배열에 저장합니다. */
     private saveCurrentQuestionsToState() {
-        const list = document.getElementById('question-list');
+        const list = document.getElementById('student-list');
         if (!list) return;
 
         const items = list.querySelectorAll('.question-item');
@@ -1743,7 +1760,7 @@ class QuizWizardApp {
             <div class="view-header">
                 <h2>${title}${qbFileInfoHtml}${sbFileInfoHtml}</h2>
             </div>
-            <div class="question-list-container" id="question-list">
+            <div class="student-list-container" id="student-list">
         `;
 
         // 범위 설정에 따른 데이터 필터링 (인덱스 기준)
@@ -2415,7 +2432,7 @@ class QuizWizardApp {
     /** 테마 설정 대화상자를 엽니다. */
     private setTheme() {
         const dialog = document.getElementById('theme-dialog') as HTMLDialogElement;
-        if (!dialog) return;
+       if (!dialog) return;
 
         // 현재 테마 라디오 버튼 선택 상태로 만들기
         const currentRadio = dialog.querySelector(`input[value="${this.currentTheme}"]`) as HTMLInputElement;
@@ -2428,7 +2445,6 @@ class QuizWizardApp {
 
     private setFonts() { console.log("setFonts() 호출됨"); }
     
-    /** 언어 설정 대화상자를 엽니다. */
     /** 언어 설정 대화상자를 엽니다. */
     private setLanguage() {
         const dialog = document.getElementById('lang-dialog') as HTMLDialogElement;
