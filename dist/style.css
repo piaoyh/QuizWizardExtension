@@ -594,3 +594,12 @@ body.theme-web .header-label {
     line-height: 1.5;
     overflow-y: auto;
 }
+
+.menu-separator {
+    height: 0;
+    border-top: 1px solid var(--border-color);
+    margin: 5px 0;
+    pointer-events: none;
+    user-select: none;
+    overflow: hidden; /* 기존의 '---' 텍스트를 숨깁니다 */
+}

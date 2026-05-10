@@ -9,6 +9,7 @@
 import { translations } from './i18n.js';
 import init, { ControlTower, NameId, ChoiceMark } from './pkg/qrate_wasm.js';
 class QuizWizardApp {
+    random_seeds = new BigUint64Array(16);
     envLang = navigator.language;
     control_tower;
     container;
@@ -1861,8 +1862,8 @@ class QuizWizardApp {
             await writable.close();
             this.isDirtyQB = false;
             console.log("문제은행 저장 완료:", this.question_bank_file_name);
-            const successMsg = this.currentLang === 'ko' ? "성공적으로 저장되었습니다." : (this.currentLang === 'ky' ? "Ийгиликтүү сакталды." : "Saved successfully.");
-            alert(successMsg);
+            // const successMsg = this.currentLang === 'ko' ? "성공적으로 저장되었습니다." : (this.currentLang === 'ky' ? "Ийгиликтүү сакталды." : "Saved successfully.");
+            // alert(successMsg);
         }
         catch (err) {
             console.error("저장 처리 중 오류 발생:", err);
@@ -2091,7 +2092,7 @@ class QuizWizardApp {
                 await writable.write(bytes);
                 await writable.close();
                 this.isDirtySL = false;
-                alert(this.currentLang === 'ko' ? "파일이 성공적으로 저장되었습니다." : (this.currentLang === 'ky' ? "Файл ийгиликтүү сакталды." : "File saved successfully."));
+                // alert(this.currentLang === 'ko' ? "파일이 성공적으로 저장되었습니다." : (this.currentLang === 'ky' ? "Файл ийгиликтүү сакталды." : "File saved successfully."));
             }
             else {
                 // 핸들이 없으면 다른 이름으로 저장 호출
@@ -2103,7 +2104,7 @@ class QuizWizardApp {
             alert(`저장 중 오류가 발생했습니다: ${err.message || err}`);
         }
         console.log("학생 명단 데이터가 WASM 엔진 및 파일에 성공적으로 저장되었습니다.");
-        this.initializeStudentListWorkspace();
+        // this.initializeStudentListWorkspace(); 
     }
     async saveAsStudentList() {
         try {
@@ -2136,19 +2137,26 @@ class QuizWizardApp {
     /** 시스템 저장 대화상자를 호출하여 시험지를 저장합니다. */
     async saveExamPaper() {
         try {
-            const handle = await window.showSaveFilePicker({
+            this.generate_seeds();
+            this.handle = await window.showSaveFilePicker({
                 id: 'save-exam-paper', // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
-                suggestedName: 'exam_paper.docx',
+                suggestedName: 'exam_paper',
                 types: [
                     { description: 'MS Word Document', accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] } },
                     { description: 'Text File', accept: { 'text/plain': ['.txt'] } },
                     { description: 'PDF Document', accept: { 'application/pdf': ['.pdf'] } }
                 ]
             });
-            this.handle = handle;
             // 파일명에서 확장자 추출 (예: 'file.docx' -> 'docx')
-            const fileName = handle.name;
-            this.doctype = fileName.split('.').pop()?.toLowerCase() || '';
+            this.doctype = this.handle.name.split('.').pop()?.toLowerCase() || '';
+            /////////////////////////////
+            // switch (this.handle.getFile().type)
+            // {
+            // case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': this.doctype = '.docx';   break;
+            // case 'text/plain':          this.doctype = '.txt';   break;
+            // case 'application/pdf':     this.doctype = '.pdf';   break;
+            // }
+            // alert(this.handle.getFile().type);
             console.log("시험지 저장 설정 완료 - 핸들:", this.handle, "형식:", this.doctype);
             switch (this.doctype) {
                 case 'docx':
@@ -2160,8 +2168,7 @@ class QuizWizardApp {
                 case 'pdf':
                     await this.saveExamPaperAsPdf();
                     break;
-                default:
-                    alert(this.currentLang === 'ko' ? "지원하지 않는 파일 형식입니다." : (this.currentLang === 'ky' ? "Колдонулбай турган файл форматы." : "Unsupported file format."));
+                default: alert(this.currentLang === 'ko' ? "지원하지 않는 파일 형식입니다." : (this.currentLang === 'ky' ? "Колдонулбай турган файл форматы." : "Unsupported file format."));
             }
         }
         catch (err) {
@@ -2172,12 +2179,25 @@ class QuizWizardApp {
         }
     }
     async saveExamPaperAsDocx() {
-        let res = this.control_tower.generate_exam_in_docx(this.scopeSettings.start, this.scopeSettings.end, this.scopeSettings.count);
+        const bytes = this.control_tower.generate_exam_in_docx(this.scopeSettings.start, this.scopeSettings.end, this.scopeSettings.count, this.random_seeds);
+        this.saveFile(bytes);
     }
     async saveExamPaperAsTxt() {
-        let res = this.control_tower.generate_exam_in_txt(this.scopeSettings.start, this.scopeSettings.end, this.scopeSettings.count);
+        const bytes = this.control_tower.generate_exam_in_txt(this.scopeSettings.start, this.scopeSettings.end, this.scopeSettings.count, this.random_seeds);
+        this.saveFile(bytes);
     }
     async saveExamPaperAsPdf() {
+    }
+    async saveFile(bytes) {
+        const writable = await this.handle.createWritable();
+        await writable.write(bytes);
+        await writable.close();
+    }
+    async generate_seeds() {
+        // 암호학적으로 안전한 난수로 채우기
+        // crypto.getRandomValues는 배열을 직접 수정하고 반환함
+        crypto.getRandomValues(this.random_seeds);
+        console.log("TS에서 생성된 난수:", this.random_seeds);
     }
     setGradingMethod() { console.log("setGradingMethod() 호출됨"); }
     startSelfstudy() { console.log("startSelfstudy() 호출됨"); }

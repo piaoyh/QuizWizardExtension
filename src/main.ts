@@ -27,6 +27,7 @@ interface StudentState {
 }
 
 class QuizWizardApp {
+    private random_seeds = new BigUint64Array(16);
     private envLang = navigator.language;
     private control_tower!: ControlTower;
     private container: HTMLElement | null;
@@ -154,7 +155,8 @@ class QuizWizardApp {
 
     private handleFinalSubmission() {
         // 여기에 제출 후 처리 로직을 작성합니다.
-        alert("답안지가 성공적으로 제출되었습니다!");
+        const msg = translations[this.currentLang].actions['msg-submit-success'];
+        alert(msg);
     }
 
     /**
@@ -291,7 +293,6 @@ class QuizWizardApp {
                 end: parseInt(endInput.value) || this.questionsData.length,
                 count: parseInt(countInput.value) || 0
             };
-
             dialog.close();
             this.initializeExamSettingWorkspace();
         });
@@ -474,7 +475,8 @@ class QuizWizardApp {
         this.studentsData = this.studentsData.filter(s => !s.selected);
         
         if (this.studentsData.length === beforeCount) {
-            alert(this.currentLang === 'ko' ? "삭제할 학생을 선택해 주세요." : (this.currentLang === 'ky' ? "Өчүрүү үчүн студенттерди тандаңыз." : "Please select students to remove."));
+            const msg = translations[this.currentLang].actions['msg-select-students-to-remove'];
+            alert(msg);
             return;
         }
 
@@ -1113,7 +1115,10 @@ class QuizWizardApp {
             document.getElementById('insert-question-btn')?.addEventListener('click', () => {
                 const pos = parseInt(rightInput.value);
                 if (!isNaN(pos)) this.insertQuestion(pos);
-                else alert("삽입할 위치(번호)를 입력해 주세요.");
+                else {
+                    const msg = translations[this.currentLang].actions['msg-input-insert-pos'];
+                    alert(msg);
+                }
             });
 
             document.getElementById('add-question-btn')?.addEventListener('click', () => this.addNewQuestion());
@@ -1320,12 +1325,14 @@ class QuizWizardApp {
         const cIdx = this.focusedChoiceIndex;
 
         if (qIdx === null || !this.questionsData[qIdx]) {
-            alert(this.currentLang === 'ko' ? "문제를 먼저 선택해 주세요." : (this.currentLang === 'ky' ? "Алгач суроону тандаңыз." : "Please select a question."));
+            const msg = translations[this.currentLang].actions['msg-select-question-to-delete-choice'];
+            alert(msg);
             return;
         }
 
         if (cIdx === null || !this.questionsData[qIdx].choices[cIdx]) {
-            alert(this.currentLang === 'ko' ? "삭제할 선택지를 지정해 주세요." : (this.currentLang === 'ky' ? "Өчүрүлө турган вариантты белгилеңиз." : "Please specify the choice to delete."));
+            const msg = translations[this.currentLang].actions['msg-specify-choice-to-delete'];
+            alert(msg);
             return;
         }
 
@@ -1340,7 +1347,7 @@ class QuizWizardApp {
         let shouldDelete = false;
 
         if (hasContent) {
-            const confirmMsg = this.currentLang === 'ko' ? "내용이 있는 선택지입니다. 정말 삭제하시겠습니까?" : (this.currentLang === 'ky' ? "Бул вариантта маалымат бар. Чын эле өчүрүүнү каалайсызбы?" : "This choice has content. Are you sure you want to delete it?");
+            const confirmMsg = translations[this.currentLang].actions['msg-confirm-delete-content-choice'];
             if (confirm(confirmMsg)) {
                 shouldDelete = true;
             }
@@ -1380,7 +1387,8 @@ class QuizWizardApp {
     private insertChoice(targetPos: number) {
         const qIdx = this.focusedQuestionIndex;
         if (qIdx === null || !this.questionsData[qIdx]) {
-            alert(this.currentLang === 'ko' ? "선택지를 삽입할 문제를 선택해 주세요." : (this.currentLang === 'ky' ? "Вариант киргизүү үчүн суроону тандаңыз." : "Please select a question."));
+            const msg = translations[this.currentLang].actions['msg-select-question-to-insert-choice'];
+            alert(msg);
             return;
         }
 
@@ -1416,8 +1424,7 @@ class QuizWizardApp {
     /** 포커스된 문제 삭제 */
     private removeFocusedQuestion() {
         if (this.focusedQuestionIndex === null) {
-            const msg = this.currentLang === 'ko' ? "삭제할 문제를 선택해 주세요." : 
-                        (this.currentLang === 'ru' ? "Выберите вопрос для удаления." : (this.currentLang === 'ky' ? "Өчүрүү үчүн суроону тандаңыз." : "Please select a question to remove."));
+            const msg = translations[this.currentLang].actions['msg-select-question-to-remove'];
             alert(msg);
             return;
         }
@@ -1433,17 +1440,7 @@ class QuizWizardApp {
 
         let shouldDelete = false;
         if (hasContent) {
-            let confirmMsg = "";
-            if (this.currentLang === 'ko') {
-                confirmMsg = "내용이 있는 문제입니다. 정말 삭제하시겠습니까?";
-            } else if (this.currentLang === 'ru') {
-                confirmMsg = "Этот вопрос содержит данные. Вы уверены, что хотите его удалить?";
-            } else if (this.currentLang === 'ky') {
-                confirmMsg = "Бул суроодо маалымат бар. Чын эле өчүрүүнү каалайсызбы?";
-            } else {
-                confirmMsg = "This question has content. Are you sure you want to delete it?";
-            }
-            
+            const confirmMsg = translations[this.currentLang].actions['msg-confirm-delete-content-question'];
             if (confirm(confirmMsg)) {
                 shouldDelete = true;
             }
@@ -1939,7 +1936,8 @@ class QuizWizardApp {
         } catch (err: any) {
             if (err.name !== 'AbortError') {
                 console.error("문제은행 파일 열기 중 오류 발생:", err);
-                alert(`파일을 여는 중 오류가 발생했습니다: ${err.message || err}`);
+                const msg = translations[this.currentLang].actions['msg-file-open-error'].replace('{error}', err.message || err);
+                alert(msg);
             }
         }
     }
@@ -2030,7 +2028,8 @@ class QuizWizardApp {
         } catch (err: any) {
             if (err.name !== 'AbortError') {
                 console.error("다른 이름으로 저장 중 오류:", err);
-                alert(`저장 중 오류가 발생했습니다: ${err.message || err}`);
+                const msg = translations[this.currentLang].actions['msg-file-save-error'].replace('{error}', err.message || err);
+                alert(msg);
             }
         }
     }
@@ -2051,8 +2050,8 @@ class QuizWizardApp {
             this.isDirtyQB = false;
             
             console.log("문제은행 저장 완료:", this.question_bank_file_name);
-            const successMsg = this.currentLang === 'ko' ? "성공적으로 저장되었습니다." : (this.currentLang === 'ky' ? "Ийгиликтүү сакталды." : "Saved successfully.");
-            alert(successMsg);
+            // const successMsg = this.currentLang === 'ko' ? "성공적으로 저장되었습니다." : (this.currentLang === 'ky' ? "Ийгиликтүү сакталды." : "Saved successfully.");
+            // alert(successMsg);
         } catch (err: any) {
             console.error("저장 처리 중 오류 발생:", err);
             throw err;
@@ -2244,6 +2243,7 @@ class QuizWizardApp {
             }
         }
     }
+    
     private optimizeStudentList()
     {
         // 1. 현재 화면의 모든 입력 내용을 먼저 배열에 저장
@@ -2298,6 +2298,7 @@ class QuizWizardApp {
                 { this.control_tower.remove_student(i); }
         }
     }
+
     private async saveStudentList()
     {
         // 1. 현재 화면의 모든 입력 내용을 먼저 배열에 저장
@@ -2317,7 +2318,7 @@ class QuizWizardApp {
                 await writable.write(bytes);
                 await writable.close();
                 this.isDirtySL = false;
-                alert(this.currentLang === 'ko' ? "파일이 성공적으로 저장되었습니다." : (this.currentLang === 'ky' ? "Файл ийгиликтүү сакталды." : "File saved successfully."));
+                // alert(this.currentLang === 'ko' ? "파일이 성공적으로 저장되었습니다." : (this.currentLang === 'ky' ? "Файл ийгиликтүү сакталды." : "File saved successfully."));
             }
             else
             {
@@ -2328,12 +2329,14 @@ class QuizWizardApp {
         catch (err: any)
         {
             console.error("학생 명단 저장 중 오류 발생:", err);
-            alert(`저장 중 오류가 발생했습니다: ${err.message || err}`);
+            const msg = translations[this.currentLang].actions['msg-file-save-error'].replace('{error}', err.message || err);
+            alert(msg);
         }
 
         console.log("학생 명단 데이터가 WASM 엔진 및 파일에 성공적으로 저장되었습니다.");
-        this.initializeStudentListWorkspace(); 
+        // this.initializeStudentListWorkspace(); 
     }
+
     private async saveAsStudentList() {
         try {
             const descriptions = {
@@ -2368,9 +2371,10 @@ class QuizWizardApp {
     /** 시스템 저장 대화상자를 호출하여 시험지를 저장합니다. */
     private async saveExamPaper() {
         try {
-            const handle = await (window as any).showSaveFilePicker({
+            this.generate_seeds();
+            this.handle = await (window as any).showSaveFilePicker({
                 id: 'save-exam-paper', // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
-                suggestedName: 'exam_paper.docx',
+                suggestedName: 'exam_paper',
                 types: [
                     { description: 'MS Word Document', accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] } },
                     { description: 'Text File', accept: { 'text/plain': ['.txt'] } },
@@ -2378,48 +2382,68 @@ class QuizWizardApp {
                 ]
             });
 
-            this.handle = handle;
             // 파일명에서 확장자 추출 (예: 'file.docx' -> 'docx')
-            const fileName = handle.name;
-            this.doctype = fileName.split('.').pop()?.toLowerCase() || '';
+            this.doctype = this.handle.name.split('.').pop()?.toLowerCase() || '';
+            /////////////////////////////
+            // switch (this.handle.getFile().type)
+            // {
+            // case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': this.doctype = '.docx';   break;
+            // case 'text/plain':          this.doctype = '.txt';   break;
+            // case 'application/pdf':     this.doctype = '.pdf';   break;
+            // }
 
+            // alert(this.handle.getFile().type);
             console.log("시험지 저장 설정 완료 - 핸들:", this.handle, "형식:", this.doctype);
 
             switch (this.doctype)
             {
-            case 'docx':
-                await this.saveExamPaperAsDocx();
-                break;
-            case 'txt':
-                await this.saveExamPaperAsTxt();
-                break;
-            case 'pdf':
-                await this.saveExamPaperAsPdf();
-                break;
-            default:
-                alert(this.currentLang === 'ko' ? "지원하지 않는 파일 형식입니다." : (this.currentLang === 'ky' ? "Колдонулбай турган файл форматы." : "Unsupported file format."));
+            case 'docx':    await this.saveExamPaperAsDocx();   break;
+            case 'txt':     await this.saveExamPaperAsTxt();    break;
+            case 'pdf':     await this.saveExamPaperAsPdf();    break;
+            default:        {
+                const msg = translations[this.currentLang].actions['msg-unsupported-file-format'];
+                alert(msg);
+            }
             }
         } catch (err: any) {
             if (err.name !== 'AbortError') {
                 console.error("시험지 저장 중 오류:", err);
-                alert(`저장 중 오류가 발생했습니다: ${err.message || err}`);
+                const msg = translations[this.currentLang].actions['msg-file-save-error'].replace('{error}', err.message || err);
+                alert(msg);
             }
         }
     }
 
     private async saveExamPaperAsDocx()
     {
-        let res = this.control_tower.generate_exam_in_docx(this.scopeSettings.start, this.scopeSettings.end, this.scopeSettings.count);
-
+        const bytes = this.control_tower.generate_exam_in_docx(this.scopeSettings.start, this.scopeSettings.end, this.scopeSettings.count, this.random_seeds);
+        this.saveFile(bytes);
     }
+
     private async saveExamPaperAsTxt()
     {
-        let res = this.control_tower.generate_exam_in_txt(this.scopeSettings.start, this.scopeSettings.end, this.scopeSettings.count);
-
+        const bytes = this.control_tower.generate_exam_in_txt(this.scopeSettings.start, this.scopeSettings.end, this.scopeSettings.count, this.random_seeds);
+        this.saveFile(bytes);
     }
+
     private async saveExamPaperAsPdf()
     {
 
+    }
+
+    private async saveFile(bytes: any)
+    {
+        const writable = await this.handle.createWritable();
+        await writable.write(bytes);
+        await writable.close();
+    }
+
+    private async generate_seeds()
+    {
+        // 암호학적으로 안전한 난수로 채우기
+        // crypto.getRandomValues는 배열을 직접 수정하고 반환함
+        crypto.getRandomValues(this.random_seeds);
+        console.log("TS에서 생성된 난수:", this.random_seeds);
     }
 
     private setGradingMethod() { console.log("setGradingMethod() 호출됨"); }

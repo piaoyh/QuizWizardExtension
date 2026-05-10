@@ -1,6 +1,6 @@
 {
-  "name": "Quiz Wizard Test",
-  "description": "Basic test for default_page",
+  "name": "QuizWiz",
+  "description": "Quiz Generator based on Question Bank",
   "manifest_version": 3,
   "version": "0.1.0",
   "permissions": ["storage", "tabs"],
@@ -9,7 +9,7 @@
     "type": "module"
   },
   "action": {
-    "default_icon": "QuizWizard_128.png"
+    "default_icon": "QuizWiz_128.png"
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"

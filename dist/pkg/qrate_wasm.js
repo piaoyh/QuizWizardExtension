@@ -186,6 +186,7 @@ export class ControlTower {
      * * `end` - The ending group number for the exam generation.
      * * `number_of_questions` - The number of questions to select
      *   for each student.
+     * * `seeds` - A seed array, each element of which is of u64.
      *
      * # Returns
      * - A `Result` containing a byte vector with the generated exam
@@ -204,16 +205,19 @@ export class ControlTower {
      * @param {number} start
      * @param {number} end
      * @param {number} number_of_questions
+     * @param {BigUint64Array} seeds
      * @returns {Uint8Array}
      */
-    generate_exam_in_docx(start, end, number_of_questions) {
-        const ret = wasm.controltower_generate_exam_in_docx(this.__wbg_ptr, start, end, number_of_questions);
+    generate_exam_in_docx(start, end, number_of_questions, seeds) {
+        const ptr0 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_generate_exam_in_docx(this.__wbg_ptr, start, end, number_of_questions, ptr0, len0);
         if (ret[3]) {
             throw takeFromExternrefTable0(ret[2]);
         }
-        var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
         wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-        return v1;
+        return v2;
     }
     /**
      * Generates a shuffled exam in plain text format based on the questions
@@ -230,6 +234,7 @@ export class ControlTower {
      * * `start` - The starting group number for the exam generation.
      * * `end` - The ending group number for the exam generation.
      * * `selected` - The number of questions to select for each student.
+     * * `seeds` - A seed array, each element of which is of u64.
      *
      * # Returns
      * - A byte vector containing the generated exam in plain text format
@@ -249,13 +254,16 @@ export class ControlTower {
      * @param {number} start
      * @param {number} end
      * @param {number} selected
+     * @param {BigUint64Array} seeds
      * @returns {Uint8Array}
      */
-    generate_exam_in_txt(start, end, selected) {
-        const ret = wasm.controltower_generate_exam_in_txt(this.__wbg_ptr, start, end, selected);
-        var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+    generate_exam_in_txt(start, end, selected, seeds) {
+        const ptr0 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_generate_exam_in_txt(this.__wbg_ptr, start, end, selected, ptr0, len0);
+        var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
         wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-        return v1;
+        return v2;
     }
     /**
      * @returns {Uint8Array}
@@ -1422,6 +1430,14 @@ function getArrayU8FromWasm0(ptr, len) {
     return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
 }
 
+let cachedBigUint64ArrayMemory0 = null;
+function getBigUint64ArrayMemory0() {
+    if (cachedBigUint64ArrayMemory0 === null || cachedBigUint64ArrayMemory0.byteLength === 0) {
+        cachedBigUint64ArrayMemory0 = new BigUint64Array(wasm.memory.buffer);
+    }
+    return cachedBigUint64ArrayMemory0;
+}
+
 function getStringFromWasm0(ptr, len) {
     ptr = ptr >>> 0;
     return decodeText(ptr, len);
@@ -1442,6 +1458,13 @@ function handleError(f, args) {
         const idx = addToExternrefTable0(e);
         wasm.__wbindgen_exn_store(idx);
     }
+}
+
+function passArray64ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 8, 8) >>> 0;
+    getBigUint64ArrayMemory0().set(arg, ptr / 8);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
 }
 
 function passArray8ToWasm0(arg, malloc) {
@@ -1527,6 +1550,7 @@ let wasmModule, wasm;
 function __wbg_finalize_init(instance, module) {
     wasm = instance.exports;
     wasmModule = module;
+    cachedBigUint64ArrayMemory0 = null;
     cachedUint8ArrayMemory0 = null;
     wasm.__wbindgen_start();
     return wasm;
