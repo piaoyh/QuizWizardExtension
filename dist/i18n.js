@@ -83,6 +83,7 @@ export const translations = {
             "st-lang": "언어 설정",
             "st-scope-guide": "출제범위와 문항수를 정해 주세요.",
             "st-scope-count-label": "문항수:",
+            "st-scope-count-max": "(최대 {n})",
             "st-scope-title": "범위 설정",
             // Information 전용 액션
             "in-help": "도움말",
@@ -107,7 +108,22 @@ export const translations = {
             "ph-header-cat-2": "나 형",
             "ph-header-cat-3": "다 형",
             "ph-header-cat-4": "라 형",
-            "ph-header-notice-text": "시험 안내 사항:\n# 공통 유의 사항\n문맥의 이해: 모든 문항은 본 정보보호(Information Security) 강의에서 다룬 내용을 바탕으로 해석하고 답해야 합니다. 이를 준수하지 않을 경우 문제 의도와 다르게 해석될 수 있습니다.\n# 문항 유형 및 채점 기준\n* 가 형: 단일 선택형 - 주어진 보기 중 가장 적절한 하나의 정답을 선택하십시오. 정답을 맞힌 경우 배정된 점수가 부여됩니다. 답을 선택하지 않거나 두 개 이상의 답을 선택할 경우 0점 처리됩니다.\n* 나 형: 다중 선택형 - 주어진 보기 중 해당하는 모든 정답을 선택하십시오. 선택한 모든 답이 정답인 경우에만 배정된 점수가 부여됩니다. 부분 점수는 없으며, 오답을 포함하거나 정답 중 일부를 누락할 경우 0점 처리됩니다.\n* 다 형: 단답형 - 요구사항에 따라 알맞은 단어, 구절 또는 짧은 표현을 작성하십시오.\n* 라 형: 서술형 - 주어진 질문에 대해 상세하고 종합적인 답변을 작성하십시오."
+            "ph-header-notice-text": "시험 안내 사항:\n# 공통 유의 사항\n문맥의 이해: 모든 문항은 본 정보보호(Information Security) 강의에서 다룬 내용을 바탕으로 해석하고 답해야 합니다. 이를 준수하지 않을 경우 문제 의도와 다르게 해석될 수 있습니다.\n# 문항 유형 및 채점 기준\n* 가 형: 단일 선택형 - 주어진 보기 중 가장 적절한 하나의 정답을 선택하십시오. 정답을 맞힌 경우 배정된 점수가 부여됩니다. 답을 선택하지 않거나 두 개 이상의 답을 선택할 경우 0점 처리됩니다.\n* 나 형: 다중 선택형 - 주어진 보기 중 해당하는 모든 정답을 선택하십시오. 선택한 모든 답이 정답인 경우에만 배정된 점수가 부여됩니다. 부분 점수는 없으며, 오답을 포함하거나 정답 중 일부를 누락할 경우 0점 처리됩니다.\n* 다 형: 단답형 - 요구사항에 따라 알맞은 단어, 구절 또는 짧은 표현을 작성하십시오.\n* 라 형: 서술형 - 주어진 질문에 대해 상세하고 종합적인 답변을 작성하십시오.",
+            // 추가된 메시지들
+            "msg-submit-success": "답안지가 성공적으로 제출되었습니다!",
+            "msg-select-students-to-remove": "삭제할 학생을 선택해 주세요.",
+            "msg-select-question-to-add-choice": "선택지를 추가할 문제를 선택해 주세요.",
+            "msg-select-question-to-delete-choice": "문제를 먼저 선택해 주세요.",
+            "msg-specify-choice-to-delete": "삭제할 선택지를 지정해 주세요.",
+            "msg-confirm-delete-content-choice": "내용이 있는 선택지입니다. 정말 삭제하시겠습니까?",
+            "msg-select-question-to-insert-choice": "선택지를 삽입할 문제를 선택해 주세요.",
+            "msg-input-insert-pos": "삽입할 위치(번호)를 입력해 주세요.",
+            "msg-select-question-to-remove": "삭제할 문제를 선택해 주세요.",
+            "msg-confirm-delete-content-question": "내용이 있는 문제입니다. 정말 삭제하시겠습니까?",
+            "msg-file-open-error": "파일을 여는 중 오류가 발생했습니다: {error}",
+            "msg-file-save-error": "저장 중 오류가 발생했습니다: {error}",
+            "msg-unsupported-file-format": "지원하지 않는 파일 형식입니다.",
+            "msg-file-save-success": "파일이 성공적으로 저장되었습니다."
         }
     },
     en: {
@@ -179,6 +195,7 @@ export const translations = {
             "st-lang": "Language",
             "st-scope-guide": "Please set the range and the number of questions.",
             "st-scope-count-label": "Questions:",
+            "st-scope-count-max": "(Max {n})",
             "st-scope-title": "Scope Setting",
             "in-help": "Help",
             "in-info-soft": "Software Info",
@@ -200,7 +217,23 @@ export const translations = {
             "ph-header-cat-1": "Type A",
             "ph-header-cat-2": "Type B",
             "ph-header-cat-3": "Type C",
-            "ph-header-cat-4": "Type D", "ph-header-notice-text": "Examination Guidelines:\n# General Instructions\nContextual Understanding: All questions must be interpreted and answered within the specific context of the Information Security course. Failure to do so may lead to incorrect interpretations.\n# Question Types & Scoring\n* Type A: Single-Choice Questions - Select one best answer from the given options. Full points are awarded for the correct answer. You will receive 0 points if no answer is selected or if multiple options are chosen.\n* Type B: Multiple-Choice Questions - Select all applicable answers from the given options. Full points are awarded only if all selected answers are correct. No partial credit is given; any incorrect or missing selection will result in 0 points.\n* Type C: Short-Answer Questions - Provide the correct word, phrase, or brief expression as required.\n* Type D: Essay Questions - Provide a comprehensive written response to the prompt."
+            "ph-header-cat-4": "Type D",
+            "ph-header-notice-text": "Examination Guidelines:\n# General Instructions\nContextual Understanding: All questions must be interpreted and answered within the specific context of the Information Security course. Failure to do so may lead to incorrect interpretations.\n# Question Types & Scoring\n* Type A: Single-Choice Questions - Select one best answer from the given options. Full points are awarded for the correct answer. You will receive 0 points if no answer is selected or if multiple options are chosen.\n* Type B: Multiple-Choice Questions - Select all applicable answers from the given options. Full points are awarded only if all selected answers are correct. No partial credit is given; any incorrect or missing selection will result in 0 points.\n* Type C: Short-Answer Questions - Provide the correct word, phrase, or brief expression as required.\n* Type D: Essay Questions - Provide a comprehensive written response to the prompt.",
+            // Added messages
+            "msg-submit-success": "The answer sheet has been submitted successfully!",
+            "msg-select-students-to-remove": "Please select students to remove.",
+            "msg-select-question-to-add-choice": "Please select a question to add a choice.",
+            "msg-select-question-to-delete-choice": "Please select a question first.",
+            "msg-specify-choice-to-delete": "Please specify the choice to delete.",
+            "msg-confirm-delete-content-choice": "This choice has content. Are you sure you want to delete it?",
+            "msg-select-question-to-insert-choice": "Please select a question to insert a choice.",
+            "msg-input-insert-pos": "Please enter the position (number) to insert.",
+            "msg-select-question-to-remove": "Please select a question to remove.",
+            "msg-confirm-delete-content-question": "This question has content. Are you sure you want to delete it?",
+            "msg-file-open-error": "An error occurred while opening the file: {error}",
+            "msg-file-save-error": "An error occurred during saving: {error}",
+            "msg-unsupported-file-format": "Unsupported file format.",
+            "msg-file-save-success": "The file has been saved successfully."
         }
     },
     ru: {
@@ -272,6 +305,7 @@ export const translations = {
             "st-lang": "Язык",
             "st-scope-guide": "Пожалуйста, установите диапазон и количество вопросов.",
             "st-scope-count-label": "Вопросы:",
+            "st-scope-count-max": "(Макс {n})",
             "st-scope-title": "Настройка диапазона",
             "in-help": "Справка",
             "in-info-soft": "О программе",
@@ -294,7 +328,22 @@ export const translations = {
             "ph-header-cat-2": "Вариант Б",
             "ph-header-cat-3": "Вариант В",
             "ph-header-cat-4": "Вариант Г",
-            "ph-header-notice-text": "Инструкция к экзамену:\n# Общие указания\nКонтекстуальное понимание: Все вопросы должны интерпретироваться и рассматриваться исключительно в рамках курса «Информационная безопасность». Несоблюдение этого условия может привести к неправильному пониманию сути вопросов.\n# Типы вопросов и система оценивания\n* Вариант А: Вопросы с выбором одного ответа - Выберите один наиболее подходящий ответ из предложенного списка. За правильный ответ начисляется полный балл. Если ответ не выбран или выбрано более одного варианта, начисляется 0 баллов.\n* Вариант Б: Вопросы с выбором нескольких ответов - Выберите все применимые варианты ответов из предложенного списка. Полный балл начисляется только в том случае, если выбраны все правильные ответы. Частичные баллы не предусмотрены; наличие любой ошибки или отсутствие одного из верных вариантов приводит к результату в 0 баллов.\n* Вариант В: Краткий ответ - Напишите правильное слово, словосочетание или краткое выражение в соответствии с вопросом.\n* Вариант Г: Развернутый ответ (Эссе) - Дайте подробный и исчерпывающий письменный ответ на поставленный вопрос."
+            "ph-header-notice-text": "Инструкция к экзамену:\n# Общие указания\nКонтекстуальное понимание: Все вопросы должны интерпретироваться и рассматриваться исключительно в рамках курса «Информационная безопасность». Несоблюдение этого условия может привести к неправильному пониманию сути вопросов.\n# Типы вопросов и система оценивания\n* Вариант А: Вопросы с выбором одного ответа - Выберите один наиболее подходящий ответ из предложенного списка. За правильный ответ начисляется полный балл. Если ответ не выбран или выбрано более одного варианта, начисляется 0 баллов.\n* Вариант Б: Вопросы с выбором нескольких ответов - Выберите все применимые варианты ответов из предложенного списка. Полный балл начисляется только в том случае, если выбраны все правильные ответы. Частичные баллы не предусмотрены; наличие любой ошибки или отсутствие одного из верных вариантов приводит к результату в 0 баллов.\n* Вариант В: Краткий ответ - Напишите правильное слово, словосочетание или краткое выражение в соответствии с вопросом.\n* Вариант Г: Развернутый ответ (Эссе) - Дайте подробный и исчерпывающий письменный ответ на поставленный вопрос.",
+            // Добавленные сообщения
+            "msg-submit-success": "Ответы успешно сданы!",
+            "msg-select-students-to-remove": "Пожалуйста, выберите студентов для удаления.",
+            "msg-select-question-to-add-choice": "Пожалуйста, выберите вопрос для добавления варианта.",
+            "msg-select-question-to-delete-choice": "Пожалуйста, сначала выберите вопрос.",
+            "msg-specify-choice-to-delete": "Пожалуйста, укажите вариант для удаления.",
+            "msg-confirm-delete-content-choice": "Этот вариант содержит данные. Вы уверены, что хотите его удалить?",
+            "msg-select-question-to-insert-choice": "Пожалуйста, выберите вопрос для вставки варианта.",
+            "msg-input-insert-pos": "Пожалуйста, введите позицию (номер) для вставки.",
+            "msg-select-question-to-remove": "Пожалуйста, выберите вопрос для удаления.",
+            "msg-confirm-delete-content-question": "Этот вопрос содержит данные. Вы уверены, что хотите его удалить?",
+            "msg-file-open-error": "Произошла ошибка при открытии файла: {error}",
+            "msg-file-save-error": "Произошла ошибка при сохранении: {error}",
+            "msg-unsupported-file-format": "Неподдерживаемый формат файла.",
+            "msg-file-save-success": "Файл успешно сохранен."
         }
     },
     ky: {
@@ -308,7 +357,7 @@ export const translations = {
         },
         actions: {
             "qb-new": "Жаңы",
-            "qb-open": "Ачуу",
+            "qb-open": "Ачу우",
             "qb-save": "Сактоо",
             "qb-save-as": "Башкача сактоо",
             "qb-edit-header": "Баш сапты түзөтүү",
@@ -344,7 +393,7 @@ export const translations = {
             "sl-new": "Жаңы",
             "sl-open": "Ачуу",
             "sl-save": "Сактоо",
-            "sl-save-as": "Башкача сактоо",
+            "sl-save-as": "Башкача сакто오",
             "sl-edit-student-list": "Студенттердин тизмесин түзөтүү",
             "sl-optimize": "Оптималдаштыруу",
             "sl-editing": "Студенттердин тизмесин түзөтүү",
@@ -366,16 +415,17 @@ export const translations = {
             "st-lang": "Тилди тандоо",
             "st-scope-guide": "Суроолордун диапазонун жана санын белгилеңиз.",
             "st-scope-count-label": "Суроолордун саны:",
+            "st-scope-count-max": "(Максимум {n})",
             "st-scope-title": "Диапазонду орнотуу",
-            "in-help": "Жардам",
+            "in-help": "Жар담",
             "in-info-soft": "Программа жөнүндө",
             "in-info-copy": "Автордук укуктар",
             "in-info-copy-text": "Автордук укуктар 2026.\nПАК Ёңхо.\nБардык укуктар корголгон.",
-            "in-info-license": "Лицензия 마알르마트",
+            "in-info-license": "Лицензия маалыматы",
             "in-info-license-text": "Бул программалык камсыздоо\nApache License 2.0 (же https://www.apache.org/licenses/LICENSE-2.0)\nже болбосо MIT (же https://opensource.org/licenses/MIT)\nлицензиясынын шарттарына ылайык таркатылат.",
             "sl-confirm-new-title": "Жаңы студенттердин тизмесин түзүү",
-            "sl-confirm-new-msg": "Эгер сиз түзөтүп жаткан студенттердин тизмесин сактабасаңыз, бардык өзгөртүүлөрүңүз жоголот. Сактайсызбы?",
-            "sl-confirm-new-yes": "Ооба",
+            "sl-confirm-new-msg": "Эгер сиз түзөтүп жа트кан студенттердин тизмесин сактабасаңыз, бардык өзгөртүүлөрүңүз жоголот. Сактайсызбы?",
+            "sl-confirm-new-yes": "Оо바",
             "sl-confirm-new-no": "Жок",
             "ph-question": "Суроону бул жерге киргизиңиз...",
             "ph-choice": "{n}-вариантты киргизиңиз...",
@@ -388,7 +438,22 @@ export const translations = {
             "ph-header-cat-2": "2-вариант",
             "ph-header-cat-3": "3-вариант",
             "ph-header-cat-4": "4-вариант",
-            "ph-header-notice-text": "Сынактын эрежелери:\n# Жалпы көрсөтмөлөр\nКонтекстти түшүнүү: Бардык суроолор «Маалыматтык коопсуздук» курсунун алкагында гана чечмелениши жана жооп берилиши керек. Бул шарт сакталбаса, суроолор ката чечмеленип калышы мүмкүн.\n# Суроолордун түрлөрү жана баалоо\n* 1-вариант: Бир туура жоопту тандоо - Берилген варианттардын ичинен бир эң туура жоопту тандаңыз. Туура жооп үчүн толук упай берилет. Эгерде жооп тандалбаса же бирден ашык вариант белгиленсе, 0 упай берилет.\n* 2-вариант: Бир нече туура жоопту тандоо - Берилген варианттардын ичинен бардык туура келген жоопторду тандаңыз. Бардык тандалган жооптор туура болгон учурда гана толук упай берилет. Жардамчы упайлар (бөлүп берүү) каралган эмес; кандайдыр бир ката кетсе же туура жооптордун бири белгиленбей калса, 0 упай берилет.\n* 3-вариант: Кыскача жооп берүү - Суроонун талабына ылайык туура сөздү, сөз айкашын же кыска туюнтманы жазыңыз.\n* 4-вариант: Эссе (Кеңири жооп берүү) - Берилген суроого толук жана кеңири жазуу жүзүндө жооп бериңиз."
+            "ph-header-notice-text": "Сынактын эрежелери:\n# Жалпы көрсөтмөлөр\nКонтекстти түшүнүү: Бардык суроолор «Маалыматтык коопсуздук» курсунун алкагында гана чечмелениши жана жооп берилиши керек. Бул шарт сакталбаса, суроолор ката чечмеленип калышы мүмкүн.\n# Суроолордун түрлөрү жана баалоо\n* 1-вариант: Бир туура жоопту тандоо - Берилген варианттардын ичинен бир эң туура жоопту тандаңыз. Туура жооп үчүн толук упай берилет. Эгерде жооп тандалбаса же бирден ашык вариант белгиленсе, 0 упай берилет.\n* 2-вариант: Бир нече туура жооп투 тандоо - Берилген варианттардын и치нен бардык туура келген жоопторду тандаңыз. Бардык тандалган жооптор туура болгон учурда гана толук упай берилет. Жардамчы упайлар (бөлүп берүү) каралган эмес; кандайдыр бир ката кетсе же туура жооптордун бири белгиленбей калса, 0 упай берилет.\n* 3-вариант: Кыскача жооп берүү - Суроонун талабына ылайык туура сөздү, сөз айкашын же кыска туюнтманы жазыңыз.\n* 4-вариант: Эссе (Кеңири жооп берүү) - Берилген су로ого толук жана кеңири жазуу жүзүндө жооп бериңиз.",
+            // Кошулган билдирүүлөр
+            "msg-submit-success": "Жооп баракчасы ийгиликтүү тапшырылды!",
+            "msg-select-students-to-remove": "Өчүрүү үчүн студенттерди тандаңыз.",
+            "msg-select-question-to-add-choice": "Вариант кошуу үчүн суроону тандаңыз.",
+            "msg-select-question-to-delete-choice": "Алгач суроону тандаңыз.",
+            "msg-specify-choice-to-delete": "Өчүрүлө турган вариантты белгилеңиз.",
+            "msg-confirm-delete-content-choice": "Бул вариантта маалымат бар. Чын эле өчүрүүнү каалайсызбы?",
+            "msg-select-question-to-insert-choice": "Вариант киргизүү үчүн суроону тандаңыз.",
+            "msg-input-insert-pos": "Киргизиле турган позицияны (номерди) жазыңыз.",
+            "msg-select-question-to-remove": "Өчүрүү үчүн суроону тандаңыз.",
+            "msg-confirm-delete-content-question": "Бул суроодо маалымат бар. Чын эле өчүрүүнү каалайсызбы?",
+            "msg-file-open-error": "Файлды ачууда ката кетти: {error}",
+            "msg-file-save-error": "Сактоо учурунда ката кетти: {error}",
+            "msg-unsupported-file-format": "Колдонулбай турган файл форматы.",
+            "msg-file-save-success": "Файл ийгиликтүү сакталды."
         }
     }
 };

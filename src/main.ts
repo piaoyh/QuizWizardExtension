@@ -922,7 +922,7 @@ class QuizWizardApp {
             /* --- Self-study (자기 주도 학습) --- */
             case 'ss-load-bank':    this.openQuestionBank(); break;               // 추가됨 (공용 함수 사용)
             case 'ss-set-scope': this.setExamScope(); break;                  // 추가됨
-            case 'ss-change-grading': this.setGradingMethod(); break;             // 추가됨
+            case 'ss-set-grading-method': this.setGradingMethod(); break;             // 추가됨
             case 'ss-start':        this.startSelfstudy(); break;                 // 추가됨
 
             /* --- Settings (설정) --- */
@@ -2058,15 +2058,9 @@ class QuizWizardApp {
         }
     }
 
-    private extractQuestionDataFromWorkspace()
+    /** 현재 questionsData 배열의 내용을 WASM 엔진(ControlTower)에 동기화합니다. */
+    private syncQuestionsToWasm()
     {
-        // 현재 화면의 데이터를 상태로 추출
-        if (this.currentMenu === 'header-edit') {
-            this.saveCurrentHeaderToState();
-        } else if (this.currentMenu === 'question-bank') {
-            this.saveCurrentQuestionsToState();
-        }
-        
         // WASM ControlTower 데이터 갱신
         let oldQLen = this.control_tower.get_question_length();
         if (oldQLen === 0)
@@ -2111,10 +2105,6 @@ class QuizWizardApp {
                     this.control_tower.push_choice(qIdx, c.text, c.correct);
                 }
             }
-
-            // 남는 선택지 삭제 (WASM에 remove_choice가 있는지 확인 필요, 없으면 빈 값으로 채우거나 대응)
-            // 만약 remove_choice가 없다면 일단 놔두거나 주인님께 여쭤봐야 함. 
-            // d.ts에 remove_choice가 없으므로 일단 업데이트만 진행합니다.
         }
 
         // 남는 문제 삭제 (뒤에서부터 삭제)
@@ -2130,13 +2120,50 @@ class QuizWizardApp {
         }
     }
 
+    private extractQuestionDataFromWorkspace()
+    {
+        // 현재 화면의 데이터를 상태로 추출
+        if (this.currentMenu === 'header-edit') {
+            this.saveCurrentHeaderToState();
+        } else if (this.currentMenu === 'question-bank') {
+            this.saveCurrentQuestionsToState();
+        }
+        
+        this.syncQuestionsToWasm();
+    }
+
     private optimizeQuestionBank()
     {
-        this.extractQuestionDataFromWorkspace();
+        // 1. 현재 화면 데이터 저장
+        if (this.currentMenu === 'question-bank') {
+            this.saveCurrentQuestionsToState();
+        } else if (this.currentMenu === 'header-edit') {
+            this.saveCurrentHeaderToState();
+        }
+
+        // 2. 비어 있는 문제 필터링 (본문과 모든 선택지가 비어 있는 경우 제거)
+        this.questionsData = this.questionsData.filter(q => 
+            q.text.trim().length > 0 || q.choices.some(c => c.text.trim().length > 0)
+        );
+
+        // 3. 만약 모든 데이터가 비어 있다면 빈 카드 하나만 남김
+        if (this.questionsData.length === 0)
+        {
+            this.questionsData = [{
+                group: '1',
+                text: '',
+                choices: Array.from({ length: 4 }, () => ({ text: '', correct: false }))
+            }];
+        }
+
+        // 4. WASM 엔진 데이터 갱신
+        this.syncQuestionsToWasm();
+        
+        // 5. WASM 엔진 최적화
         this.control_tower.optimize_qbank();
+
+        // 6. 결과 반영 (WASM에서 다시 읽어와서 UI 갱신)
         this.putQuestionBankToWorkspace();
-        // [참고] putQuestionBankToWorkspace() 내에서 이미 initializeQuestionBankWorkspace(false, true)를 호출함.
-        // 그리고 initializeQuestionBankWorkspace에서 데이터가 없을 때 1개만 남기도록 수정됨.
     }
 
     /* 학생 명단 관련 함수군 */

@@ -117,7 +117,8 @@ class QuizWizardApp {
     }
     handleFinalSubmission() {
         // 여기에 제출 후 처리 로직을 작성합니다.
-        alert("답안지가 성공적으로 제출되었습니다!");
+        const msg = translations[this.currentLang].actions['msg-submit-success'];
+        alert(msg);
     }
     /**
      * 테마 설정 대화상자의 버튼 이벤트를 초기화합니다.
@@ -402,7 +403,8 @@ class QuizWizardApp {
         const beforeCount = this.studentsData.length;
         this.studentsData = this.studentsData.filter(s => !s.selected);
         if (this.studentsData.length === beforeCount) {
-            alert(this.currentLang === 'ko' ? "삭제할 학생을 선택해 주세요." : (this.currentLang === 'ky' ? "Өчүрүү үчүн студенттерди тандаңыз." : "Please select students to remove."));
+            const msg = translations[this.currentLang].actions['msg-select-students-to-remove'];
+            alert(msg);
             return;
         }
         this.isDirtySL = true;
@@ -837,7 +839,7 @@ class QuizWizardApp {
             case 'ss-set-scope':
                 this.setExamScope();
                 break; // 추가됨
-            case 'ss-change-grading':
+            case 'ss-set-grading-method':
                 this.setGradingMethod();
                 break; // 추가됨
             case 'ss-start':
@@ -1030,8 +1032,10 @@ class QuizWizardApp {
                 const pos = parseInt(rightInput.value);
                 if (!isNaN(pos))
                     this.insertQuestion(pos);
-                else
-                    alert("삽입할 위치(번호)를 입력해 주세요.");
+                else {
+                    const msg = translations[this.currentLang].actions['msg-input-insert-pos'];
+                    alert(msg);
+                }
             });
             document.getElementById('add-question-btn')?.addEventListener('click', () => this.addNewQuestion());
             document.getElementById('remove-question-btn')?.addEventListener('click', () => this.removeFocusedQuestion());
@@ -1221,11 +1225,13 @@ class QuizWizardApp {
         const qIdx = this.focusedQuestionIndex;
         const cIdx = this.focusedChoiceIndex;
         if (qIdx === null || !this.questionsData[qIdx]) {
-            alert(this.currentLang === 'ko' ? "문제를 먼저 선택해 주세요." : (this.currentLang === 'ky' ? "Алгач суроону тандаңыз." : "Please select a question."));
+            const msg = translations[this.currentLang].actions['msg-select-question-to-delete-choice'];
+            alert(msg);
             return;
         }
         if (cIdx === null || !this.questionsData[qIdx].choices[cIdx]) {
-            alert(this.currentLang === 'ko' ? "삭제할 선택지를 지정해 주세요." : (this.currentLang === 'ky' ? "Өчүрүлө турган вариантты белгилеңиз." : "Please specify the choice to delete."));
+            const msg = translations[this.currentLang].actions['msg-specify-choice-to-delete'];
+            alert(msg);
             return;
         }
         this.saveCurrentQuestionsToState();
@@ -1237,7 +1243,7 @@ class QuizWizardApp {
         const hasContent = targetChoice.text.trim().length > 0;
         let shouldDelete = false;
         if (hasContent) {
-            const confirmMsg = this.currentLang === 'ko' ? "내용이 있는 선택지입니다. 정말 삭제하시겠습니까?" : (this.currentLang === 'ky' ? "Бул вариантта маалымат бар. Чын эле өчүрүүнү каалайсызбы?" : "This choice has content. Are you sure you want to delete it?");
+            const confirmMsg = translations[this.currentLang].actions['msg-confirm-delete-content-choice'];
             if (confirm(confirmMsg)) {
                 shouldDelete = true;
             }
@@ -1274,7 +1280,8 @@ class QuizWizardApp {
     insertChoice(targetPos) {
         const qIdx = this.focusedQuestionIndex;
         if (qIdx === null || !this.questionsData[qIdx]) {
-            alert(this.currentLang === 'ko' ? "선택지를 삽입할 문제를 선택해 주세요." : (this.currentLang === 'ky' ? "Вариант киргизүү үчүн суроону тандаңыз." : "Please select a question."));
+            const msg = translations[this.currentLang].actions['msg-select-question-to-insert-choice'];
+            alert(msg);
             return;
         }
         this.saveCurrentQuestionsToState();
@@ -1305,8 +1312,7 @@ class QuizWizardApp {
     /** 포커스된 문제 삭제 */
     removeFocusedQuestion() {
         if (this.focusedQuestionIndex === null) {
-            const msg = this.currentLang === 'ko' ? "삭제할 문제를 선택해 주세요." :
-                (this.currentLang === 'ru' ? "Выберите вопрос для удаления." : (this.currentLang === 'ky' ? "Өчүрүү үчүн суроону тандаңыз." : "Please select a question to remove."));
+            const msg = translations[this.currentLang].actions['msg-select-question-to-remove'];
             alert(msg);
             return;
         }
@@ -1319,19 +1325,7 @@ class QuizWizardApp {
         const hasContent = q.text.trim().length > 0 || q.choices.some(c => c.text.trim().length > 0);
         let shouldDelete = false;
         if (hasContent) {
-            let confirmMsg = "";
-            if (this.currentLang === 'ko') {
-                confirmMsg = "내용이 있는 문제입니다. 정말 삭제하시겠습니까?";
-            }
-            else if (this.currentLang === 'ru') {
-                confirmMsg = "Этот вопрос содержит данные. Вы уверены, что хотите его удалить?";
-            }
-            else if (this.currentLang === 'ky') {
-                confirmMsg = "Бул суроодо маалымат бар. Чын эле өчүрүүнү каалайсызбы?";
-            }
-            else {
-                confirmMsg = "This question has content. Are you sure you want to delete it?";
-            }
+            const confirmMsg = translations[this.currentLang].actions['msg-confirm-delete-content-question'];
             if (confirm(confirmMsg)) {
                 shouldDelete = true;
             }
@@ -1765,7 +1759,8 @@ class QuizWizardApp {
         catch (err) {
             if (err.name !== 'AbortError') {
                 console.error("문제은행 파일 열기 중 오류 발생:", err);
-                alert(`파일을 여는 중 오류가 발생했습니다: ${err.message || err}`);
+                const msg = translations[this.currentLang].actions['msg-file-open-error'].replace('{error}', err.message || err);
+                alert(msg);
             }
         }
     }
@@ -1846,7 +1841,8 @@ class QuizWizardApp {
         catch (err) {
             if (err.name !== 'AbortError') {
                 console.error("다른 이름으로 저장 중 오류:", err);
-                alert(`저장 중 오류가 발생했습니다: ${err.message || err}`);
+                const msg = translations[this.currentLang].actions['msg-file-save-error'].replace('{error}', err.message || err);
+                alert(msg);
             }
         }
     }
@@ -1870,14 +1866,8 @@ class QuizWizardApp {
             throw err;
         }
     }
-    extractQuestionDataFromWorkspace() {
-        // 현재 화면의 데이터를 상태로 추출
-        if (this.currentMenu === 'header-edit') {
-            this.saveCurrentHeaderToState();
-        }
-        else if (this.currentMenu === 'question-bank') {
-            this.saveCurrentQuestionsToState();
-        }
+    /** 현재 questionsData 배열의 내용을 WASM 엔진(ControlTower)에 동기화합니다. */
+    syncQuestionsToWasm() {
         // WASM ControlTower 데이터 갱신
         let oldQLen = this.control_tower.get_question_length();
         if (oldQLen === 0) {
@@ -1918,9 +1908,6 @@ class QuizWizardApp {
                     this.control_tower.push_choice(qIdx, c.text, c.correct);
                 }
             }
-            // 남는 선택지 삭제 (WASM에 remove_choice가 있는지 확인 필요, 없으면 빈 값으로 채우거나 대응)
-            // 만약 remove_choice가 없다면 일단 놔두거나 주인님께 여쭤봐야 함. 
-            // d.ts에 remove_choice가 없으므로 일단 업데이트만 진행합니다.
         }
         // 남는 문제 삭제 (뒤에서부터 삭제)
         if (oldQLen > newQLen) {
@@ -1933,12 +1920,40 @@ class QuizWizardApp {
             this.control_tower.determine_category(i + 1);
         }
     }
+    extractQuestionDataFromWorkspace() {
+        // 현재 화면의 데이터를 상태로 추출
+        if (this.currentMenu === 'header-edit') {
+            this.saveCurrentHeaderToState();
+        }
+        else if (this.currentMenu === 'question-bank') {
+            this.saveCurrentQuestionsToState();
+        }
+        this.syncQuestionsToWasm();
+    }
     optimizeQuestionBank() {
-        this.extractQuestionDataFromWorkspace();
+        // 1. 현재 화면 데이터 저장
+        if (this.currentMenu === 'question-bank') {
+            this.saveCurrentQuestionsToState();
+        }
+        else if (this.currentMenu === 'header-edit') {
+            this.saveCurrentHeaderToState();
+        }
+        // 2. 비어 있는 문제 필터링 (본문과 모든 선택지가 비어 있는 경우 제거)
+        this.questionsData = this.questionsData.filter(q => q.text.trim().length > 0 || q.choices.some(c => c.text.trim().length > 0));
+        // 3. 만약 모든 데이터가 비어 있다면 빈 카드 하나만 남김
+        if (this.questionsData.length === 0) {
+            this.questionsData = [{
+                    group: '1',
+                    text: '',
+                    choices: Array.from({ length: 4 }, () => ({ text: '', correct: false }))
+                }];
+        }
+        // 4. WASM 엔진 데이터 갱신
+        this.syncQuestionsToWasm();
+        // 5. WASM 엔진 최적화
         this.control_tower.optimize_qbank();
+        // 6. 결과 반영 (WASM에서 다시 읽어와서 UI 갱신)
         this.putQuestionBankToWorkspace();
-        // [참고] putQuestionBankToWorkspace() 내에서 이미 initializeQuestionBankWorkspace(false, true)를 호출함.
-        // 그리고 initializeQuestionBankWorkspace에서 데이터가 없을 때 1개만 남기도록 수정됨.
     }
     /* 학생 명단 관련 함수군 */
     newStudentList() {
@@ -2101,7 +2116,8 @@ class QuizWizardApp {
         }
         catch (err) {
             console.error("학생 명단 저장 중 오류 발생:", err);
-            alert(`저장 중 오류가 발생했습니다: ${err.message || err}`);
+            const msg = translations[this.currentLang].actions['msg-file-save-error'].replace('{error}', err.message || err);
+            alert(msg);
         }
         console.log("학생 명단 데이터가 WASM 엔진 및 파일에 성공적으로 저장되었습니다.");
         // this.initializeStudentListWorkspace(); 
@@ -2168,13 +2184,17 @@ class QuizWizardApp {
                 case 'pdf':
                     await this.saveExamPaperAsPdf();
                     break;
-                default: alert(this.currentLang === 'ko' ? "지원하지 않는 파일 형식입니다." : (this.currentLang === 'ky' ? "Колдонулбай турган файл форматы." : "Unsupported file format."));
+                default: {
+                    const msg = translations[this.currentLang].actions['msg-unsupported-file-format'];
+                    alert(msg);
+                }
             }
         }
         catch (err) {
             if (err.name !== 'AbortError') {
                 console.error("시험지 저장 중 오류:", err);
-                alert(`저장 중 오류가 발생했습니다: ${err.message || err}`);
+                const msg = translations[this.currentLang].actions['msg-file-save-error'].replace('{error}', err.message || err);
+                alert(msg);
             }
         }
     }
