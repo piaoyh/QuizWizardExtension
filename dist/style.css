@@ -71,6 +71,12 @@ body.theme-web .app-logo { color: #7fbde6; }
 }
 .menu-item.active { background-color: var(--active-bg); color: var(--active-text); font-weight: bold; }
 
+/* 마우스가 메뉴 바 위에 있을 때, 선택된 메뉴의 하이라이트를 일단 해제합니다. */
+.menu-bar:hover .menu-item.active { background-color: transparent; color: var(--nav-text); }
+
+/* 마우스가 올라가 있는 메뉴 항목(또는 그 하위 메뉴 포함)만 하이라이트합니다. */
+.menu-item-container:hover .menu-item { background-color: var(--active-bg); color: var(--active-text); }
+
 .submenu {
     display: none; position: absolute; top: var(--nav-height); left: 0;
     min-width: 180px; background-color: var(--nav-bg); border: 1px solid var(--border-color);
