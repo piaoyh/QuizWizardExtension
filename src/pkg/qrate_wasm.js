@@ -2,7 +2,6 @@
 
 export class ChoiceMark {
     static __wrap(ptr) {
-        ptr = ptr >>> 0;
         const obj = Object.create(ChoiceMark.prototype);
         obj.__wbg_ptr = ptr;
         ChoiceMarkFinalization.register(obj, obj.__wbg_ptr, obj);
@@ -86,7 +85,7 @@ export class ChoiceMark {
         const ptr0 = passStringToWasm0(text, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.choicemark_new(ptr0, len0, is_correct);
-        this.__wbg_ptr = ret >>> 0;
+        this.__wbg_ptr = ret;
         ChoiceMarkFinalization.register(this, this.__wbg_ptr, this);
         return this;
     }
@@ -620,7 +619,7 @@ export class ControlTower {
      */
     constructor() {
         const ret = wasm.controltower_new();
-        this.__wbg_ptr = ret >>> 0;
+        this.__wbg_ptr = ret;
         ControlTowerFinalization.register(this, this.__wbg_ptr, this);
         return this;
     }
@@ -1174,7 +1173,6 @@ export const ErrorMessage = Object.freeze({
 
 export class NameId {
     static __wrap(ptr) {
-        ptr = ptr >>> 0;
         const obj = Object.create(NameId.prototype);
         obj.__wbg_ptr = ptr;
         NameIdFinalization.register(obj, obj.__wbg_ptr, obj);
@@ -1268,7 +1266,7 @@ export class NameId {
         const ptr1 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
         const ret = wasm.nameid_new(ptr0, len0, ptr1, len1);
-        this.__wbg_ptr = ret >>> 0;
+        this.__wbg_ptr = ret;
         NameIdFinalization.register(this, this.__wbg_ptr, this);
         return this;
     }
@@ -1319,61 +1317,61 @@ export function generate_exam_wasm(input_data) {
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
-        __wbg___wbindgen_throw_6b64449b9b9ed33c: function(arg0, arg1) {
+        __wbg___wbindgen_throw_9c31b086c2b26051: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
-        __wbg_getDate_a6d29e0195e2b922: function(arg0) {
+        __wbg_getDate_a52123c8affc9072: function(arg0) {
             const ret = arg0.getDate();
             return ret;
         },
-        __wbg_getDay_d40b1e1b4ed9ae92: function(arg0) {
+        __wbg_getDay_50a9ee1e4d17dc24: function(arg0) {
             const ret = arg0.getDay();
             return ret;
         },
-        __wbg_getFullYear_87c6d68ce4941f16: function(arg0) {
+        __wbg_getFullYear_d5d1f7de344fdc5b: function(arg0) {
             const ret = arg0.getFullYear();
             return ret;
         },
-        __wbg_getHours_bba0ffaba65cf3f1: function(arg0) {
+        __wbg_getHours_c974d920209733e8: function(arg0) {
             const ret = arg0.getHours();
             return ret;
         },
-        __wbg_getMinutes_240bbdd69fb6e5d0: function(arg0) {
+        __wbg_getMinutes_e2e8ae846b37b328: function(arg0) {
             const ret = arg0.getMinutes();
             return ret;
         },
-        __wbg_getMonth_774597931909564c: function(arg0) {
+        __wbg_getMonth_de70091920053153: function(arg0) {
             const ret = arg0.getMonth();
             return ret;
         },
         __wbg_getRandomValues_477b66419bbb968d: function() { return handleError(function (arg0, arg1) {
             globalThis.crypto.getRandomValues(getArrayU8FromWasm0(arg0, arg1));
         }, arguments); },
-        __wbg_getSeconds_95f730540087b3b6: function(arg0) {
+        __wbg_getSeconds_2782a558f414ec05: function(arg0) {
             const ret = arg0.getSeconds();
             return ret;
         },
-        __wbg_getTime_da7c55f52b71e8c6: function(arg0) {
+        __wbg_getTime_09f1dd40a44edb30: function(arg0) {
             const ret = arg0.getTime();
             return ret;
         },
-        __wbg_getTimezoneOffset_31f57a5389d0d57c: function(arg0) {
+        __wbg_getTimezoneOffset_96cfb6ddebc9e5ca: function(arg0) {
             const ret = arg0.getTimezoneOffset();
             return ret;
         },
-        __wbg_new_0_4d657201ced14de3: function() {
+        __wbg_new_0_2722fcdb71a888a6: function() {
             const ret = new Date();
             return ret;
         },
-        __wbg_new_7913666fe5070684: function(arg0) {
+        __wbg_new_859b9002e2668e82: function(arg0) {
             const ret = new Date(arg0);
             return ret;
         },
-        __wbg_new_with_year_month_day_c5da92578bfcdd66: function(arg0, arg1, arg2) {
+        __wbg_new_with_year_month_day_0ccdc1cc3a42b726: function(arg0, arg1, arg2) {
             const ret = new Date(arg0 >>> 0, arg1, arg2);
             return ret;
         },
-        __wbg_random_ce7f6871aed001dd: function() {
+        __wbg_random_a8dfe52b70cb65a5: function() {
             const ret = Math.random();
             return ret;
         },
@@ -1405,13 +1403,13 @@ function __wbg_get_imports() {
 
 const ChoiceMarkFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_choicemark_free(ptr >>> 0, 1));
+    : new FinalizationRegistry(ptr => wasm.__wbg_choicemark_free(ptr, 1));
 const ControlTowerFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_controltower_free(ptr >>> 0, 1));
+    : new FinalizationRegistry(ptr => wasm.__wbg_controltower_free(ptr, 1));
 const NameIdFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_nameid_free(ptr >>> 0, 1));
+    : new FinalizationRegistry(ptr => wasm.__wbg_nameid_free(ptr, 1));
 
 function addToExternrefTable0(obj) {
     const idx = wasm.__externref_table_alloc();
@@ -1439,8 +1437,7 @@ function getBigUint64ArrayMemory0() {
 }
 
 function getStringFromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return decodeText(ptr, len);
+    return decodeText(ptr >>> 0, len);
 }
 
 let cachedUint8ArrayMemory0 = null;
@@ -1546,8 +1543,9 @@ if (!('encodeInto' in cachedTextEncoder)) {
 
 let WASM_VECTOR_LEN = 0;
 
-let wasmModule, wasm;
+let wasmModule, wasmInstance, wasm;
 function __wbg_finalize_init(instance, module) {
+    wasmInstance = instance;
     wasm = instance.exports;
     wasmModule = module;
     cachedBigUint64ArrayMemory0 = null;

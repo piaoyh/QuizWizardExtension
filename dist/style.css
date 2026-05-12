@@ -561,8 +561,8 @@ dialog::backdrop {
 .header-label {
     font-size: 13px;
     font-weight: bold;
-    min-width: 30px;
-    flex-shrink: 1;
+    min-width: 30px; /* Increased from 30px to accommodate longer labels */
+    flex-shrink: 0;   /* Changed from 1 to 0 to prevent shrinking */
     line-height: 26px; /* 추가: 입력창과 높이 맞춤 */
 }
 

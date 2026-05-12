@@ -1262,8 +1262,22 @@ class QuizWizardApp {
                     <div class="header-row">
         `;
 
-        for (let i = 1; i <= 4; i++) {
-            const labelCat = (langData.actions['qb-header-category'] || '카테고리 {n}:').replace('{n}', i.toString());
+        for (let i = 1; i <= 2; i++) {
+            const labelCat = langData.actions[`qb-header-category-${i}`] || (langData.actions['qb-header-category'] || '카테고리 {n}:').replace('{n}', i.toString());
+            const defaultCat = langData.actions[`ph-header-cat-${i}`] || `Type ${String.fromCharCode(64 + i)}`;
+            html += `
+                <div class="header-label">${labelCat}</div>
+                <input type="text" id="header-cat-${i}" class="header-input header-input-category" value="${headerCats[i-1] || defaultCat}">
+            `;
+        }
+
+        html += `
+                    </div>
+                    <div class="header-row">
+        `;
+
+        for (let i = 3; i <= 4; i++) {
+            const labelCat = langData.actions[`qb-header-category-${i}`] || (langData.actions['qb-header-category'] || '카테고리 {n}:').replace('{n}', i.toString());
             const defaultCat = langData.actions[`ph-header-cat-${i}`] || `Type ${String.fromCharCode(64 + i)}`;
             html += `
                 <div class="header-label">${labelCat}</div>
