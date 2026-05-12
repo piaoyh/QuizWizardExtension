@@ -1081,7 +1081,15 @@ class QuizWizardApp {
                 this.isDirtyQB = true;
                 const el = e.target;
                 el.style.height = '0px';
-                el.style.height = el.scrollHeight + 'px';
+                const scrollHeight = el.scrollHeight;
+                el.style.height = scrollHeight + 'px';
+                // [수정] 한 줄일 때는 스크롤바 숨김, 두 줄 이상일 때만 보임
+                if (scrollHeight > el.clientHeight + 2) {
+                    el.style.overflowY = 'auto';
+                }
+                else {
+                    el.style.overflowY = 'hidden';
+                }
             });
         });
         // 체크박스 변경 감지
@@ -1694,6 +1702,13 @@ class QuizWizardApp {
                 el.style.height = '0px'; // 높이를 0으로 설정하여 scrollHeight를 정확히 측정
                 const scrollHeight = el.scrollHeight;
                 el.style.height = scrollHeight + 'px';
+                // [수정] 한 줄일 때는 스크롤바 숨김, 두 줄 이상일 때만 보임
+                if (scrollHeight > el.clientHeight + 2) {
+                    el.style.overflowY = 'auto';
+                }
+                else {
+                    el.style.overflowY = 'hidden';
+                }
             });
         }, 10);
     }
