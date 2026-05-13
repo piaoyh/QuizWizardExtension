@@ -2374,9 +2374,6 @@ class QuizWizardApp {
         await writable.close();
     }
     async savePdfFile(bytes) {
-        const jsonStr = new TextDecoder().decode(bytes);
-        const docDefinition = JSON.parse(jsonStr);
-        console.log("PDF 정의 데이터 생성 완료:", docDefinition);
         // 생성자에서 초기화에 실패했거나 나중에 로드되었을 경우를 대비해 다시 확인
         if (!this.pdfMake) {
             this.pdfMake = window.pdfMake;
@@ -2384,6 +2381,32 @@ class QuizWizardApp {
         if (!this.pdfMake) {
             throw new Error("pdfMake가 로드되지 않았습니다.");
         }
+        // VFS가 설정되지 않았을 경우 전역 vfs 객체에서 가져옴
+        if (!this.pdfMake.vfs && window.vfs) {
+            this.pdfMake.vfs = window.vfs;
+            console.log("pdfMake VFS 설정됨 (window.vfs 사용)");
+        }
+        // 폰트 파일명이 key가 됩니다.
+        this.pdfMake.fonts = {
+            Roboto: {
+                normal: 'Pretendard-Regular.ttf', // 파일명과 정확히 일치해야 함
+                bold: 'Pretendard-Bold.ttf',
+                italics: 'Pretendard-Regular.ttf',
+                bolditalics: 'Pretendard-Regular.ttf'
+            },
+            MyCustomFont: {
+                normal: 'Pretendard-Regular.ttf', // 파일명과 정확히 일치해야 함
+                bold: 'Pretendard-Bold.ttf',
+                italics: 'Pretendard-Regular.ttf',
+                bolditalics: 'Pretendard-Regular.ttf'
+            }
+        };
+        const jsonStr = new TextDecoder().decode(bytes);
+        const docDefinition = JSON.parse(jsonStr);
+        docDefinition.defaultStyle = {
+            font: 'MyCustomFont'
+        };
+        console.log("PDF 정의 데이터 생성 완료:", docDefinition);
         return new Promise((resolve, reject) => {
             this.pdfMake.createPdf(docDefinition).getBlob(async (blob) => {
                 console.log("PDF Blob 생성 완료, 크기:", blob.size);
