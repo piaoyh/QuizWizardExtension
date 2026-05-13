@@ -25,8 +25,10 @@ interface StudentState {
     studentId: string;
     selected: boolean;
 }
+// Auto Close Tag, ESLint, Live Server, Markdown All in One, Windsurf Plugin: Free AI-powered code acceleration toolkit
 
 class QuizWizardApp {
+    private pdfMake: any = null;
     private random_seeds = new BigUint64Array(16);
     private envLang = navigator.language;
     private control_tower!: ControlTower;
@@ -78,6 +80,7 @@ class QuizWizardApp {
 
     constructor() {
         this.container = document.getElementById('view-container');
+        this.pdfMake = (window as any).pdfMake;
         this.initApp();
     }
 
@@ -2642,7 +2645,8 @@ class QuizWizardApp {
 
     private async saveExamPaperAsPdf()
     {
-
+        const bytes = this.control_tower.generate_exam_in_pdf(this.scopeSettings.start, this.scopeSettings.end, this.scopeSettings.count, this.random_seeds);
+        await this.savePdfFile(bytes);
     }
 
     private async saveFile(bytes: any)
@@ -2650,6 +2654,43 @@ class QuizWizardApp {
         const writable = await this.handle.createWritable();
         await writable.write(bytes);
         await writable.close();
+    }
+
+    private async savePdfFile(bytes: any): Promise<void>
+    {
+        const jsonStr = new TextDecoder().decode(bytes);
+        const docDefinition = JSON.parse(jsonStr);
+        console.log("PDF 정의 데이터 생성 완료:", docDefinition);
+        
+        // 생성자에서 초기화에 실패했거나 나중에 로드되었을 경우를 대비해 다시 확인
+        if (!this.pdfMake) {
+            this.pdfMake = (window as any).pdfMake;
+        }
+
+        if (!this.pdfMake) {
+            throw new Error("pdfMake가 로드되지 않았습니다.");
+        }
+
+        return new Promise((resolve, reject) => {
+            this.pdfMake.createPdf(docDefinition).getBlob(async (blob: Blob) =>
+            {
+                console.log("PDF Blob 생성 완료, 크기:", blob.size);
+                if (blob.size === 0) {
+                    reject(new Error("생성된 PDF Blob의 크기가 0입니다."));
+                    return;
+                }
+                try {
+                    const writable = await this.handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    console.log("PDF 파일 쓰기 성공");
+                    resolve();
+                } catch (error) {
+                    console.error("PDF 파일 쓰기 실패:", error);
+                    reject(error);
+                }
+            });
+        });
     }
 
     private async generate_seeds()
