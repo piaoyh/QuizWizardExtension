@@ -2356,11 +2356,11 @@ class QuizWizardApp {
         else
             { this.questionsData = []; }
 
-        // [추가] 기본 출제 범위 및 문항 수 설정
+        // [추가] 기본 출제 범위(1번~끝) 및 문항 수(고유 그룹 수) 자동 설정
         this.scope_start = 1;
         this.scope_end = this.questionsData.length;
         
-        // 중복 없는 그룹 수를 계산하여 기본 문항 수로 설정
+        // 중복 없는 그룹 수를 계산하여 기본 문항 수로 설정 (WASM 생성기 요구사항 충족)
         const groups = new Set(this.questionsData.map(q => q.group).filter(g => g.trim() !== ''));
         this.scope_count = groups.size;
 
@@ -2960,7 +2960,7 @@ class QuizWizardApp {
         this.generate_seeds();
         const success = this.control_tower.start_self_study(start, end, count, this.random_seeds as any);
 
-        if (success) {//alert(this.control_tower.get_self_study_number_of_questions());
+        if (success) {
             // [수정] 학습 UI 상태 전환: 시작 버튼 숨기고 나머지 표시
             this.isStudyStarted = true;
             this.showStudyUI(); 
@@ -2977,7 +2977,7 @@ class QuizWizardApp {
                 this.renderSidebarButtons();
                 this.updateNavButtonsVisibility();
             }
-        }//else{alert("Wrong");}
+        }
     }
 
     private showStudyUI() {
