@@ -7,17 +7,22 @@
 // except according to those terms.
 ///////////////////////////////////////////////////////////////////////////////
 import { translations } from './i18n.js';
-import init, { ControlTower, NameId, ChoiceMark } from './pkg/qrate_wasm.js';
-// Auto Close Tag, ESLint, Live Server, Markdown All in One, Windsurf Plugin: Free AI-powered code acceleration toolkit
+import init, { ControlTower, NameId, ChoiceMark, QuestionData } from './pkg/qrate_wasm.js';
 class QuizWizardApp {
     pdfMake = null;
     random_seeds = new BigUint64Array(16);
     envLang = navigator.language;
     control_tower;
     container;
-    currentTheme = 'theme-web';
+    currentTheme = 'theme-blue';
     currentLang = 'ko';
-    currentMenu = ''; // [추가] 선택된 문제은행 파일의 경로를 저장할 필드
+    currentMenu = '';
+    header_scoring_rules = 'no-negative-marking-no-partial-credit';
+    scoring_rules = 'no-negative-marking-no-partial-credit';
+    scope_start = 1;
+    scope_end = 0;
+    scope_count = 0;
+    // [추가] 선택된 문제은행 파일의 경로를 저장할 필드
     question_bank_file_name = '';
     question_bank_file_handle = null; // [추가] 문제은행 파일 핸들 저장
     student_list_file_name = '';
@@ -30,12 +35,13 @@ class QuizWizardApp {
     currentQuestionIndex = 0;
     // 자기주도학습에서 사용자가 선택한 답안 (0-based question index -> 0-based choice index)
     userAnswers = [];
+    // 현재 포커스된 학생의 인덱스 (0-based)
+    focusedStudentIndex = null;
     // 현재 포커스된 문제의 인덱스 (0-based, 문제은행/학생명단 편집용)
     focusedQuestionIndex = null;
     // 현재 포커스된 선택지의 인덱스 (0-based)
     focusedChoiceIndex = null;
-    // 시험 출제 범위 설정
-    scopeSettings = { start: 1, end: 0, count: 0 };
+    // [삭제됨]
     // 문제은행 편집 모드 ('question' 또는 'choice')
     editorMode = 'question';
     isDirtyQB = false;
@@ -68,13 +74,20 @@ class QuizWizardApp {
         }
         // 3. 기존 로직들
         const data = await chrome.storage.local.get(['theme', 'lang']);
-        this.currentTheme = data.theme || 'theme-web';
+        let savedTheme = data.theme;
+        // 구버전 테마 이름 마이그레이션
+        if (savedTheme === 'theme-web')
+            savedTheme = 'theme-blue';
+        if (savedTheme === 'theme-desktop')
+            savedTheme = 'theme-light';
+        this.currentTheme = savedTheme || 'theme-blue';
         this.currentLang = data.lang || 'ko';
         document.body.className = this.currentTheme;
         this.updateUILanguage();
         this.bindEvents();
         this.initLanguageDialog(); // 대화상자 이벤트 초기화
         this.initThemeDialog(); // 테마 대화상자 이벤트 초기화
+        this.initScoringDialog(); // 채점 방식 대화상자 이벤트 초기화
         this.initSubmitDialog(); // 제출 확인 대화상자 이벤트 초기화
         this.initScopeDialog(); // 범위 설정 대화상자 이벤트 초기화
         this.initNewQBDialog(); // 새 문제은행 확인 대화상자 이벤트 초기화
@@ -87,14 +100,47 @@ class QuizWizardApp {
     }
     /** 메뉴 활성화 상태 업데이트 */
     updateMenuActivation() {
+        const isLoaded = this.question_bank_file_handle !== null;
         const scopeMenu = document.querySelector('[data-action="ex-set-scope"]');
         if (scopeMenu) {
-            if (this.question_bank_file_handle) {
-                scopeMenu.classList.remove('disabled');
-            }
-            else {
-                scopeMenu.classList.add('disabled');
-            }
+            isLoaded ? scopeMenu.classList.remove('disabled') : scopeMenu.classList.add('disabled');
+        }
+        const studyScopeMenu = document.querySelector('[data-action="ss-set-scope"]');
+        if (studyScopeMenu) {
+            isLoaded ? studyScopeMenu.classList.remove('disabled') : studyScopeMenu.classList.add('disabled');
+        }
+        // [추가] 자기주도학습 시작 메뉴 제어
+        const studyStartMenu = document.querySelector('[data-action="ss-start"]');
+        if (studyStartMenu) {
+            isLoaded ? studyStartMenu.classList.remove('disabled') : studyStartMenu.classList.add('disabled');
+        }
+        // [추가] 현재 자기주도학습 작업공간인 경우 내부 버튼들도 즉시 업데이트
+        if (this.currentMenu === 'self-study') {
+            this.updateSelfStudyUIActivation(isLoaded);
+        }
+    }
+    /** 자기주도학습 작업공간 내의 버튼 및 입력 요소 활성화/비활성화 */
+    updateSelfStudyUIActivation(enabled) {
+        const startBtn = document.getElementById('ss-start-btn');
+        const nextBtn = document.getElementById('ss-next-btn');
+        const submitBtn = document.getElementById('ss-submit-btn');
+        const sidebar = document.getElementById('ss-sidebar');
+        const cardContainer = document.getElementById('ss-card-container');
+        if (startBtn)
+            startBtn.disabled = !enabled;
+        if (nextBtn)
+            nextBtn.disabled = !enabled;
+        if (submitBtn)
+            submitBtn.disabled = !enabled;
+        if (sidebar) {
+            sidebar.querySelectorAll('.ss-sidebar-btn').forEach(btn => {
+                btn.disabled = !enabled;
+            });
+        }
+        if (cardContainer) {
+            cardContainer.querySelectorAll('.choice-check').forEach(chk => {
+                chk.disabled = !enabled;
+            });
         }
     }
     /** 주메뉴의 활성 상태(하이라이트)를 업데이트합니다. */
@@ -186,6 +232,27 @@ class QuizWizardApp {
             this.renderView(this.lastWorkspace);
         });
     }
+    /**
+     * 채점 방식 설정 대화상자의 버튼 이벤트를 초기화합니다.
+     */
+    initScoringDialog() {
+        const dialog = document.getElementById('scoring-dialog');
+        const confirmBtn = document.getElementById('scoring-confirm-btn');
+        const cancelBtn = document.getElementById('scoring-cancel-btn');
+        if (!dialog || !confirmBtn || !cancelBtn)
+            return;
+        confirmBtn.addEventListener('click', () => {
+            const selected = dialog.querySelector('input[name="scoring"]:checked')?.value;
+            if (selected) {
+                this.scoring_rules = selected;
+                console.log("주인님, 채점 방식이 변경되었습니다:", this.scoring_rules);
+            }
+            dialog.close();
+        });
+        cancelBtn.addEventListener('click', () => {
+            dialog.close();
+        });
+    }
     initScopeDialog() {
         const dialog = document.getElementById('scope-dialog');
         const confirmBtn = document.getElementById('scope-confirm-btn');
@@ -252,11 +319,9 @@ class QuizWizardApp {
         });
         // 6. 확인 버튼 클릭 시 데이터 저장 및 닫기
         confirmBtn.addEventListener('click', () => {
-            this.scopeSettings = {
-                start: parseInt(startInput.value) || 1,
-                end: parseInt(endInput.value) || this.questionsData.length,
-                count: parseInt(countInput.value) || 0
-            };
+            this.scope_start = parseInt(startInput.value) || 1;
+            this.scope_end = parseInt(endInput.value) || this.questionsData.length;
+            this.scope_count = parseInt(countInput.value) || 0;
             dialog.close();
             this.initializeExamSettingWorkspace();
         });
@@ -275,19 +340,19 @@ class QuizWizardApp {
         if (!startInput || !endInput || !countInput)
             return;
         // 초기값 설정 (현재 설정값 또는 기본값)
-        startInput.value = this.scopeSettings.start.toString();
-        endInput.value = (this.scopeSettings.end || this.questionsData.length).toString();
+        startInput.value = this.scope_start.toString();
+        endInput.value = (this.scope_end || this.questionsData.length).toString();
         // 중복 없는 그룹 번호 개수 계산하여 초기 문항 수 설정
         const start = parseInt(startInput.value);
         const end = parseInt(endInput.value);
         const range = this.questionsData.slice(start - 1, end);
         const groups = new Set(range.map(q => q.group).filter(g => g.trim() !== ''));
         // 만약 기존 설정된 count가 0이거나 최대 그룹수를 넘는다면 재계산
-        if (this.scopeSettings.count === 0 || this.scopeSettings.count > groups.size) {
+        if (this.scope_count === 0 || this.scope_count > groups.size) {
             countInput.value = groups.size.toString();
         }
         else {
-            countInput.value = this.scopeSettings.count.toString();
+            countInput.value = this.scope_count.toString();
         }
         dialog.showModal();
     }
@@ -389,10 +454,29 @@ class QuizWizardApp {
         // 현재 선택된 메뉴 강조 업데이트
         this.updateActiveMenu('student-list');
         const listContainer = document.getElementById('student-list-container');
-        listContainer?.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', () => this.isDirtySL = true);
-            input.addEventListener('change', () => this.isDirtySL = true);
-        });
+        if (listContainer) {
+            const items = listContainer.querySelectorAll('.student-item');
+            items.forEach((item, idx) => {
+                const setFocus = () => {
+                    items.forEach(el => el.classList.remove('focused'));
+                    item.classList.add('focused');
+                    this.focusedStudentIndex = idx;
+                };
+                item.addEventListener('click', setFocus);
+                item.addEventListener('focusin', setFocus);
+                // 만약 이전에 포커스된 인덱스였다면 클래스 복구 및 스크롤 위치 유지
+                if (this.focusedStudentIndex === idx) {
+                    item.classList.add('focused');
+                    setTimeout(() => {
+                        item.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+                    }, 0);
+                }
+            });
+            listContainer.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', () => this.isDirtySL = true);
+                input.addEventListener('change', () => this.isDirtySL = true);
+            });
+        }
     }
     /** 모든 학생 선택/해제 */
     selectAllStudents(selected) {
@@ -477,11 +561,12 @@ class QuizWizardApp {
         if (newData.length > 0)
             this.studentsData = newData;
     }
+    // 자기주도학습 시작 여부
+    isStudyStarted = false;
     /** 자기주도학습 작업공간 초기화 */
     initializeSelfStudyWorkspace() {
         if (!this.container)
             return;
-        // 다른 메뉴에서 돌아오는 경우 데이터 저장
         if (this.currentMenu === 'question-bank') {
             this.saveCurrentQuestionsToState();
         }
@@ -492,88 +577,120 @@ class QuizWizardApp {
             this.saveStudyState();
         }
         this.currentMenu = 'self-study';
-        // 현재 선택된 메뉴 강조 업데이트
         this.updateActiveMenu('self-study');
-        // [추가] 자기주도학습 진입 시 사용자의 이전 답안 초기화
-        this.userAnswers = Array.from({ length: this.questionsData.length }, () => [false, false, false, false]);
-        this.currentQuestionIndex = 0;
+        const isLoaded = this.question_bank_file_handle !== null;
         const langData = translations[this.currentLang] || translations['ko'];
         const title = langData.actions['ss-viewing'] || 'Taking an Exam';
-        const fileInfoHtml = this.question_bank_file_name
-            ? `<span class="file-info-label">[ ${this.question_bank_file_name} ]</span>`
-            : '';
+        const fileInfoHtml = this.question_bank_file_name ? `<span class="file-info-label">[ ${this.question_bank_file_name} ]</span>` : '';
         const submitBtnText = langData.actions['ss-submit-paper'] || 'Submit';
+        const startBtnText = langData.actions['ss-start'] || 'Start';
         const prevBtnText = langData.actions['ss-prev-question'] || '<-';
         const nextBtnText = langData.actions['ss-next-question'] || '->';
-        // 컨테이너 레이아웃 (메인 뷰 + 사이드바)
+        // 밴드(헤더) 구성
+        let navControlsHtml = '';
+        let viewActionsHtml = '';
+        if (isLoaded) {
+            navControlsHtml = `
+                <div class="ss-nav-controls">
+                    <button class="ss-nav-btn" id="ss-start-btn" style="${this.isStudyStarted ? 'display:none;' : ''}">${startBtnText}</button>
+                    <button class="ss-nav-btn" id="ss-prev-btn" style="${!this.isStudyStarted ? 'display:none;' : ''}">${prevBtnText}</button>
+                    <button class="ss-nav-btn" id="ss-next-btn" style="${!this.isStudyStarted ? 'display:none;' : ''}">${nextBtnText}</button>
+                </div>
+            `;
+            viewActionsHtml = `<button id="ss-submit-btn" style="${!this.isStudyStarted ? 'display:none;' : ''}">${submitBtnText}</button>`;
+        }
         this.container.innerHTML = `
             <div class="ss-container">
                 <div class="ss-main-view">
                     <div class="view-header">
                         <h2>${title}${fileInfoHtml}</h2>
-                        <div class="ss-nav-controls">
-                            <button class="ss-nav-btn" id="ss-prev-btn">${prevBtnText}</button>
-                            <button class="ss-nav-btn" id="ss-next-btn">${nextBtnText}</button>
-                        </div>
+                        ${navControlsHtml}
                         <div class="view-actions">
-                            <button id="ss-submit-btn">${submitBtnText}</button>
+                            ${viewActionsHtml}
                         </div>
                     </div>
                     <div class="student-list-container" id="ss-card-container">
-                        <!-- 현재 한 문제만 표시됨 -->
+                        ${!isLoaded ? this.getSelfStudyWarningMessage(false) : (this.isStudyStarted ? '' : this.getSelfStudyWarningMessage(true))}
                     </div>
                 </div>
-                <div class="ss-sidebar" id="ss-sidebar">
-                    <!-- 문제 번호 버튼들 -->
-                </div>
+                <div class="ss-sidebar" id="ss-sidebar" style="${!this.isStudyStarted ? 'display:none;' : 'display:flex;'}"></div>
             </div>
         `;
-        // 이벤트 바인딩
-        document.getElementById('ss-prev-btn')?.addEventListener('click', () => this.prevQuestion());
-        document.getElementById('ss-next-btn')?.addEventListener('click', () => this.nextQuestion());
-        document.getElementById('ss-submit-btn')?.addEventListener('click', () => {
-            const dialog = document.getElementById('submit-confirm-dialog');
-            dialog?.showModal();
-        });
-        // 문제 리스트가 비어있지 않은지 확인 (최소 10개는 기본 생성되므로)
-        if (this.questionsData.length === 0) {
-            this.questionsData = Array.from({ length: 10 }, (_, idx) => ({
-                group: (idx + 1).toString(),
-                text: '',
-                choices: Array.from({ length: 4 }, () => ({ text: '', correct: false }))
-            }));
+        if (isLoaded) {
+            document.getElementById('ss-start-btn')?.addEventListener('click', () => {
+                this.isStudyStarted = true;
+                this.startSelfstudy();
+            });
+            document.getElementById('ss-prev-btn')?.addEventListener('click', () => this.prevQuestion());
+            document.getElementById('ss-next-btn')?.addEventListener('click', () => this.nextQuestion());
+            document.getElementById('ss-submit-btn')?.addEventListener('click', () => {
+                const dialog = document.getElementById('submit-confirm-dialog');
+                dialog?.showModal();
+            });
+            // 학습 중인 상태라면 현재 문제 렌더링
+            if (this.isStudyStarted) {
+                // Wasm 데이터 대신 TS의 저장된 데이터 인덱스를 사용하여 렌더링
+                this.renderCurrentQuestion();
+                this.renderSidebarButtons();
+                this.updateNavButtonsVisibility();
+            }
         }
-        this.renderCurrentQuestion();
-        this.renderSidebarButtons();
-        this.updateNavButtonsVisibility();
-        // [추가] 높이 자동 조절 적용
+        this.updateMenuActivation();
         this.adjustAllTextAreasHeight();
+    }
+    getSelfStudyWarningMessage(isLoaded) {
+        if (!isLoaded) {
+            return `<div style="padding: 100px; text-align: center; font-size: 24px; font-weight: bold; color: #555;">
+                ${this.currentLang === 'ko' ? '문제은행을 선택해 주세요.<br>문제은행 없이는 자기 주도 학습을 할 수 없습니다.' :
+                this.currentLang === 'en' ? 'Please select a question bank.<br>Self-study cannot be performed without a question bank.' :
+                    this.currentLang === 'ru' ? 'Пожалуйста, выберите банк вопросов.<br>Самостоятельное обучение невозможно без банка вопросов.' :
+                        'Суроолор банкысын тандаңыз.<br>Суроолор банкысы жок өз алдынча окууну аткаруу мүмкүн эмес.'}
+            </div>`;
+        }
+        const msgs = {
+            ko: '\'시작\' 버튼을 누르시거나 메뉴에서 \'시작\'을 선택하시면 바로 모의시험이 시작됩니다.',
+            en: 'Press the \'Start\' button or select \'Start\' from the menu to begin the mock exam.',
+            ru: 'Нажмите кнопку «Старт» или выберите «Старт» в меню, чтобы начать пробный экзамен.',
+            ky: '\'Баштоо\' баскычын басыңыз же менюдан \'Баштоо\' тандап, пробный экзаменди баштаңыз.'
+        };
+        const msg = msgs[this.currentLang] || msgs.en;
+        return `<textarea class="self-study-notice" readonly>${this.control_tower.get_notice()}</textarea>\n<div style="padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #555;">${msg}</div>`;
     }
     /** 현재 인덱스의 문제를 카드 영역에 렌더링 */
     renderCurrentQuestion() {
         const container = document.getElementById('ss-card-container');
         if (!container)
             return;
+        const isLoaded = this.question_bank_file_handle !== null;
         const q = this.questionsData[this.currentQuestionIndex];
-        // [수정] useUserAnswers=true로 전달하여 정답 대신 사용자의 선택값을 보여줌
-        container.innerHTML = this.createQuestionItemHtml(this.currentQuestionIndex + 1, q, true, true, false, true);
+        // [수정] useUserAnswers=true로 전달하며, 문제은행이 로드되지 않았으면 체크박스 비활성화
+        container.innerHTML = this.createQuestionItemHtml(this.currentQuestionIndex + 1, q, true, true, !isLoaded, true);
         // [추가] 높이 자동 조절 적용
         this.adjustAllTextAreasHeight();
-        // [추가] 체크박스 클릭 시 실시간으로 사이드바와 상태 동기화
-        container.querySelectorAll('.choice-check').forEach(chk => {
-            chk.addEventListener('change', () => {
-                this.saveStudyState();
-                this.renderSidebarButtons();
+        // [추가] 체크박스 클릭 시 실시간으로 사이드바와 상태 동기화 (활성화된 경우에만)
+        if (isLoaded) {
+            container.querySelectorAll('.choice-check').forEach(chk => {
+                chk.addEventListener('change', () => {
+                    this.saveStudyState();
+                    this.renderSidebarButtons();
+                });
             });
-        });
+        }
     }
     /** 사이드바에 모든 문제 번호 버튼 렌더링 */
     renderSidebarButtons() {
         const sidebar = document.getElementById('ss-sidebar');
-        if (!sidebar)
+        if (!sidebar || !this.control_tower)
             return;
+        // 학습 세션이 시작되었으면 세션 문항 수를, 아니면 문제은행 문항 수를 가져옴
+        let totalQuestions = this.control_tower.get_self_study_number_of_questions();
+        if (totalQuestions === 0) {
+            totalQuestions = this.questionsData.length;
+        }
+        const isLoaded = this.question_bank_file_handle !== null;
+        const btnDisabled = isLoaded ? '' : 'disabled';
         let html = '';
-        this.questionsData.forEach((q, i) => {
+        for (let i = 0; i < totalQuestions; i++) {
             const isActive = i === this.currentQuestionIndex ? 'active' : '';
             // [수정] 실제 정답 대신 사용자가 선택한 답안(userAnswers) 번호 찾기 (1-based index)
             const userSelections = this.userAnswers[i] || [];
@@ -584,35 +701,67 @@ class QuizWizardApp {
             if (selectedIndices.length > 0) {
                 label += ` -> ${selectedIndices.join(', ')}`;
             }
-            html += `<button class="ss-sidebar-btn ${isActive}" data-idx="${i}">${label}</button>`;
-        });
+            html += `<button class="ss-sidebar-btn ${isActive}" data-idx="${i}" ${btnDisabled}>${label}</button>`;
+        }
         sidebar.innerHTML = html;
-        // 사이드바 버튼 클릭 이벤트
-        sidebar.querySelectorAll('.ss-sidebar-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idx = parseInt(e.currentTarget.dataset.idx || '0');
-                this.jumpToQuestion(idx);
+        // 사이드바 버튼 클릭 이벤트 (활성화된 경우에만)
+        if (isLoaded) {
+            sidebar.querySelectorAll('.ss-sidebar-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(e.currentTarget.dataset.idx || '0');
+                    this.jumpToQuestion(idx);
+                });
             });
-        });
+        }
     }
     prevQuestion() {
-        if (this.currentQuestionIndex > 0) {
-            this.saveStudyState();
-            this.currentQuestionIndex--;
-            this.refreshStudyView();
+        if (!this.control_tower)
+            return;
+        // 1. 현재 답안 저장 및 사이드바 갱신
+        this.saveStudyState();
+        this.renderSidebarButtons();
+        // 2. 이전 문제 데이터 가져오기 (절대 인덱스 사용)
+        const targetIdx = this.currentQuestionIndex - 1;
+        if (targetIdx >= 0) {
+            const qdata = this.control_tower.get_self_study_question(targetIdx + 1);
+            if (qdata) {
+                this.currentQuestionIndex = targetIdx;
+                this.renderSelfStudyQuestion(qdata);
+                this.renderSidebarButtons();
+            }
         }
     }
     nextQuestion() {
-        if (this.currentQuestionIndex < this.questionsData.length - 1) {
-            this.saveStudyState();
-            this.currentQuestionIndex++;
-            this.refreshStudyView();
+        if (!this.control_tower)
+            return;
+        // 1. 현재 답안 저장 및 사이드바 갱신
+        this.saveStudyState();
+        this.renderSidebarButtons();
+        // 2. 다음 문제 데이터 가져오기 (절대 인덱스 사용)
+        const total = this.control_tower.get_self_study_number_of_questions();
+        const targetIdx = this.currentQuestionIndex + 1;
+        if (targetIdx < total) {
+            const qdata = this.control_tower.get_self_study_question(targetIdx + 1);
+            if (qdata) {
+                this.currentQuestionIndex = targetIdx;
+                this.renderSelfStudyQuestion(qdata);
+                this.renderSidebarButtons();
+            }
         }
     }
     jumpToQuestion(index) {
+        if (!this.control_tower)
+            return;
+        // 1. 현재 답안 저장 및 사이드바 갱신
         this.saveStudyState();
-        this.currentQuestionIndex = index;
-        this.refreshStudyView();
+        this.renderSidebarButtons();
+        // 2. 선택된 문제 데이터 가져오기 (WASM은 1-based 인덱스 사용)
+        const qdata = this.control_tower.get_self_study_question(index + 1);
+        if (qdata) {
+            this.currentQuestionIndex = index;
+            this.renderSelfStudyQuestion(qdata);
+            this.renderSidebarButtons();
+        }
     }
     /** 화면의 입력값을 현재 문제 상태에 저장 (자기주도학습 전용) */
     saveStudyState() {
@@ -638,11 +787,12 @@ class QuizWizardApp {
     updateNavButtonsVisibility() {
         const prevBtn = document.getElementById('ss-prev-btn');
         const nextBtn = document.getElementById('ss-next-btn');
+        const totalQuestions = this.control_tower.get_self_study_number_of_questions();
         if (prevBtn) {
             prevBtn.style.visibility = this.currentQuestionIndex === 0 ? 'hidden' : 'visible';
         }
         if (nextBtn) {
-            nextBtn.style.visibility = this.currentQuestionIndex === this.questionsData.length - 1 ? 'hidden' : 'visible';
+            nextBtn.style.visibility = this.currentQuestionIndex === totalQuestions - 1 ? 'hidden' : 'visible';
         }
     }
     /**
@@ -683,10 +833,10 @@ class QuizWizardApp {
         const fixedLangLabels = ["한국어", "English", "Русский", "Кыргызча"];
         // 테마 목록은 현재 언어 설정을 따름
         const themeLabels = {
-            ko: ["데스크탑 앱 스타일", "웹 스타일"],
-            en: ["Desktop App Style", "Web Style"],
-            ru: ["Стиль рабочего стола", "Веб-стиль"],
-            ky: ["Иш тактасынын стили", "Веб стили"]
+            ko: ['파란색 분위기', '밝은 분위기', '차분한 분위기'],
+            en: ['Blue Theme', 'Light Theme', 'Calm Theme'],
+            ru: ['Синяя тема', 'Светлая тема', 'Спокойная тема'],
+            ky: ['Көк тема', 'Жарык тема', 'Тынч тема']
         };
         const currentThemeLabels = themeLabels[this.currentLang] || themeLabels.en;
         const langDialog = document.getElementById('lang-dialog');
@@ -702,14 +852,23 @@ class QuizWizardApp {
         }
         const themeDialog = document.getElementById('theme-dialog');
         if (themeDialog) {
-            themeDialog.querySelectorAll('.radio-group label').forEach((el, idx) => {
-                const radio = el.querySelector('input');
-                if (radio && currentThemeLabels[idx]) {
-                    el.innerHTML = "";
-                    el.appendChild(radio);
-                    el.appendChild(document.createTextNode(` ${currentThemeLabels[idx]}`));
-                }
-            });
+            const themes = ['theme-blue', 'theme-light', 'theme-dark'];
+            const group = themeDialog.querySelector('.radio-group');
+            if (group) {
+                group.innerHTML = '';
+                themes.forEach((theme, idx) => {
+                    const label = document.createElement('label');
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = 'theme';
+                    radio.value = theme;
+                    if (this.currentTheme === theme)
+                        radio.checked = true;
+                    label.appendChild(radio);
+                    label.appendChild(document.createTextNode(` ${currentThemeLabels[idx]}`));
+                    group.appendChild(label);
+                });
+            }
         }
         // 공통 버튼 텍스트 (확인/취소)
         const btnLabels = {
@@ -843,9 +1002,9 @@ class QuizWizardApp {
             case 'ss-set-scope':
                 this.setExamScope();
                 break; // 추가됨
-            case 'ss-set-grading-method':
-                this.setGradingMethod();
-                break; // 추가됨
+            case 'ss-set-scoring-rules':
+                this.setScoringRules();
+                break;
             case 'ss-start':
                 this.startSelfstudy();
                 break; // 추가됨
@@ -1001,9 +1160,13 @@ class QuizWizardApp {
                         this.focusedChoiceIndex = cIdx;
                     });
                 });
-                // 만약 이전에 포커스된 인덱스였다면 클래스 복구
+                // 만약 이전에 포커스된 인덱스였다면 클래스 복구 및 스크롤 위치 유지
                 if (this.focusedQuestionIndex === idx) {
                     item.classList.add('focused');
+                    // [수정] 토글 버튼 클릭 등으로 재렌더링 시 포커스된 문제가 화면에 보이도록 스크롤 유지
+                    setTimeout(() => {
+                        item.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+                    }, 0);
                 }
             });
         }
@@ -1139,6 +1302,10 @@ class QuizWizardApp {
         const defaultId = langData.actions['ph-header-id'] || '학번';
         const defaultNotice = langData.actions['ph-header-notice-text'] || '';
         const defaultBtnText = langData.actions['qb-default-header-content'] || 'Default Header Content';
+        const labelScoring1 = langData.actions['qb-header-scoring-1'] || 'Scoring 1';
+        const labelScoring2 = langData.actions['qb-header-scoring-2'] || 'Scoring 2';
+        const labelScoring3 = langData.actions['qb-header-scoring-3'] || 'Scoring 3';
+        const labelScoring4 = langData.actions['qb-header-scoring-4'] || 'Scoring 4';
         // [수정] 제목이 없거나 기본 플레이스홀더와 같으면 value를 비우고 placeholder로 표시
         const displayTitle = (headerTitle === phTitle || !headerTitle) ? '' : headerTitle;
         let html = `
@@ -1146,6 +1313,12 @@ class QuizWizardApp {
                 <h2>${title}</h2>
                 <div class="view-actions">
                     <button id="qb-default-header-btn">${defaultBtnText}</button>
+                    <select id="qb-header-scoring-rules" style="margin-left: 5px; height: 22px; font-size: 11px;">
+                        <option value="negative-marking-partial-credit" ${this.header_scoring_rules === 'negative-marking-partial-credit' ? 'selected' : ''}>${labelScoring1}</option>
+                        <option value="negative-marking-no-partial-credit" ${this.header_scoring_rules === 'negative-marking-no-partial-credit' ? 'selected' : ''}>${labelScoring2}</option>
+                        <option value="no-negative-marking-partial-credit" ${this.header_scoring_rules === 'no-negative-marking-partial-credit' ? 'selected' : ''}>${labelScoring3}</option>
+                        <option value="no-negative-marking-no-partial-credit" ${this.header_scoring_rules === 'no-negative-marking-no-partial-credit' ? 'selected' : ''}>${labelScoring4}</option>
+                    </select>
                     <select id="qb-default-header-lang" style="margin-left: 5px; height: 22px; font-size: 11px;">
                         <option value="ko" ${this.currentLang === 'ko' ? 'selected' : ''}>한국어</option>
                         <option value="en" ${this.currentLang === 'en' ? 'selected' : ''}>English</option>
@@ -1209,6 +1382,11 @@ class QuizWizardApp {
                 this.applyDefaultHeaderContent(langSelect.value);
             }
         });
+        // 채점 방식 드롭다운 이벤트 바인딩
+        document.getElementById('qb-header-scoring-rules')?.addEventListener('change', (e) => {
+            this.header_scoring_rules = e.target.value;
+            this.isDirtyQB = true;
+        });
     }
     /** 선택된 언어의 기본 헤더 내용을 에디터에 적용합니다. */
     applyDefaultHeaderContent(lang) {
@@ -1226,10 +1404,8 @@ class QuizWizardApp {
         if (idInput)
             idInput.value = langData.actions['ph-header-id'] || '';
         if (noticeInput) {
-            noticeInput.value = langData.actions['ph-header-notice-text'] || '';
-            // 내용 업데이트 후 높이 조절
-            noticeInput.style.height = '0px';
-            noticeInput.style.height = noticeInput.scrollHeight + 'px';
+            const scoringKey = `ph-header-notice-text-${this.header_scoring_rules}`;
+            noticeInput.value = langData.actions[scoringKey] || langData.actions['ph-header-notice-text'] || '';
         }
         for (let i = 1; i <= 4; i++) {
             const catInput = document.getElementById(`header-cat-${i}`);
@@ -1591,6 +1767,8 @@ class QuizWizardApp {
             this.questionsData[i] = qAbove;
             this.questionsData[j] = qCurrent;
             this.isDirtyQB = true;
+            // [추가] 이동된 문제의 새 인덱스로 포커스 갱신
+            this.focusedQuestionIndex = j;
             // UI 갱신
             this.initializeQuestionBankWorkspace(false, true);
             // [수정] 스크롤 위치 복구 후 부드럽게 이동
@@ -1619,6 +1797,8 @@ class QuizWizardApp {
             this.questionsData[i] = qBelow;
             this.questionsData[j] = qCurrent;
             this.isDirtyQB = true;
+            // [추가] 이동된 문제의 새 인덱스로 포커스 갱신
+            this.focusedQuestionIndex = j;
             // UI 갱신
             this.initializeQuestionBankWorkspace(false, true);
             // [수정] 스크롤 위치 복구 후 부드럽게 이동
@@ -1754,8 +1934,8 @@ class QuizWizardApp {
             <div class="student-list-container" id="student-list">
         `;
         // 범위 설정에 따른 데이터 필터링 (인덱스 기준)
-        const startIdx = this.scopeSettings.start > 0 ? this.scopeSettings.start - 1 : 0;
-        const endIdx = this.scopeSettings.end > 0 ? this.scopeSettings.end : this.questionsData.length;
+        const startIdx = this.scope_start > 0 ? this.scope_start - 1 : 0;
+        const endIdx = this.scope_end > 0 ? this.scope_end : this.questionsData.length;
         const filteredQuestions = this.questionsData.slice(startIdx, endIdx);
         // 편집 중인 문제 리스트를 읽기 전용으로 표시
         filteredQuestions.forEach((q, i) => {
@@ -1862,8 +2042,11 @@ class QuizWizardApp {
     doNewQuestionBank() {
         this.question_bank_file_handle = null;
         this.question_bank_file_name = '';
-        this.scopeSettings = { start: 1, end: 0, count: 0 };
+        this.scope_start = 1;
+        this.scope_end = 0;
+        this.scope_count = 0;
         this.isDirtyQB = false;
+        this.isStudyStarted = false; // [추가] 자기주도학습 상태 초기화
         this.initializeQuestionBankWorkspace(true);
         this.updateMenuActivation();
     }
@@ -1933,6 +2116,14 @@ class QuizWizardApp {
         else {
             this.questionsData = [];
         }
+        // [추가] 기본 출제 범위 및 문항 수 설정
+        this.scope_start = 1;
+        this.scope_end = this.questionsData.length;
+        // 중복 없는 그룹 수를 계산하여 기본 문항 수로 설정
+        const groups = new Set(this.questionsData.map(q => q.group).filter(g => g.trim() !== ''));
+        this.scope_count = groups.size;
+        // [추가] 자기주도학습 상태 초기화
+        this.isStudyStarted = false;
         // [수정] 현재 메뉴에 맞는 작업공간 유지 및 리렌더링 (UI가 데이터 길이에 맞게 자동 갱신됨)
         this.isDirtyQB = false;
         if (this.currentMenu === 'exam-setting') {
@@ -1974,7 +2165,13 @@ class QuizWizardApp {
             await this.saveAsQuestionBank();
             return;
         }
+        const scrollPos = document.getElementById('student-list')?.scrollTop;
         await this.performQuestionBankSave(this.question_bank_file_handle);
+        if (scrollPos !== undefined) {
+            const newList = document.getElementById('student-list');
+            if (newList)
+                newList.scrollTop = scrollPos;
+        }
     }
     async saveAsQuestionBank() {
         try {
@@ -1994,7 +2191,8 @@ class QuizWizardApp {
             this.question_bank_file_handle = handle;
             this.question_bank_file_name = handle.name;
             await this.performQuestionBankSave(handle);
-            this.initializeQuestionBankWorkspace(false, true); // 제목 갱신 (파일 이름 표시용)
+            // [수정] skipSave=true를 전달하여 현재 폼 상태를 유지하면서 헤더(파일명)만 갱신
+            this.initializeQuestionBankWorkspace(false, true);
         }
         catch (err) {
             if (err.name !== 'AbortError') {
@@ -2026,56 +2224,33 @@ class QuizWizardApp {
     }
     /** 현재 questionsData 배열의 내용을 WASM 엔진(ControlTower)에 동기화합니다. */
     syncQuestionsToWasm() {
-        // WASM ControlTower 데이터 갱신
-        let oldQLen = this.control_tower.get_question_length();
-        if (oldQLen === 0) {
-            this.control_tower.push_an_empty_question();
-            oldQLen = 1;
+        // [개선] 기존 업데이트 방식은 인덱스 오동작 위험이 있으므로, 
+        // 모든 문제를 삭제한 후 현재 순서대로 새로 추가하는 방식을 사용합니다.
+        // 1. WASM 엔진의 기존 모든 문제 삭제 (뒤에서부터 삭제하여 인덱스 유지)
+        const oldQLen = this.control_tower.get_question_length();
+        for (let i = oldQLen; i >= 1; i--) {
+            this.control_tower.remove_question(i);
         }
+        // 2. questionsData 배열의 순서대로 문제를 새로 추가
         const newQLen = this.questionsData.length;
-        // 문제 데이터 업데이트 및 추가
         for (let i = 0; i < newQLen; i++) {
             const q = this.questionsData[i];
             if (!q)
-                continue; // TS18048 방지
+                continue;
             const qIdx = i + 1; // 1-based index
-            if (i < oldQLen) {
-                // 기존 문제 업데이트
-                this.control_tower.set_question(qIdx, q.text);
-                this.control_tower.set_group(qIdx, parseInt(q.group) || 0);
-            }
-            else {
-                // 새 문제 추가
-                this.control_tower.push_an_empty_question();
-                this.control_tower.set_question(qIdx, q.text);
-                this.control_tower.set_group(qIdx, parseInt(q.group) || 0);
-            }
-            // 선택지 처리
-            const oldCLen = this.control_tower.get_choices_length(qIdx);
-            const newCLen = q.choices.length;
-            for (let j = 0; j < newCLen; j++) {
+            // 새 문제 생성 및 데이터 설정
+            this.control_tower.push_an_empty_question();
+            this.control_tower.set_question(qIdx, q.text);
+            this.control_tower.set_group(qIdx, parseInt(q.group) || 0);
+            // 선택지 추가
+            for (let j = 0; j < q.choices.length; j++) {
                 const c = q.choices[j];
                 if (!c)
-                    continue; // TS18048 방지
-                const cIdx = j + 1;
-                const choiceMark = new ChoiceMark(c.text, c.correct);
-                if (j < oldCLen) {
-                    this.control_tower.set_choice(qIdx, cIdx, choiceMark);
-                }
-                else {
-                    this.control_tower.push_choice(qIdx, c.text, c.correct);
-                }
+                    continue;
+                this.control_tower.push_choice(qIdx, c.text, c.correct);
             }
-        }
-        // 남는 문제 삭제 (뒤에서부터 삭제)
-        if (oldQLen > newQLen) {
-            for (let i = oldQLen; i > newQLen; i--) {
-                this.control_tower.remove_question(i);
-            }
-        }
-        // 모든 문제에 대해 카테고리 재결정
-        for (let i = 0; i < newQLen; i++) {
-            this.control_tower.determine_category(i + 1);
+            // 카테고리 결정
+            this.control_tower.determine_category(qIdx);
         }
     }
     extractQuestionDataFromWorkspace() {
@@ -2224,6 +2399,15 @@ class QuizWizardApp {
         // 5. UI 갱신 및 상태 변경
         this.isDirtySL = true;
         this.initializeStudentListWorkspace(false, true);
+        // [추가] 최적화 후 포커스 유지 (학생이 삭제될 수 있으므로 인덱스 범위 체크)
+        if (this.focusedStudentIndex !== null) {
+            if (this.focusedStudentIndex >= this.studentsData.length) {
+                this.focusedStudentIndex = this.studentsData.length - 1;
+            }
+            if (this.focusedStudentIndex < 0)
+                this.focusedStudentIndex = null;
+            // initializeStudentListWorkspace 내에서 스크롤 처리를 수행함
+        }
     }
     /** 현재 studentsData 배열의 내용을 WASM 엔진(ControlTower)에 동기화합니다. */
     syncStudentsToWasm() {
@@ -2261,10 +2445,16 @@ class QuizWizardApp {
         try {
             const bytes = this.control_tower.write_sbank_to_bytes_in_sqlite();
             if (this.student_list_handle) {
+                const scrollPos = document.getElementById('student-list-container')?.scrollTop;
                 const writable = await this.student_list_handle.createWritable();
                 await writable.write(bytes);
                 await writable.close();
                 this.isDirtySL = false;
+                if (scrollPos !== undefined) {
+                    const newList = document.getElementById('student-list-container');
+                    if (newList)
+                        newList.scrollTop = scrollPos;
+                }
                 // alert(this.currentLang === 'ko' ? "파일이 성공적으로 저장되었습니다." : (this.currentLang === 'ky' ? "Файл ийгиликтүү сакталды." : "File saved successfully."));
             }
             else {
@@ -2299,13 +2489,13 @@ class QuizWizardApp {
             this.student_list_file_name = handle.name;
             // 데이터 수집 후 저장 실행
             await this.saveStudentList();
+            this.initializeStudentListWorkspace(false, true);
         }
         catch (err) {
             if (err.name !== 'AbortError') {
                 console.error("다른 이름으로 저장 중 오류 발생:", err);
             }
         }
-        this.initializeStudentListWorkspace();
     }
     /* 시험 및 학습 관련 함수군 */
     /** 시스템 저장 대화상자를 호출하여 시험지를 저장합니다. */
@@ -2357,15 +2547,15 @@ class QuizWizardApp {
         }
     }
     async saveExamPaperAsDocx() {
-        const bytes = this.control_tower.generate_exam_in_docx(this.scopeSettings.start, this.scopeSettings.end, this.scopeSettings.count, this.random_seeds);
+        const bytes = this.control_tower.generate_exam_in_docx(this.scope_start, this.scope_end, this.scope_count, this.random_seeds);
         this.saveFile(bytes);
     }
     async saveExamPaperAsTxt() {
-        const bytes = this.control_tower.generate_exam_in_txt(this.scopeSettings.start, this.scopeSettings.end, this.scopeSettings.count, this.random_seeds);
+        const bytes = this.control_tower.generate_exam_in_txt(this.scope_start, this.scope_end, this.scope_count, this.random_seeds);
         this.saveFile(bytes);
     }
     async saveExamPaperAsPdf() {
-        const bytes = this.control_tower.generate_exam_in_pdf(this.scopeSettings.start, this.scopeSettings.end, this.scopeSettings.count, this.random_seeds);
+        const bytes = this.control_tower.generate_exam_in_pdf(this.scope_start, this.scope_end, this.scope_count, this.random_seeds);
         await this.savePdfFile(bytes);
     }
     async saveFile(bytes) {
@@ -2434,8 +2624,91 @@ class QuizWizardApp {
         crypto.getRandomValues(this.random_seeds);
         console.log("TS에서 생성된 난수:", this.random_seeds);
     }
-    setGradingMethod() { console.log("setGradingMethod() 호출됨"); }
-    startSelfstudy() { console.log("startSelfstudy() 호출됨"); }
+    startSelfstudy() {
+        if (!this.control_tower)
+            return;
+        // 현재 설정된 범위와 문항수 가져오기
+        const start = this.scope_start;
+        const end = this.scope_end;
+        const count = this.scope_count;
+        console.log(`자기주도학습 시작: 범위 ${start}~${end}, 문항수 ${count}`);
+        // Rust 백엔드에서 생성기 초기화
+        this.generate_seeds();
+        const success = this.control_tower.start_self_study(start, end, count, this.random_seeds);
+        if (success) { //alert(this.control_tower.get_self_study_number_of_questions());
+            // [수정] 학습 UI 상태 전환: 시작 버튼 숨기고 나머지 표시
+            this.isStudyStarted = true;
+            this.showStudyUI();
+            // 상태 초기화
+            const totalQuestions = this.control_tower.get_self_study_number_of_questions();
+            this.userAnswers = Array.from({ length: totalQuestions }, () => []);
+            this.currentQuestionIndex = 0;
+            // 첫 번째 문제 가져오기 및 렌더링
+            const qdata = this.control_tower.get_next_self_study_question();
+            if (qdata) {
+                this.renderSelfStudyQuestion(qdata);
+                this.renderSidebarButtons();
+                this.updateNavButtonsVisibility();
+            }
+        } //else{alert("Wrong");}
+    }
+    showStudyUI() {
+        const startBtn = document.getElementById('ss-start-btn');
+        if (startBtn)
+            startBtn.style.display = 'none';
+        const prevBtn = document.getElementById('ss-prev-btn');
+        if (prevBtn)
+            prevBtn.style.display = 'inline-block';
+        const nextBtn = document.getElementById('ss-next-btn');
+        if (nextBtn)
+            nextBtn.style.display = 'inline-block';
+        const submitBtn = document.getElementById('ss-submit-btn');
+        if (submitBtn)
+            submitBtn.style.display = 'inline-block';
+        const sidebar = document.getElementById('ss-sidebar');
+        if (sidebar)
+            sidebar.style.display = 'flex';
+    }
+    /** Rust에서 받은 문제 데이터를 화면에 렌더링합니다. */
+    renderSelfStudyQuestion(qdata) {
+        const container = document.getElementById('ss-card-container');
+        if (!container)
+            return;
+        const num = qdata.get_num();
+        const category_str = qdata.get_category_string();
+        const text = "[" + category_str + "] " + qdata.get_question();
+        const choicesLen = qdata.get_choices_length();
+        let choicesHtml = '';
+        const currentAnswers = this.userAnswers[this.currentQuestionIndex] || [];
+        const isLoaded = this.question_bank_file_handle !== null;
+        const chkDisabled = isLoaded ? '' : 'disabled';
+        for (let i = 0; i < choicesLen; i++) {
+            const choice = qdata.get_choice(i);
+            const cText = choice.get_text();
+            const isChecked = currentAnswers[i] ? 'checked' : '';
+            choicesHtml += `
+                <div class="choice-row" data-index="${i}">
+                    <input type="checkbox" class="choice-check" id="choice-${num}-${i}" ${isChecked} ${chkDisabled}>
+                    <textarea class="choice-input" style="width: 100%; border: none; background: transparent; resize: none;" readonly>${cText}</textarea>
+                </div>
+            `;
+        }
+        container.innerHTML = `
+            <div class="question-item active">
+                <div class="q-main-row" style="display: flex; align-items: flex-start; gap: 10px;">
+                    <div class="q-number" style="font-weight: bold; min-width: 30px;">${num}.</div>
+                    <textarea class="q-text-area" style="width: 100%; border: none; background: transparent; resize: none;" readonly>${text}</textarea>
+                </div>
+                <div class="choices-list" style="margin-left: 35px; margin-top: 10px;">
+                    ${choicesHtml}
+                </div>
+            </div>
+        `;
+        // 내비게이션 버튼 가시성 업데이트
+        this.updateNavButtonsVisibility();
+        // [추가] 높이 자동 조절 적용
+        this.adjustAllTextAreasHeight();
+    }
     /* 설정 관련 함수군 */
     setQuestionBankDefaultPath() { console.log("setQuestionBankDefaultPath() 호출됨"); }
     setStudentListDefaultPath() { console.log("setStudentListDefaultPath() 호출됨"); }
@@ -2486,6 +2759,32 @@ class QuizWizardApp {
         langs.forEach(lang => {
             const label = document.createElement('label');
             label.innerHTML = `<input type="radio" name="lang" value="${lang.value}" ${this.currentLang === lang.value ? 'checked' : ''}> ${lang.label}`;
+            group.appendChild(label);
+        });
+        dialog.showModal();
+    }
+    /**
+     * 채점 방식 설정 대화상자를 엽니다.
+     */
+    setScoringRules() {
+        const dialog = document.getElementById('scoring-dialog');
+        const group = document.getElementById('scoring-radio-group');
+        const titleEl = document.getElementById('scoring-dialog-title');
+        if (!dialog || !group || !titleEl)
+            return;
+        const langData = translations[this.currentLang] || translations['ko'];
+        titleEl.textContent = langData.actions['ss-set-scoring-rules'] || '채점 방식 설정';
+        const rules = [
+            { value: 'negative-marking-partial-credit', labelKey: 'qb-header-scoring-1' },
+            { value: 'negative-marking-no-partial-credit', labelKey: 'qb-header-scoring-2' },
+            { value: 'no-negative-marking-partial-credit', labelKey: 'qb-header-scoring-3' },
+            { value: 'no-negative-marking-no-partial-credit', labelKey: 'qb-header-scoring-4' }
+        ];
+        group.innerHTML = '';
+        rules.forEach(sys => {
+            const label = document.createElement('label');
+            const labelText = langData.actions[sys.labelKey] || sys.value;
+            label.innerHTML = `<input type="radio" name="scoring" value="${sys.value}" ${this.scoring_rules === sys.value ? 'checked' : ''}> ${labelText}`;
             group.appendChild(label);
         });
         dialog.showModal();

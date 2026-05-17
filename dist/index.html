@@ -27,7 +27,7 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     -->
 </head>
-<body class="theme-desktop">
+<body class="theme-blue">
     <div id="app">
         <header class="top-nav">
             <div class="app-logo">
@@ -81,7 +81,7 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
                     <div class="submenu">
                         <div class="submenu-item" data-action="ss-load-bank"></div>
                         <div class="submenu-item" data-action="ss-set-scope"></div>
-                        <div class="submenu-item" data-action="ss-set-grading-method"></div>
+                        <div class="submenu-item" data-action="ss-set-scoring-rules"></div>
                         <div class="menu-separator"></div>
                         <div class="submenu-item" data-action="ss-start"></div>
                     </div>
@@ -116,6 +116,20 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
             </main>
     </div>
 
+    <!-- 채점 방식 설정 대화상자 추가 -->
+    <dialog id="scoring-dialog" class="modal">
+        <div class="modal-content">
+            <h3 id="scoring-dialog-title">채점 방식 설정</h3>
+            <div class="radio-group" id="scoring-radio-group">
+                <!-- 라디오 버튼은 JS에서 동적으로 생성됨 -->
+            </div>
+            <div class="modal-actions">
+                <button id="scoring-cancel-btn">취소</button>
+                <button id="scoring-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
     <!-- 언어 설정 대화상자 추가 -->
     <dialog id="lang-dialog" class="modal">
         <div class="modal-content">
@@ -138,8 +152,9 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
         <div class="modal-content">
             <h3 id="theme-dialog-title">테마 설정 / Theme Settings</h3>
             <div class="radio-group">
-                <label><input type="radio" name="theme" value="theme-desktop"> 데스크탑 앱 스타일 (Desktop Style)</label>
-                <label><input type="radio" name="theme" value="theme-web"> 웹 스타일 (Web Style)</label>
+                <label><input type="radio" name="theme" value="theme-blue"> 파란색 분위기 (Blue Theme)</label>
+                <label><input type="radio" name="theme" value="theme-light"> 밝은 분위기 (Light Theme)</label>
+                <label><input type="radio" name="theme" value="theme-dark"> 어두운 분위기 (Dark Theme)</label>
             </div>
             <div class="modal-actions">
                 <button id="theme-cancel-btn">취소</button>

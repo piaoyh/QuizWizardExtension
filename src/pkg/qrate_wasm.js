@@ -314,18 +314,6 @@ export class ControlTower {
         return v2;
     }
     /**
-     * @returns {Uint8Array}
-     */
-    generate_pdf() {
-        const ret = wasm.controltower_generate_pdf(this.__wbg_ptr);
-        if (ret[3]) {
-            throw takeFromExternrefTable0(ret[2]);
-        }
-        var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
-        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-        return v1;
-    }
-    /**
      * Retrieves the category number for a given question number from the QBank.
      *
      * If the QBank is not loaded or the question number is out of bounds,
@@ -450,6 +438,21 @@ export class ControlTower {
         return ret;
     }
     /**
+     * Retrieves the number of categories in the QBank's header.
+     *
+     * If the QBank is not loaded, it returns `0`.
+     *
+     * # Returns
+     * - `usize`: The number of categories in the QBank's header.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_header_categories_length(), 0);
+     * // After loading a QBank with categories
+     * // assert_eq!(control_tower.get_header_categories_length(), 2);
+     * ```
      * @returns {number}
      */
     get_header_categories_length() {
@@ -457,6 +460,25 @@ export class ControlTower {
         return ret >>> 0;
     }
     /**
+     * Retrieves a specific category from the QBank's header by index.
+     *
+     * If the QBank is not loaded or the index is out of bounds, it returns an empty string.
+     *
+     * # Arguments
+     * * `index` - The zero-based index of the category to retrieve.
+     *
+     * # Returns
+     * - `String`: The category string at the specified index.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_header_category(0), "");
+     * // After loading a QBank with categories
+     * // assert_eq!(control_tower.get_header_category(0), "Category 1");
+     * // assert_eq!(control_tower.get_header_category(1), "Category 2");
+     * ```
      * @param {number} index
      * @returns {string}
      */
@@ -473,6 +495,21 @@ export class ControlTower {
         }
     }
     /**
+     * Retrieves the ID of the QBank.
+     *
+     * If the QBank is not loaded, it returns an empty string.
+     *
+     * # Returns
+     * - `String`: The ID of the QBank.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_id(), "");
+     * // After loading a QBank with an ID
+     * // assert_eq!(control_tower.get_id(), "QBank123");
+     * ```
      * @returns {string}
      */
     get_id() {
@@ -488,6 +525,21 @@ export class ControlTower {
         }
     }
     /**
+     * Retrieves the name of the QBank.
+     *
+     * If the QBank is not loaded, it returns an empty string.
+     *
+     * # Returns
+     * - `String`: The name of the QBank.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_name(), "");
+     * // After loading a QBank with a name
+     * // assert_eq!(control_tower.get_name(), "My QBank");
+     * ```
      * @returns {string}
      */
     get_name() {
@@ -503,6 +555,47 @@ export class ControlTower {
         }
     }
     /**
+     * Returns the next question data in the self-study session.
+     *
+     * This method returns the next question data in the self-study session
+     * from the `Generator` instance. If the `Generator` instance is not
+     * initialized, it returns `None`.
+     *
+     * # Returns
+     * - `Some(QuestionData)` if the next question data is retrieved successfully.
+     * - `None` if the `Generator` instance is not initialized.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * if let Some(qdata) = control_tower.get_next_self_study_question()
+     *     { println!("Next question data retrieved successfully"); }
+     * else
+     *     { println!("Failed to retrieve next question data"); }
+     * ```
+     * @returns {QuestionData | undefined}
+     */
+    get_next_self_study_question() {
+        const ret = wasm.controltower_get_next_self_study_question(this.__wbg_ptr);
+        return ret === 0 ? undefined : QuestionData.__wrap(ret);
+    }
+    /**
+     * Retrieves the notice string from the QBank's header.
+     *
+     * If the QBank is not loaded, it returns an empty string.
+     *
+     * # Returns
+     * - `String`: The notice string from the QBank's header.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_notice(), "");
+     * // After loading a QBank with a notice
+     * // assert_eq!(control_tower.get_notice(), "Important Notice!");
+     * ```
      * @returns {string}
      */
     get_notice() {
@@ -516,6 +609,32 @@ export class ControlTower {
         } finally {
             wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
         }
+    }
+    /**
+     * Returns the previous question data in the self-study session.
+     *
+     * This method returns the previous question data in the self-study session
+     * from the `Generator` instance. If the `Generator` instance is not
+     * initialized, it returns `None`.
+     *
+     * # Returns
+     * - `Some(QuestionData)` if the previous question data is retrieved successfully.
+     * - `None` if the `Generator` instance is not initialized.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * if let Some(qdata) = control_tower.get_prev_self_study_question()
+     *     { println!("Previous question data retrieved successfully"); }
+     * else
+     *     { println!("Failed to retrieve previous question data"); }
+     * ```
+     * @returns {QuestionData | undefined}
+     */
+    get_prev_self_study_question() {
+        const ret = wasm.controltower_get_prev_self_study_question(this.__wbg_ptr);
+        return ret === 0 ? undefined : QuestionData.__wrap(ret);
     }
     /**
      * Retrieves the question text for a given question number from the QBank.
@@ -579,6 +698,60 @@ export class ControlTower {
         return ret >>> 0;
     }
     /**
+     * Returns the number of questions in the self-study session.
+     *
+     * This method returns the number of questions in the self-study session
+     * from the `Generator` instance. If the `Generator` instance is not
+     * initialized, it returns `0`.
+     *
+     * # Returns
+     * - The number of questions in the self-study session.
+     * - `0` if the `Generator` instance is not initialized.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * let num_questions = control_tower.get_self_study_number_of_questions();
+     * println!("Number of questions in self-study session: {}", num_questions);
+     * ```
+     * @returns {number}
+     */
+    get_self_study_number_of_questions() {
+        const ret = wasm.controltower_get_self_study_number_of_questions(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * Returns the question data for the specified question number.
+     *
+     * This method returns the question data for the specified question number
+     * from the `Generator` instance. If the `Generator` instance is not
+     * initialized, it returns `None`.
+     *
+     * # Arguments
+     * * `num` - The question number to retrieve.
+     *
+     * # Returns
+     * - `Some(QuestionData)` if the question data is retrieved successfully.
+     * - `None` if the `Generator` instance is not initialized.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * if let Some(qdata) = control_tower.get_self_study_question(1)
+     *     { println!("Question data retrieved successfully"); }
+     * else
+     *     { println!("Failed to retrieve question data"); }
+     * ```
+     * @param {number} num
+     * @returns {QuestionData | undefined}
+     */
+    get_self_study_question(num) {
+        const ret = wasm.controltower_get_self_study_question(this.__wbg_ptr, num);
+        return ret === 0 ? undefined : QuestionData.__wrap(ret);
+    }
+    /**
      * Retrieves the name and ID of a student by their 1-based index from the SBank.
      *
      * If the SBank is not loaded or the student number is out of bounds,
@@ -632,6 +805,21 @@ export class ControlTower {
         return ret >>> 0;
     }
     /**
+     * Retrieves the title of the QBank.
+     *
+     * If the QBank is not loaded, it returns an empty string.
+     *
+     * # Returns
+     * - `String`: The title of the QBank.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_title(), "");
+     * // After loading a QBank with a title
+     * // assert_eq!(control_tower.get_title(), "My QBank");
+     * ```
      * @returns {string}
      */
     get_title() {
@@ -795,6 +983,36 @@ export class ControlTower {
         wasm.controltower_push_student(this.__wbg_ptr, ptr0);
     }
     /**
+     * Removes a choice from the Quetion by its 1-based index.
+     *
+     * If the QBank is not loaded or the question number is out of bounds,
+     * it returns `false`. Otherwise, it removes the choice and returns `true`.
+     *
+     * # Arguments
+     * * `question_number` - The 1-based index of the question to remove.
+     * * `choice_number` - The 1-based index of the choice to remove.
+     *
+     * # Returns
+     * - `true` if the choice was successfully removed.
+     * - `false` if the QBank is not loaded or the question number is invalid.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.remove_question(1), false);
+     * // After loading a QBank with a question at index 0
+     * // assert_eq!(control_tower.remove_question(1), true);
+     * ```
+     * @param {number} question_number
+     * @param {number} choice_number
+     * @returns {boolean}
+     */
+    remove_choice(question_number, choice_number) {
+        const ret = wasm.controltower_remove_choice(this.__wbg_ptr, question_number, choice_number);
+        return ret !== 0;
+    }
+    /**
      * Removes a question from the QBank by its 1-based index.
      *
      * If the QBank is not loaded or the question number is out of bounds,
@@ -949,6 +1167,23 @@ export class ControlTower {
         return ret !== 0;
     }
     /**
+     * Sets a specific category in the QBank's header by index.
+     *
+     * If the QBank is not loaded or the index is out of bounds,
+     * this method does nothing.
+     *
+     * # Arguments
+     * * `index` - The zero-based index of the category to set.
+     * * `category` - The new category string to set at the specified index.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.set_header_category(0, "New Category".to_string());
+     * // After loading a QBank, its categories will be updated
+     * control_tower.set_header_category(0, "Updated Category".to_string());
+     * ```
      * @param {number} index
      * @param {string} category
      */
@@ -958,6 +1193,21 @@ export class ControlTower {
         wasm.controltower_set_header_category(this.__wbg_ptr, index, ptr0, len0);
     }
     /**
+     * Sets the ID of the QBank.
+     *
+     * If the QBank is not loaded, this method does nothing.
+     *
+     * # Arguments
+     * * `id` - The new ID to set for the QBank.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.set_id("New ID".to_string());
+     * // After loading a QBank, its ID will be updated
+     * control_tower.set_id("Updated ID".to_string());
+     * ```
      * @param {string} id
      */
     set_id(id) {
@@ -966,6 +1216,21 @@ export class ControlTower {
         wasm.controltower_set_id(this.__wbg_ptr, ptr0, len0);
     }
     /**
+     * Sets the name of the QBank.
+     *
+     * If the QBank is not loaded, this method does nothing.
+     *
+     * # Arguments
+     * * `name` - The new name to set for the QBank.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.set_name("New Name".to_string());
+     * // After loading a QBank, its name will be updated
+     * control_tower.set_name("Updated Name".to_string());
+     * ```
      * @param {string} name
      */
     set_name(name) {
@@ -974,6 +1239,21 @@ export class ControlTower {
         wasm.controltower_set_name(this.__wbg_ptr, ptr0, len0);
     }
     /**
+     * Sets the notice string in the QBank's header.
+     *
+     * If the QBank is not loaded, this method does nothing.
+     *
+     * # Arguments
+     * * `notice` - The new notice string to set in the QBank's header.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.set_notice("New Notice".to_string());
+     * // After loading a QBank, its notice will be updated
+     * control_tower.set_notice("Updated Notice".to_string());
+     * ```
      * @param {string} notice
      */
     set_notice(notice) {
@@ -1131,12 +1411,56 @@ export class ControlTower {
         return ret !== 0;
     }
     /**
+     * Sets the title of the QBank.
+     *
+     * If the QBank is not loaded, this method does nothing.
+     *
+     * # Arguments
+     * * `title` - The new title to set for the QBank.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.set_title("New Title".to_string());
+     * // After loading a QBank, its title will be updated
+     * control_tower.set_title("Updated Title".to_string());
+     * ```
      * @param {string} title
      */
     set_title(title) {
         const ptr0 = passStringToWasm0(title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         wasm.controltower_set_title(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
+     * Starts a self-study session with the specified parameters.
+     *
+     * This method creates a `Generator` instance using the loaded QBank and
+     * starts the self-study session with the specified parameters.
+     *
+     * If the QBank is not loaded, it returns `false`.
+     *
+     * # Arguments
+     * * `start` - The starting question number for the self-study session.
+     * * `end` - The ending question number for the self-study session.
+     * * `number_of_questions` - The number of questions to select
+     *   for user student.
+     * * `seeds` - A seed array, each element of which is of u64.
+     *
+     * # Returns
+     * - `true` if the self-study session is started successfully.
+     * @param {number} start
+     * @param {number} end
+     * @param {number} number_of_questions
+     * @param {BigUint64Array} seeds
+     * @returns {boolean}
+     */
+    start_self_study(start, end, number_of_questions, seeds) {
+        const ptr0 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_start_self_study(this.__wbg_ptr, start, end, number_of_questions, ptr0, len0);
+        return ret !== 0;
     }
     /**
      * Writes the question bank (QBank) to a byte vector containing SQLite
@@ -1345,6 +1669,186 @@ export class NameId {
 }
 if (Symbol.dispose) NameId.prototype[Symbol.dispose] = NameId.prototype.free;
 
+export class QuestionData {
+    static __wrap(ptr) {
+        const obj = Object.create(QuestionData.prototype);
+        obj.__wbg_ptr = ptr;
+        QuestionDataFinalization.register(obj, obj.__wbg_ptr, obj);
+        return obj;
+    }
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        QuestionDataFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_questiondata_free(ptr, 0);
+    }
+    /**
+     * Retrieves the category of the question.
+     *
+     * # Returns
+     * - `u8`: The category ID of the question.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::QuestionData;
+     * let qdata = QuestionData::new(1, 1, "Category".to_string(), "Text".to_string());
+     * assert_eq!(qdata.get_category_id(), 1);
+     * ```
+     * @returns {number}
+     */
+    get_category_id() {
+        const ret = wasm.questiondata_get_category_id(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * Retrieves the category of the question.
+     *
+     * # Returns
+     * - `String`: The category string of the question.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::QuestionData;
+     * let qdata = QuestionData::new(1, 1, "Category".to_string(), "Text".to_string());
+     * assert_eq!(qdata.get_category_string(), "Category");
+     * ```
+     * @returns {string}
+     */
+    get_category_string() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.questiondata_get_category_string(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * Retrieves a specific choice from the question.
+     *
+     * # Arguments
+     * * `index` - The index of the choice to retrieve (0-based).
+     *
+     * # Returns
+     * - `ChoiceMark`: The choice at the specified index.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::QuestionData;
+     * let qdata = QuestionData::new(1, "Category".to_string(), "Text".to_string());
+     * assert_eq!(qdata.get_choice(0), ChoiceMark::new(String::new(), false));
+     * ```
+     * @param {number} index
+     * @returns {ChoiceMark}
+     */
+    get_choice(index) {
+        const ret = wasm.questiondata_get_choice(this.__wbg_ptr, index);
+        return ChoiceMark.__wrap(ret);
+    }
+    /**
+     * Retrieves the number of choices in the question.
+     *
+     * # Returns
+     * - `usize`: The number of choices in the question.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::QuestionData;
+     * let qdata = QuestionData::new(1, "Category".to_string(), "Text".to_string());
+     * assert_eq!(qdata.get_choices_length(), 0);
+     * ```
+     * @returns {number}
+     */
+    get_choices_length() {
+        const ret = wasm.questiondata_get_choices_length(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
+     * Retrieves the question number.
+     *
+     * # Returns
+     * - `u16`: The question number.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::QuestionData;
+     * let qdata = QuestionData::new(1, "Category".to_string(), "Text".to_string());
+     * assert_eq!(qdata.get_num(), 1);
+     * ```
+     * @returns {number}
+     */
+    get_num() {
+        const ret = wasm.questiondata_get_num(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * Retrieves the text of the question.
+     *
+     * # Returns
+     * - `String`: The text of the question.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::QuestionData;
+     * let qdata = QuestionData::new(1, "Category".to_string(), "Text".to_string());
+     * assert_eq!(qdata.get_text(), "Text");
+     * ```
+     * @returns {string}
+     */
+    get_question() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.questiondata_get_question(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * Creates a new `QuestionData` instance.
+     *
+     * # Arguments
+     * * `num` - The question number.
+     * * `category_id` - The category ID of the question.
+     * * `category_str` - The category string of the question.
+     * * `question` - The text of the question.
+     *
+     * # Returns
+     * A new `QuestionData` instance.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::QuestionData;
+     * let qdata = QuestionData::new(1, "Category".to_string(), "Text".to_string());
+     * ```
+     * @param {number} num
+     * @param {number} category_id
+     * @param {string} category_str
+     * @param {string} question
+     */
+    constructor(num, category_id, category_str, question) {
+        const ptr0 = passStringToWasm0(category_str, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(question, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.questiondata_new(num, category_id, ptr0, len0, ptr1, len1);
+        this.__wbg_ptr = ret;
+        QuestionDataFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+}
+if (Symbol.dispose) QuestionData.prototype[Symbol.dispose] = QuestionData.prototype.free;
+
 /**
  * @param {string} input_data
  * @returns {string}
@@ -1429,11 +1933,6 @@ function __wbg_get_imports() {
             const ret = arg0;
             return ret;
         },
-        __wbindgen_cast_0000000000000002: function(arg0, arg1) {
-            // Cast intrinsic for `Ref(String) -> Externref`.
-            const ret = getStringFromWasm0(arg0, arg1);
-            return ret;
-        },
         __wbindgen_init_externref_table: function() {
             const table = wasm.__wbindgen_externrefs;
             const offset = table.grow(4);
@@ -1459,6 +1958,9 @@ const ControlTowerFinalization = (typeof FinalizationRegistry === 'undefined')
 const NameIdFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_nameid_free(ptr, 1));
+const QuestionDataFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_questiondata_free(ptr, 1));
 
 function addToExternrefTable0(obj) {
     const idx = wasm.__externref_table_alloc();

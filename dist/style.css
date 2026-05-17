@@ -10,23 +10,73 @@ except according to those terms.
 
 :root {
     --nav-height: 32px;
+    --font-size: 11px;
+}
+
+body.theme-light {
+    --bg-color: #ffffff;
     --nav-bg: #f3f3f3;
     --nav-text: #333333;
     --main-text: #333333;
     --active-bg: #ffffff;
     --active-text: #0078d4;
-    --font-size: 11px;
-    --border-color: #d1d1d1;
+    --border-color: #000000;
+    --hover-bg: #e5e5e5;
+    --header-bg: #f3f3f3;
     --app-bg: #ffffff;
+    background-color: var(--bg-color);
+    color: var(--main-text);
 }
 
-body.theme-web {
+body.theme-blue {
+    --bg-color: #f9f9f9;
     --nav-bg: #2c3e50;
     --nav-text: #ecf0f1;
     --main-text: #2c3e50;
     --active-bg: #3498db;
     --active-text: #ffffff;
+    --border-color: #bdc3c7;
+    --hover-bg: #3e5871;
+    --header-bg: #ecf0f1;
     --app-bg: #f9f9f9;
+    background-color: var(--bg-color);
+    color: var(--main-text);
+}
+
+body.theme-dark {
+    --bg-color: #121212;
+    --nav-bg: #1e1e1e;
+    --nav-text: #e0e0e0;
+    --main-text: #e0e0e0;
+    --active-bg: #2d2d2d;
+    --active-text: #ffffff;
+    --border-color: #333333;
+    --hover-bg: #3a3a3a;
+    --header-bg: #1e1e1e;
+    --app-bg: #121212;
+    background-color: var(--bg-color);
+    color: var(--main-text);
+}
+
+body.theme-dark .question-item, 
+body.theme-dark .student-item, 
+body.theme-dark .header-card { 
+    background-color: var(--active-bg); 
+    border: 1px solid var(--border-color); 
+}
+body.theme-dark .q-number, 
+body.theme-dark .sl-label, 
+body.theme-dark .header-label { 
+    color: #ffffff !important; 
+    font-weight: bold !important; 
+}
+body.theme-dark .question-item.focused { 
+    border-color: #0078d4 !important;
+    box-shadow: 0 0 8px rgba(0, 120, 212, 0.5);
+}
+
+body.theme-dark .view-header {
+    border-bottom: 2px solid #ffffff;
 }
 
 body, html { margin: 0; padding: 0; height: 100%; overflow: auto; font-family: "Segoe UI", sans-serif; background-color: var(--app-bg); color: var(--main-text); }
@@ -60,7 +110,7 @@ body, html { margin: 0; padding: 0; height: 100%; overflow: auto; font-family: "
     width: auto;
 }
 
-body.theme-web .app-logo { color: #7fbde6; }
+body.theme-blue .app-logo { color: #7fbde6; }
 
 .menu-bar { display: flex; height: 100%; align-items: center; }
 .menu-item-container { position: relative; height: 100%; }
@@ -75,7 +125,16 @@ body.theme-web .app-logo { color: #7fbde6; }
 .menu-bar:hover .menu-item.active { background-color: transparent; color: var(--nav-text); }
 
 /* 마우스가 올라가 있는 메뉴 항목(또는 그 하위 메뉴 포함)만 하이라이트합니다. */
-.menu-item-container:hover .menu-item { background-color: var(--active-bg); color: var(--active-text); }
+body.theme-light .menu-item-container:hover .menu-item {
+    background-color: var(--nav-bg);
+    color: var(--main-text);
+    font-weight: normal;
+}
+
+/* 활성화된 메뉴는 호버 시에도 볼드체 유지 */
+body.theme-light .menu-item-container:hover .menu-item.active {
+    font-weight: bold;
+}
 
 .submenu {
     display: none; position: absolute; top: var(--nav-height); left: 0;
@@ -109,11 +168,11 @@ body.theme-web .app-logo { color: #7fbde6; }
 }
 
 .question-item.focused {
-    border-color: var(--active-text) !important;
+    border-color: var(--active-bg) !important;
     box-shadow: 0 0 8px rgba(0, 120, 212, 0.3);
 }
 
-body.theme-web .question-item.focused {
+body.theme-blue .question-item.focused {
     border-color: #0d47a1 !important; /* 웹 스타일에서 눈에 잘 띄는 어두운 남색 */
     box-shadow: 0 0 8px rgba(13, 71, 161, 0.4);
 }
@@ -209,10 +268,13 @@ body.theme-web .question-item.focused {
     width: 16px;
     height: 16px;
     cursor: pointer;
-    margin-top: 6px; /* 텍스트 시작 위치에 맞춤 */
+    margin-top: 6px;
+    vertical-align: middle;
 }
 
+
 .choice-input {
+
     flex: 1;
     min-height: 24px;
     height: auto;
@@ -227,7 +289,11 @@ body.theme-web .question-item.focused {
     box-sizing: border-box;
 }
 
-/* Student List Styles */
+body.theme-light .question-item.focused,
+body.theme-light .header-card.focused {
+    border-color: #0078d4 !important;
+    box-shadow: 0 0 8px rgba(0, 120, 212, 0.3);
+}
 .student-list-container {
     flex: 1;
     overflow: auto;
@@ -239,10 +305,10 @@ body.theme-web .question-item.focused {
 .student-list-container::-webkit-scrollbar { width: 8px; }
 .student-list-container::-webkit-scrollbar-track { background: var(--nav-bg); }
 .student-list-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-.student-list-container::-webkit-scrollbar-thumb:hover { background: var(--active-text); }
+.student-list-container::-webkit-scrollbar-thumb:hover { background: var(--active-bg); }
 
 .student-item {
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
     border-radius: 4px;
     padding: 10px 15px;
     margin-bottom: 10px;
@@ -260,7 +326,7 @@ body.theme-web .question-item.focused {
     white-space: nowrap;
 }
 
-body.theme-web .sl-label {
+body.theme-blue .sl-label {
     color: #ffffff;
 }
 
@@ -324,23 +390,25 @@ body.theme-web .sl-label {
     font-weight: bold;
 }
 
-body.theme-web .ss-sidebar-btn {
+body.theme-blue .ss-sidebar-btn {
     background: #e1f5fe; /* 연한 파란색 */
     color: #01579b;
     font-weight: bold !important;
 }
 
 .ss-sidebar-btn.active {
-    background: var(--active-text) !important;
+    background: var(--active-bg) !important;
     color: #ffffff !important; /* 활성화 시 글자색을 흰색으로 고정 */
     font-weight: bold;
 }
 
-body.theme-desktop .ss-sidebar-btn.active {
-    color: #ffffff !important; /* 데스크 탑 스타일에서도 활성화 시 흰색 */
+body.theme-light .ss-sidebar-btn.active {
+    color: #0078d4 !important;
+    border-color: #0078d4 !important;
+    background: #ffffff !important;
 }
 
-body.theme-web .ss-sidebar-btn.active {
+body.theme-blue .ss-sidebar-btn.active {
     color: #000000 !important; /* 웹 스타일에서는 활성화 시 검은색 */
 }
 
@@ -360,25 +428,25 @@ body.theme-web .ss-sidebar-btn.active {
     color: var(--nav-text); /* 기본 텍스트 색상 */
 }
 
-body.theme-web .ss-nav-btn {
+body.theme-blue .ss-nav-btn {
     color: #ffffff; /* 웹 테마에서 화살표를 흰색으로 */
 }
 
-body.theme-web .q-nav-up-btn, 
-body.theme-web .q-nav-down-btn {
+body.theme-blue .q-nav-up-btn, 
+body.theme-blue .q-nav-down-btn {
     background-color: #ecf0f1;
     color: #2c3e50;
     border-color: #bdc3c7;
 }
 
-body.theme-web .q-nav-up-btn:hover, 
-body.theme-web .q-nav-down-btn:hover {
+body.theme-blue .q-nav-up-btn:hover, 
+body.theme-blue .q-nav-down-btn:hover {
     background-color: #d5dbdb;
 }
 
 /* 웹 테마에서 문제 번호 흰색으로 */
-body.theme-web .q-number, 
-body.theme-web .question-item .q-number {
+body.theme-blue .q-number, 
+body.theme-blue .question-item .q-number {
     color: #ffffff !important;
     font-weight: 900 !important; /* 더 굵은 수치 적용 */
 }
@@ -426,8 +494,12 @@ input:disabled, textarea:disabled {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid var(--active-text);
+    border-bottom: 2px solid var(--active-bg);
     padding-bottom: 5px;
+}
+
+body.theme-light .view-header {
+    border-bottom: 2px solid #000000;
 }
 
 .view-header h2 {
@@ -453,7 +525,7 @@ input:disabled, textarea:disabled {
     font-weight: normal;
 }
 
-body.theme-web .file-info-label {
+body.theme-blue .file-info-label {
     color: #3498db; /* 웹 스타일에서 눈에 잘 띄는 하늘색/파란색 */
 }
 
@@ -566,7 +638,7 @@ dialog::backdrop {
     line-height: 26px; /* 추가: 입력창과 높이 맞춤 */
 }
 
-body.theme-web .header-label {
+body.theme-blue .header-label {
     color: #ffffff;
 }
 
@@ -599,6 +671,24 @@ body.theme-web .header-label {
     resize: none;
     line-height: 1.5;
     overflow-y: auto;
+}
+
+#ss-card-container textarea.self-study-notice {
+    height: 250px;
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto !important;
+    display: block !important;
+    padding: 10px 15px !important;
+    resize: none;
+    line-height: 1.6;
+    overflow-y: auto;
+    border: 3px solid #0078d4 !important;
+    border-color: #0078d4 !important;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #ffffff !important;
+    color: #000000 !important;
 }
 
 .menu-separator {
