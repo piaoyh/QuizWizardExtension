@@ -274,7 +274,6 @@ body.theme-blue .question-item.focused {
 
 
 .choice-input {
-
     flex: 1;
     min-height: 24px;
     height: auto;
@@ -377,7 +376,8 @@ body.theme-blue .sl-label {
 
 .ss-sidebar-btn {
     width: 100%;
-    padding: 8px 0;
+    height: 32px; /* 높이를 조금 더 크게 설정 */
+    padding: 0 10px;
     font-size: 11px;
     cursor: pointer;
     border: 1px solid var(--border-color);
@@ -385,9 +385,21 @@ body.theme-blue .sl-label {
     color: var(--main-text);
     border-radius: 4px;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    align-items: center; /* 수직 중앙 정렬 */
+    justify-content: center; /* 수평 중앙 정렬 */
     font-weight: bold;
+    box-sizing: border-box;
+    transition: background-color 0.2s;
+}
+
+.ss-sidebar-label {
+    display: block;
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1;
 }
 
 body.theme-blue .ss-sidebar-btn {
@@ -698,4 +710,34 @@ body.theme-blue .header-label {
     pointer-events: none;
     user-select: none;
     overflow: hidden; /* 기존의 '---' 텍스트를 숨깁니다 */
+}
+
+/* 추가: 자기주도학습용 에디터 스타일 */
+.ss-editor {
+    width: 100%;
+    margin-left: 35px; /* 문제 번호 영역만큼 들여쓰기 */
+    margin-right: 35px; /* 문제 번호 영역만큼 들여쓰기 */
+    max-width: calc(100% - 35px); /* 폭 조절 */
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-family: inherit;
+    resize: none;
+    line-height: 1.5;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.ss-editor:focus {
+    border-color: #0078d4;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 120, 212, 0.2);
+}
+
+.ss-editor-cat4 {
+    height: 18em; /* 약 12줄 (1.5 line-height * 12) */
+    min-height: 18em;
+    overflow-y: auto; /* 내용이 넘칠 때 스크롤바 표시 */
 }

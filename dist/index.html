@@ -175,6 +175,35 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
         </div>
     </dialog>
 
+    <!-- 채점 결과 대화상자 추가 -->
+    <dialog id="score-result-dialog" class="modal">
+        <div class="modal-content">
+            <h3 id="score-dialog-title">시험 결과 / Exam Result</h3>
+            <div id="score-display-area" style="padding: 30px; text-align: center;">
+                <span id="final-score" style="font-size: 48px; font-weight: bold; color: #0078d4;">0</span>
+                <span style="font-size: 24px; font-weight: bold; color: #555;"> / 100</span>
+            </div>
+            <div class="modal-actions">
+                <button id="score-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 통계 결과 대화상자 추가 -->
+    <dialog id="stat-result-dialog" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3 id="stat-dialog-title">문제은행 통계 / QBank Statistics</h3>
+            <div id="stat-content-area" style="padding: 15px; font-size: 13px; line-height: 1.6;">
+                <div id="stat-summary" style="margin-bottom: 15px; font-weight: bold; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;"></div>
+                <div id="stat-categories" style="margin-bottom: 15px;"></div>
+                <div id="stat-correct-answers" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+            <div class="modal-actions">
+                <button id="stat-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
     <!-- 새 문제은행 생성 확인 대화상자 추가 -->
     <dialog id="confirm-new-qb-dialog" class="modal">
         <div class="modal-content">
