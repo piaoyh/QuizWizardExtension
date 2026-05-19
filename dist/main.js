@@ -552,10 +552,14 @@ class QuizWizardApp {
         }
         const langData = translations[this.currentLang] || translations['ko'];
         const title = langData.actions['sl-editing'] || 'Editing Student List';
-        const addBtnText = this.currentLang === 'ko' ? "+ 학생 추가" : (this.currentLang === 'ru' ? "+ Добавить студента" : (this.currentLang === 'ky' ? "+ Студент кошуу" : "+ Add Student"));
+        const addBtnText = langData.actions['sl-add-student'] || "+ 학생 추가";
+        const addBtnTooltip = langData.actions['sl-add-student-tooltip'] || "";
         const selectAllText = langData.actions['sl-select-all'] || 'Select All';
+        const selectAllTooltip = langData.actions['sl-select-all-tooltip'] || "";
         const invertText = langData.actions['sl-invert-selection'] || 'Invert';
+        const invertTooltip = langData.actions['sl-invert-selection-tooltip'] || "";
         const removeText = langData.actions['sl-remove-selected'] || '- Remove';
+        const removeTooltip = langData.actions['sl-remove-selected-tooltip'] || "";
         // 파일 이름 표시용 HTML 추가
         const fileInfoHtml = this.student_list_file_name
             ? `<span class="file-info-label">[ ${this.student_list_file_name} ]</span>`
@@ -565,10 +569,10 @@ class QuizWizardApp {
             <div class="view-header">
                 <h2>${title}${fileInfoHtml}</h2>
                 <div class="view-actions">
-                    <button id="sl-select-all-btn">${selectAllText}</button>
-                    <button id="sl-invert-btn" style="margin-left: 5px;">${invertText}</button>
-                    <button id="add-student-btn" style="margin-left: 15px;">${addBtnText}</button>
-                    <button id="sl-remove-btn" style="margin-left: 5px;">${removeText}</button>
+                    <button id="sl-select-all-btn" title="${selectAllTooltip}">${selectAllText}</button>
+                    <button id="sl-invert-btn" style="margin-left: 5px;" title="${invertTooltip}">${invertText}</button>
+                    <button id="add-student-btn" style="margin-left: 15px;" title="${addBtnTooltip}">${addBtnText}</button>
+                    <button id="sl-remove-btn" style="margin-left: 5px;" title="${removeTooltip}">${removeText}</button>
                 </div>
             </div>
             <div class="student-list-container" id="student-list-container">
@@ -1063,6 +1067,15 @@ class QuizWizardApp {
         });
         // 하위 메뉴(고유 액션) 클릭 핸들러
         document.querySelectorAll('.submenu-item').forEach(item => {
+            // [추가] 툴팁 설정
+            const action = item.getAttribute('data-action');
+            if (action) {
+                const langData = translations[this.currentLang] || translations['ko'];
+                const tooltipKey = `${action}-tooltip`;
+                if (langData.actions[tooltipKey]) {
+                    item.setAttribute('title', langData.actions[tooltipKey]);
+                }
+            }
             item.addEventListener('click', (e) => {
                 const target = e.currentTarget;
                 const action = target.dataset.action;
@@ -1242,33 +1255,40 @@ class QuizWizardApp {
         let actionButtonsHtml = "";
         if (this.editorMode === 'question') {
             const addBtnText = langData.actions['qb-add-question'] || "+ 문제 추가";
+            const addBtnTooltip = langData.actions['qb-add-question-tooltip'] || "";
             const duplicateBtnText = langData.actions['qb-duplicate-question'] || "= 문제 복제";
+            const duplicateBtnTooltip = langData.actions['qb-duplicate-question-tooltip'] || "";
             const removeBtnText = langData.actions['qb-remove-question'] || "- 문제 삭제";
             const removeBtnTooltip = langData.actions['qb-remove-question-tooltip'] || "";
             const insertBtnText = langData.actions['qb-insert'] || '->V<- 문제 삽입';
+            const insertBtnTooltip = langData.actions['qb-insert-tooltip'] || "";
             actionButtonsHtml = `
                 <input type="number" id="insert-pos-left" style="width: 40px; text-align: center;" min="1">
                 <span style="margin: 0 5px;">:</span>
                 <input type="number" id="insert-pos-right" style="width: 40px; text-align: center;" min="2">
-                <button id="insert-question-btn" style="margin-right: 10px; margin-left: 5px;">${insertBtnText}</button>
-                <button id="duplicate-question-btn" style="margin-right: 5px;">${duplicateBtnText}</button>
-                <button id="add-question-btn" style="margin-right: 5px;">${addBtnText}</button>
+                <button id="insert-question-btn" style="margin-right: 10px; margin-left: 5px;" title="${insertBtnTooltip}">${insertBtnText}</button>
+                <button id="duplicate-question-btn" style="margin-right: 5px;" title="${duplicateBtnTooltip}">${duplicateBtnText}</button>
+                <button id="add-question-btn" style="margin-right: 5px;" title="${addBtnTooltip}">${addBtnText}</button>
                 <button id="remove-question-btn" style="margin-right: 5px;" title="${removeBtnTooltip}">${removeBtnText}</button>
             `;
         }
         else {
             const addBtnText = langData.actions['qb-add-choice'] || "+ 선택지 추가";
+            const addBtnTooltip = langData.actions['qb-add-choice-tooltip'] || "";
             const duplicateBtnText = langData.actions['qb-duplicate-choice'] || "= 선택지 복제";
+            const duplicateBtnTooltip = langData.actions['qb-duplicate-choice-tooltip'] || "";
             const removeBtnText = langData.actions['qb-remove-choice'] || "- 선택지 삭제";
+            const removeBtnTooltip = langData.actions['qb-remove-choice-tooltip'] || "";
             const insertBtnText = langData.actions['qb-insert-choice'] || '->V<- 선택지 삽입';
+            const insertBtnTooltip = langData.actions['qb-insert-choice-tooltip'] || "";
             actionButtonsHtml = `
                 <input type="number" id="insert-choice-pos-left" style="width: 40px; text-align: center;" min="1">
                 <span style="margin: 0 5px;">:</span>
                 <input type="number" id="insert-choice-pos-right" style="width: 40px; text-align: center;" min="2">
-                <button id="insert-choice-btn" style="margin-right: 10px; margin-left: 5px;">${insertBtnText}</button>
-                <button id="duplicate-choice-btn" style="margin-right: 5px;">${duplicateBtnText}</button>
-                <button id="add-choice-btn" style="margin-right: 5px;">${addBtnText}</button>
-                <button id="remove-choice-btn" style="margin-right: 5px;">${removeBtnText}</button>
+                <button id="insert-choice-btn" style="margin-right: 10px; margin-left: 5px;" title="${insertBtnTooltip}">${insertBtnText}</button>
+                <button id="duplicate-choice-btn" style="margin-right: 5px;" title="${duplicateBtnTooltip}">${duplicateBtnText}</button>
+                <button id="add-choice-btn" style="margin-right: 5px;" title="${addBtnTooltip}">${addBtnText}</button>
+                <button id="remove-choice-btn" style="margin-right: 5px;" title="${removeBtnTooltip}">${removeBtnText}</button>
             `;
         }
         let html = `

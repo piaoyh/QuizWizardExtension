@@ -153,7 +153,6 @@ body.theme-light .menu-item-container:hover .menu-item.active {
 .submenu-item.disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    pointer-events: none;
 }
 
 #view-container { flex: 1; padding: 10px 25px; overflow: auto; display: flex; flex-direction: column; }
