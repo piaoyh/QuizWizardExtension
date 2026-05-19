@@ -90,8 +90,6 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
                 <div class="menu-item-container">
                     <button class="menu-item" data-menu="settings"></button>
                     <div class="submenu">
-                        <div class="submenu-item" data-action="st-path-bank"></div>
-                        <div class="submenu-item" data-action="st-path-student"></div>
                         <div class="submenu-item" data-action="st-theme"></div>
                         <div class="submenu-item" data-action="st-font"></div>
                         <div class="submenu-item" data-action="st-lang"></div>
@@ -126,6 +124,30 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
             <div class="modal-actions">
                 <button id="scoring-cancel-btn">취소</button>
                 <button id="scoring-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 글꼴 설정 대화상자 추가 -->
+    <dialog id="font-dialog" class="modal">
+        <div class="modal-content">
+            <h3 id="font-dialog-title">글꼴 설정 / Font Settings</h3>
+            <div id="font-selector-container">
+                <label for="font-input" id="font-label">시스템 글꼴 선택:</label>
+                <div class="custom-dropdown">
+                    <div class="dropdown-input-wrapper">
+                        <input type="text" id="font-input">
+                        <button id="font-dropdown-btn">▼</button>
+                    </div>
+                    <div id="font-dropdown-list" class="dropdown-list">
+                        <!-- 글꼴 목록이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+                <p id="font-guide"></p>
+            </div>
+            <div class="modal-actions" style="margin-top: 20px;">
+                <button id="font-cancel-btn">취소</button>
+                <button id="font-confirm-btn">확인</button>
             </div>
         </div>
     </dialog>
@@ -192,7 +214,7 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
     <!-- 통계 결과 대화상자 추가 -->
     <dialog id="stat-result-dialog" class="modal">
         <div class="modal-content" style="max-width: 500px;">
-            <h3 id="stat-dialog-title">문제은행 통계 / QBank Statistics</h3>
+            <h3 id="stat-dialog-title"></h3>
             <div id="stat-content-area" style="padding: 15px; font-size: 13px; line-height: 1.6;">
                 <div id="stat-summary" style="margin-bottom: 15px; font-weight: bold; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;"></div>
                 <div id="stat-categories" style="margin-bottom: 15px;"></div>
@@ -269,6 +291,20 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
             <p id="in-info-license-msg" style="text-align: center; margin: 20px 0; font-size: 13px;"></p>
             <div class="modal-actions">
                 <button id="in-info-license-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 소프트웨어 정보 대화상자 -->
+    <dialog id="in-info-soft-dialog" class="modal">
+        <div class="modal-content">
+            <h3 id="in-info-soft-title">소프트웨어 정보</h3>
+            <div id="in-info-soft-msg" style="text-align: center; margin: 20px 0;">
+                <img src="QuizWiz_128.png" alt="QuizWiz Logo" style="width: 128px; height: 128px; margin-bottom: 10px;">
+                <p id="in-info-soft-version" style="font-weight: bold; font-size: 16px; margin: 0;">QuizWiz ver. 1.0</p>
+            </div>
+            <div class="modal-actions">
+                <button id="in-info-soft-confirm-btn">확인</button>
             </div>
         </div>
     </dialog>

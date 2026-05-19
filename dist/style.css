@@ -11,6 +11,7 @@ except according to those terms.
 :root {
     --nav-height: 32px;
     --font-size: 11px;
+    --app-font: "Segoe UI", sans-serif;
 }
 
 body.theme-light {
@@ -79,7 +80,7 @@ body.theme-dark .view-header {
     border-bottom: 2px solid #ffffff;
 }
 
-body, html { margin: 0; padding: 0; height: 100%; overflow: auto; font-family: "Segoe UI", sans-serif; background-color: var(--app-bg); color: var(--main-text); }
+body, html { margin: 0; padding: 0; height: 100%; overflow: auto; font-family: var(--app-font); background-color: var(--app-bg); color: var(--main-text); }
 
 ::placeholder {
     color: #888888;
@@ -561,6 +562,11 @@ dialog::backdrop {
     width: 300px;
 }
 
+.modal-content {
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
 .modal-content h3 {
     margin-top: 0;
     font-size: 15px;
@@ -736,8 +742,97 @@ body.theme-blue .header-label {
     box-shadow: 0 0 5px rgba(0, 120, 212, 0.2);
 }
 
-.ss-editor-cat4 {
-    height: 18em; /* 약 12줄 (1.5 line-height * 12) */
-    min-height: 18em;
-    overflow-y: auto; /* 내용이 넘칠 때 스크롤바 표시 */
+/* 글꼴 설정 대화상자 전용 스타일 */
+#font-dialog {
+    overflow: visible !important;
+}
+
+#font-dialog .modal-content {
+    overflow: visible !important;
+    max-height: none;
+    min-height: 160px; /* 입력창과 안내문구가 잘 보일 정도의 최소 높이 */
+}
+
+.custom-dropdown {
+    position: relative;
+    margin-top: 10px;
+}
+
+.dropdown-input-wrapper {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: #ffffff;
+    overflow: hidden;
+    height: 32px;
+}
+
+#font-input {
+    flex: 1;
+    padding: 0 10px;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    background-color: #ffffff;
+    color: #000000;
+    height: 100%;
+}
+
+#font-dropdown-btn {
+    width: 30px;
+    height: 100%;
+    border: none;
+    background: #eeeeee;
+    color: #333333;
+    cursor: pointer;
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    border-left: 1px solid var(--border-color);
+}
+
+body.theme-blue #font-dropdown-btn {
+    background-color: #ffffff;
+    color: #000000;
+    border-left: 1px solid var(--border-color);
+}
+
+.dropdown-list {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 150px; /* 요청하신 대로 목록 창의 높이를 줄임 */
+    overflow-y: auto;  /* 목록에만 스크롤바 허용 */
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    z-index: 2000;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.dropdown-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #000000;
+    border-bottom: 1px solid #f0f0f0;
+    background-color: #ffffff;
+    white-space: nowrap;
+}
+
+.dropdown-item:hover {
+    background-color: #e3f2fd;
+}
+
+#font-guide {
+    margin-top: 15px;
+    font-size: 11px;
+    color: #666;
+    line-height: 1.4;
 }

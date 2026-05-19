@@ -41,6 +41,7 @@ class QuizWizardApp {
     private container: HTMLElement | null;
     private currentTheme: AppTheme = 'theme-blue';
     private currentLang: SupportedLang = 'ko';
+    private currentFont: string = '"Segoe UI", sans-serif';
     private currentMenu: string = '';
     private header_scoring_rules: ScoringRules = 'no-negative-marking-no-partial-credit';
     private scoring_rules: ScoringRules = 'no-negative-marking-no-partial-credit';
@@ -115,17 +116,21 @@ class QuizWizardApp {
         }
 
         // 3. 기존 로직들
-        const data = await chrome.storage.local.get(['theme', 'lang']);
+        const data = await chrome.storage.local.get(['theme', 'lang', 'font']);
         let savedTheme = data.theme;
         
         this.currentTheme = (savedTheme as AppTheme) || 'theme-blue';
         this.currentLang = (data.lang as SupportedLang) || 'ko';
+        this.currentFont = (data.font as string) || '"Segoe UI", sans-serif';
         
         document.body.className = this.currentTheme;
+        document.documentElement.style.setProperty('--app-font', this.currentFont);
+        
         this.updateUILanguage();
         this.bindEvents();
         this.initLanguageDialog(); // 대화상자 이벤트 초기화
         this.initThemeDialog();    // 테마 대화상자 이벤트 초기화
+        this.initFontDialog();     // 글꼴 대화상자 이벤트 초기화
         this.initScoringDialog();  // 채점 방식 대화상자 이벤트 초기화
         this.initSubmitDialog();   // 제출 확인 대화상자 이벤트 초기화
         this.initScoreResultDialog(); // 채점 결과 대화상자 이벤트 초기화
@@ -136,6 +141,7 @@ class QuizWizardApp {
         this.initNewSLDialog();    // 새 학생명단 확인 대화상자 이벤트 초기화
         this.initCopyrightDialog(); // 저작권 대화상자 이벤트 초기화
         this.initLicenseDialog();  // 라이센스 대화상자 이벤트 초기화
+        this.initSoftwareInfoDialog(); // 소프트웨어 정보 대화상자 이벤트 초기화
 
         // 앱 시작 시 문제은행 편집 작업영역으로 시작 (기본 10개 카드 생성)
         this.initializeQuestionBankWorkspace(true);
@@ -144,27 +150,34 @@ class QuizWizardApp {
 
     /** 메뉴 활성화 상태 업데이트 */
     private updateMenuActivation() {
-        const isLoaded = this.question_bank_file_handle !== null;
+        const isBankLoaded = this.question_bank_file_handle !== null;
+        const isStudentsLoaded = this.student_list_handle !== null;
+        const canCreateExam = isBankLoaded && isStudentsLoaded;
 
         const scopeMenu = document.querySelector('[data-action="ex-set-scope"]');
         if (scopeMenu) {
-            isLoaded ? scopeMenu.classList.remove('disabled') : scopeMenu.classList.add('disabled');
+            canCreateExam ? scopeMenu.classList.remove('disabled') : scopeMenu.classList.add('disabled');
+        }
+
+        const savePaperMenu = document.querySelector('[data-action="ex-save-paper"]');
+        if (savePaperMenu) {
+            canCreateExam ? savePaperMenu.classList.remove('disabled') : savePaperMenu.classList.add('disabled');
         }
 
         const studyScopeMenu = document.querySelector('[data-action="ss-set-scope"]');
         if (studyScopeMenu) {
-            isLoaded ? studyScopeMenu.classList.remove('disabled') : studyScopeMenu.classList.add('disabled');
+            isBankLoaded ? studyScopeMenu.classList.remove('disabled') : studyScopeMenu.classList.add('disabled');
         }
 
         // [추가] 자기주도학습 시작 메뉴 제어
         const studyStartMenu = document.querySelector('[data-action="ss-start"]');
         if (studyStartMenu) {
-            isLoaded ? studyStartMenu.classList.remove('disabled') : studyStartMenu.classList.add('disabled');
+            isBankLoaded ? studyStartMenu.classList.remove('disabled') : studyStartMenu.classList.add('disabled');
         }
 
         // [추가] 현재 자기주도학습 작업공간인 경우 내부 버튼들도 즉시 업데이트
         if (this.currentMenu === 'self-study') {
-            this.updateSelfStudyUIActivation(isLoaded);
+            this.updateSelfStudyUIActivation(isBankLoaded);
         }
     }
 
@@ -548,21 +561,43 @@ class QuizWizardApp {
         const langData = translations[this.currentLang];
         if (!langData) return;
 
-        // 주메뉴 텍스트 적용
+        // 주메뉴 툴팁 및 텍스트 적용
         document.querySelectorAll('.menu-item').forEach(el => {
             const key = (el as HTMLElement).dataset.menu;
             if (key && langData.menus[key]) {
                 el.textContent = langData.menus[key];
+                
+                const tooltip = langData.actions[key + '-tooltip'];
+                if (tooltip) {
+                    el.setAttribute('title', tooltip);
+                }
             }
         });
 
-        // 하위 메뉴 텍스트 적용
+        // 하위 메뉴 툴팁 및 텍스트 적용
         document.querySelectorAll('.submenu-item').forEach(el => {
-            const key = (el as HTMLElement).dataset.action;
-            if (key && langData.actions[key]) {
-                el.textContent = langData.actions[key];
+            const action = (el as HTMLElement).dataset.action;
+            if (!action) return;
+
+            // 텍스트 적용
+            if (langData.actions[action]) {
+                el.textContent = langData.actions[action];
+            }
+            
+            // 툴팁 적용
+            const tooltipKey = action + '-tooltip';
+            if (langData.actions[tooltipKey]) {
+                el.setAttribute('title', langData.actions[tooltipKey]);
+            } else {
+                el.removeAttribute('title');
             }
         });
+
+        // toggle-mode-btn 툴팁 적용
+        const toggleBtn = document.getElementById('toggle-mode-btn');
+        if (toggleBtn && langData.actions['qb-toggle-tooltip']) {
+            toggleBtn.setAttribute('title', langData.actions['qb-toggle-tooltip']);
+        }
 
         // 현재 렌더링된 뷰가 있다면 제목 등도 다시 갱신
         if (this.currentMenu) {
@@ -1073,6 +1108,13 @@ class QuizWizardApp {
         const themeTitle = document.getElementById('theme-dialog-title');
         if (themeTitle) themeTitle.textContent = langData.actions['st-theme'];
 
+        const fontDialogTitle = document.getElementById('font-dialog-title');
+        const fontLabel = document.getElementById('font-label');
+        const fontGuide = document.getElementById('font-guide');
+        if (fontDialogTitle) fontDialogTitle.textContent = langData.actions['st-font-dialog-title'];
+        if (fontLabel) fontLabel.textContent = langData.actions['st-font-label'];
+        if (fontGuide) fontGuide.textContent = langData.actions['st-font-guide'];
+
         const submitTitle = document.getElementById('submit-dialog-title');
         if (submitTitle) submitTitle.textContent = langData.actions['ss-submit-paper'];
 
@@ -1249,14 +1291,12 @@ class QuizWizardApp {
             case 'ss-start':        this.startSelfstudy(); break;                 // 추가됨
 
             /* --- Settings (설정) --- */
-            case 'st-path-bank':    this.setQuestionBankDefaultPath(); break;     // 추가됨
-            case 'st-path-student': this.setStudentListDefaultPath(); break;     // 추가됨
             case 'st-theme':        this.setTheme(); break;                       // 추가 및 변경됨
             case 'st-font':         this.setFonts(); break;                       // 추가됨
             case 'st-lang':         this.setLanguage(); break;                    // 추가 및 변경됨
 
             /* --- Information (정보) --- */
-            case 'in-help':         this.help(); break;                           // 추가됨
+            case 'in-help':         window.open('./help/help_ko.html', '_blank'); break;
             case 'in-info-soft':    this.showSoftwareInfo(); break;               // 추가됨
             case 'in-info-copy':    this.showCopyright(); break;                   // 추가됨
             case 'in-info-license': this.showLicense(); break;                     // 추가됨
@@ -1312,12 +1352,14 @@ class QuizWizardApp {
 
         // 버튼 텍스트 및 모드별 버튼 구성
         const toggleBtnText = langData.actions['qb-toggle'] || '토글';
+        const toggleBtnTooltip = langData.actions['qb-toggle-tooltip'] || '';
         let actionButtonsHtml = "";
 
         if (this.editorMode === 'question') {
             const addBtnText = langData.actions['qb-add-question'] || "+ 문제 추가";
             const duplicateBtnText = langData.actions['qb-duplicate-question'] || "= 문제 복제";
             const removeBtnText = langData.actions['qb-remove-question'] || "- 문제 삭제";
+            const removeBtnTooltip = langData.actions['qb-remove-question-tooltip'] || "";
             const insertBtnText = langData.actions['qb-insert'] || '->V<- 문제 삽입';
 
             actionButtonsHtml = `
@@ -1327,7 +1369,7 @@ class QuizWizardApp {
                 <button id="insert-question-btn" style="margin-right: 10px; margin-left: 5px;">${insertBtnText}</button>
                 <button id="duplicate-question-btn" style="margin-right: 5px;">${duplicateBtnText}</button>
                 <button id="add-question-btn" style="margin-right: 5px;">${addBtnText}</button>
-                <button id="remove-question-btn" style="margin-right: 5px;">${removeBtnText}</button>
+                <button id="remove-question-btn" style="margin-right: 5px;" title="${removeBtnTooltip}">${removeBtnText}</button>
             `;
         } else {
             const addBtnText = langData.actions['qb-add-choice'] || "+ 선택지 추가";
@@ -1354,7 +1396,7 @@ class QuizWizardApp {
                 </div>
                 <div class="view-actions">
                     ${actionButtonsHtml}
-                    <button id="toggle-editor-mode-btn" style="margin-left: 5px;">${toggleBtnText}</button>
+                    <button id="toggle-mode-btn" style="margin-left: 5px;" title="${toggleBtnTooltip}">${toggleBtnText}</button>
                 </div>
             </div>
             <div class="student-list-container" id="student-list">
@@ -1369,7 +1411,7 @@ class QuizWizardApp {
         this.container.innerHTML = html;
 
         // 토글 버튼 이벤트 바인딩
-        document.getElementById('toggle-editor-mode-btn')?.addEventListener('click', () => this.toggleEditorMode());
+        document.getElementById('toggle-mode-btn')?.addEventListener('click', () => this.toggleEditorMode());
 
         // 문제 카드 포커스 이벤트 설정
         const listContainer = document.getElementById('student-list');
@@ -2571,11 +2613,13 @@ class QuizWizardApp {
         }
 
         const dialog = document.getElementById('stat-result-dialog') as HTMLDialogElement;
+        const dialogTitle = document.getElementById('stat-dialog-title');
         const summary = document.getElementById('stat-summary');
         const categories = document.getElementById('stat-categories');
         const correctAnswers = document.getElementById('stat-correct-answers');
 
-        if (dialog && summary && categories && correctAnswers) {
+        if (dialog && dialogTitle && summary && categories && correctAnswers) {
+            dialogTitle.textContent = langData.actions['stat-dialog-title'];
             summary.textContent = langData.actions['stat-total-questions'].replace('{n}', total.toString());
             
             categories.innerHTML = `<div>${langData.actions['stat-category-distribution']}</div>` +
@@ -3280,8 +3324,6 @@ class QuizWizardApp {
     }
 
     /* 설정 관련 함수군 */
-    private setQuestionBankDefaultPath() { console.log("setQuestionBankDefaultPath() 호출됨"); }
-    private setStudentListDefaultPath() { console.log("setStudentListDefaultPath() 호출됨"); }
     
     /** 테마 설정 대화상자를 엽니다. */
     private setTheme() {
@@ -3297,7 +3339,136 @@ class QuizWizardApp {
         dialog.showModal();
     }
 
-    private setFonts() { console.log("setFonts() 호출됨"); }
+    private setFonts() {
+        const dialog = document.getElementById('font-dialog') as HTMLDialogElement;
+        if (!dialog) return;
+
+        this.loadSystemFonts();
+        dialog.showModal();
+    }
+
+    // private loadSystemFonts()
+    /// Load system fonts and populate the select element.
+    private async loadSystemFonts() {
+        const input = document.getElementById('font-input') as HTMLInputElement;
+        const dropdownList = document.getElementById('font-dropdown-list') as HTMLDivElement;
+        const langData = translations[this.currentLang];
+        if (!input || !dropdownList) return;
+
+        // 이미 로드된 글꼴이 있으면 다시 로드하지 않음 (단, 자식이 없는 경우 제외)
+        if (dropdownList.children.length > 0) {
+            input.value = this.currentFont;
+            return;
+        }
+
+        input.value = this.currentFont;
+        dropdownList.innerHTML = `<div class="dropdown-item">${langData.actions['st-font-loading']}</div>`;
+        dropdownList.style.display = 'block';
+
+        try {
+            let fontFamilies: string[] = [];
+            if ('queryLocalFonts' in window) {
+                const fonts = await (window as any).queryLocalFonts();
+                fontFamilies = Array.from(new Set(fonts.map((f: any) => f.family))) as string[];
+            }
+
+            const essentialUnicodeFonts = [
+                "Batang", "Gulim", "Dotum", "Malgun Gothic", "Nanum Gothic", 
+                "Arial Unicode MS", "MS Gothic", "SimSun", "PMingLiU", "Meiryo",
+                "Segoe UI", "Arial", "Helvetica", "Times New Roman", "Courier New"
+            ];
+
+            const allFonts = Array.from(new Set([...fontFamilies, ...essentialUnicodeFonts])).sort();
+
+            dropdownList.innerHTML = "";
+            allFonts.forEach(family => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.textContent = family;
+                // 실제 글꼴을 미리보기로 적용 (해당 폰트가 설치되어 있으면 해당 폰트로 보임)
+                // 폰트 이름에 공백이 있을 수 있으므로 따옴표로 감싸고, 실패 시 sans-serif로 대체
+                item.style.fontFamily = `"${family}", sans-serif`; 
+                item.addEventListener('click', () => {
+                    input.value = family;
+                    dropdownList.style.display = 'none';
+                });
+                dropdownList.appendChild(item);
+            });
+            
+            // 초기에는 목록을 닫아둠
+            dropdownList.style.display = 'none';
+
+        } catch (e) {
+            console.error("Font loading error:", e);
+            dropdownList.innerHTML = `<div class="dropdown-item">${langData.actions['st-font-no-fonts']}</div>`;
+        }
+    }
+
+    // private initFontDialog()
+    /// Initialize font dialog events.
+    private initFontDialog() {
+        const dialog = document.getElementById('font-dialog') as HTMLDialogElement;
+        const confirmBtn = document.getElementById('font-confirm-btn');
+        const cancelBtn = document.getElementById('font-cancel-btn');
+        const input = document.getElementById('font-input') as HTMLInputElement;
+        const dropdownBtn = document.getElementById('font-dropdown-btn');
+        const dropdownList = document.getElementById('font-dropdown-list') as HTMLDivElement;
+
+        if (!dialog || !confirmBtn || !cancelBtn || !input || !dropdownBtn || !dropdownList) return;
+
+        // 역삼각형 버튼 클릭 시 목록 토글
+        dropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = dropdownList.style.display === 'block';
+            dropdownList.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // 입력창에 입력 시 필터링
+        input.addEventListener('input', () => {
+            const filter = input.value.toLowerCase();
+            const items = dropdownList.getElementsByClassName('dropdown-item');
+            let hasVisible = false;
+
+            Array.from(items).forEach((item: any) => {
+                const text = item.textContent || "";
+                if (text.toLowerCase().includes(filter)) {
+                    item.style.display = 'block';
+                    hasVisible = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            dropdownList.style.display = hasVisible ? 'block' : 'none';
+        });
+
+        // 대화상자 내부 클릭 시 (입력창/버튼 제외) 목록 닫기
+        dialog.addEventListener('click', (e) => {
+            if (e.target !== input && e.target !== dropdownBtn) {
+                dropdownList.style.display = 'none';
+            }
+        });
+        
+        // 대화상자가 닫힐 때 목록도 함께 닫기
+        dialog.addEventListener('close', () => {
+            dropdownList.style.display = 'none';
+        });
+
+        confirmBtn.addEventListener('click', () => {
+            const selectedFont = input.value.trim();
+            if (selectedFont) {
+                this.currentFont = selectedFont;
+                document.documentElement.style.setProperty('--app-font', selectedFont);
+                chrome.storage.local.set({ font: selectedFont });
+            }
+            dialog.close();
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            dialog.close();
+        });
+    }
+
     
     /** 언어 설정 대화상자를 엽니다. */
     private setLanguage() {
@@ -3370,8 +3541,31 @@ class QuizWizardApp {
     }
 
     /* 정보 관련 함수군 */
-    private help() { console.log("help() 호출됨"); }
-    private showSoftwareInfo() { console.log("showSoftwareInfo() 호출됨"); }
+
+    private showSoftwareInfo()
+    {
+        const dialog = document.getElementById('in-info-soft-dialog') as HTMLDialogElement;
+        const titleEl = document.getElementById('in-info-soft-title');
+
+        if (!dialog || !titleEl)
+            { return; }
+
+        const langData = translations[this.currentLang] || translations['ko'];
+        titleEl.textContent = langData.actions['in-info-soft'];
+
+        dialog.showModal();
+    }
+
+    /** 소프트웨어 정보 대화상자 초기화 */
+    private initSoftwareInfoDialog()
+    {
+        const dialog = document.getElementById('in-info-soft-dialog') as HTMLDialogElement;
+        const confirmBtn = document.getElementById('in-info-soft-confirm-btn');
+
+        confirmBtn?.addEventListener('click', () => {
+            dialog.close();
+        });
+    }
 
     /** 저작권 정보 대화상자 초기화 */
     private initCopyrightDialog()

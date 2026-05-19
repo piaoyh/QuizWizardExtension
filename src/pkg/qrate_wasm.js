@@ -675,6 +675,37 @@ export class ControlTower {
         }
     }
     /**
+     * Returns the question data from question bank (QBank)
+     * for the specified question number.
+     *
+     * This method returns the question data from question bank (QBank)
+     * for the specified question number. If the `Generator` instance is not
+     * initialized, it returns `None`.
+     *
+     * # Arguments
+     * * `num` - The question number to retrieve.
+     *
+     * # Returns
+     * - `Some(QuestionData)` if the question data is retrieved successfully.
+     * - `None` if the `Generator` instance is not initialized.
+     *
+     * # Examples
+     * ```
+     * use qrate::QBank;
+     * let qbank = QBank::new();
+     * if let Some(qdata) = qbank.get_question_data(1)
+     *     { println!("Question data retrieved successfully"); }
+     * else
+     *     { println!("Failed to retrieve question data"); }
+     * ```
+     * @param {number} num
+     * @returns {QuestionData | undefined}
+     */
+    get_question_data(num) {
+        const ret = wasm.controltower_get_question_data(this.__wbg_ptr, num);
+        return ret === 0 ? undefined : QuestionData.__wrap(ret);
+    }
+    /**
      * Returns the number of questions in the question bank (QBank).
      *
      * If the QBank is not loaded, it returns 0.
