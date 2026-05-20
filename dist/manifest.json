@@ -2,7 +2,7 @@
   "name": "QuizWiz",
   "description": "Quiz Generator based on Question Bank",
   "manifest_version": 3,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "permissions": ["storage", "tabs"],
   "background": {
     "service_worker": "background.js",

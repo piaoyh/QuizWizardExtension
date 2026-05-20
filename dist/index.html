@@ -104,6 +104,7 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
                         <div class="submenu-item" data-action="in-info-soft"></div>
                         <div class="submenu-item" data-action="in-info-copy"></div>
                         <div class="submenu-item" data-action="in-info-license"></div>
+                        <div class="submenu-item" data-action="in-info-development"></div>
                     </div>
                 </div>
 
@@ -274,10 +275,10 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
     </dialog>
 
     <!-- 저작권 정보 대화상자 -->
-    <dialog id="in-info-copy-dialog">
+    <dialog id="in-info-copy-dialog" class="modal">
         <div class="modal-content">
             <h3 id="in-info-copy-title">저작권 정보</h3>
-            <p id="in-info-copy-msg" style="text-align: center; margin: 20px 0;"></p>
+            <p id="in-info-copy-msg" style="text-align: center; margin: 10px 0;"></p>
             <div class="modal-actions">
                 <button id="in-info-copy-confirm-btn">확인</button>
             </div>
@@ -285,10 +286,10 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
     </dialog>
 
     <!-- 라이센스 정보 대화상자 -->
-    <dialog id="in-info-license-dialog">
+    <dialog id="in-info-license-dialog" class="modal">
         <div class="modal-content">
             <h3 id="in-info-license-title">라이센스 정보</h3>
-            <p id="in-info-license-msg" style="text-align: center; margin: 20px 0; font-size: 13px;"></p>
+            <p id="in-info-license-msg" style="text-align: center; margin: 10px 0; font-size: 13px;"></p>
             <div class="modal-actions">
                 <button id="in-info-license-confirm-btn">확인</button>
             </div>
@@ -305,6 +306,19 @@ https://raw.githubusercontent.com/bpampuch/pdfmake/master/build/vfs_fonts.js
             </div>
             <div class="modal-actions">
                 <button id="in-info-soft-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 개발 정보 대화상자 -->
+    <dialog id="in-info-dev-dialog" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <h3 id="in-info-dev-title">개발 정보</h3>
+            <div id="in-info-dev-msg" style="margin: 20px 0; font-size: 13px; line-height: 1.6;">
+                <!-- JS에서 동적 생성 -->
+            </div>
+            <div class="modal-actions">
+                <button id="in-info-dev-confirm-btn">확인</button>
             </div>
         </div>
     </dialog>

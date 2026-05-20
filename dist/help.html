@@ -1,0 +1,75 @@
+<!--
+Copyright 2026. PARK Youngho. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your option.
+This file may not be copied, modified, or distributed
+except according to those terms.
+-->
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizWiz Help</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body class="theme-blue">
+    <div id="app">
+        <header class="top-nav">
+            <div class="app-logo">
+                <img src="./QuizWiz_128.png" alt="QuizWiz Logo" class="logo-img">
+                QuizWiz Help
+            </div>
+
+            <nav class="menu-bar">
+                
+                <div class="menu-item-container">
+                    <button class="menu-item" data-menu="about-qbank"></button>
+                    <div class="submenu">
+                        <div class="submenu-item" data-action="qbank-structure"></div>
+                        <div class="submenu-item" data-action="qbank-editing"></div>
+                        <div class="submenu-item" data-action="qbank-usage"></div>
+                    </div>
+                </div>
+
+                <div class="menu-item-container">
+                    <button class="menu-item" data-menu="about-exam"></button>
+                    <div class="submenu">
+                        <div class="submenu-item" data-action="exam-random"></div>
+                        <div class="submenu-item" data-action="exam-scope"></div>
+                        <div class="submenu-item" data-action="exam-relationship"></div>
+                    </div>
+                </div>
+
+                <div class="menu-item-container">
+                    <button class="menu-item" data-menu="about-students"></button>
+                    <div class="submenu">
+                        <div class="submenu-item" data-action="students-structure"></div>
+                        <div class="submenu-item" data-action="students-editing"></div>
+                        <div class="submenu-item" data-action="students-usage"></div>
+                    </div>
+                </div>
+
+                <div class="menu-item-container">
+                    <button class="menu-item" data-menu="about-selfstudy"></button>
+                    <div class="submenu">
+                        <div class="submenu-item" data-action="selfstudy-prep"></div>
+                        <div class="submenu-item" data-action="selfstudy-scoring"></div>
+                        <div class="submenu-item" data-action="selfstudy-usage"></div>
+                    </div>
+                </div>
+
+            </nav>
+        </header>
+
+        <main id="view-container">
+            <!-- 도움말 내용이 여기에 동적으로 렌더링됩니다 -->
+        </main>
+    </div>
+
+    <script type="module" src="./help.js"></script>
+</body>
+</html>

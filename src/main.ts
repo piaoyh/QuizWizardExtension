@@ -142,6 +142,7 @@ class QuizWizardApp {
         this.initCopyrightDialog(); // 저작권 대화상자 이벤트 초기화
         this.initLicenseDialog();  // 라이센스 대화상자 이벤트 초기화
         this.initSoftwareInfoDialog(); // 소프트웨어 정보 대화상자 이벤트 초기화
+        this.initDevDialog();      // 개발 정보 대화상자 이벤트 초기화
 
         // 앱 시작 시 문제은행 편집 작업영역으로 시작 (기본 10개 카드 생성)
         this.initializeQuestionBankWorkspace(true);
@@ -597,6 +598,22 @@ class QuizWizardApp {
         const toggleBtn = document.getElementById('toggle-mode-btn');
         if (toggleBtn && langData.actions['qb-toggle-tooltip']) {
             toggleBtn.setAttribute('title', langData.actions['qb-toggle-tooltip']);
+        }
+
+        // 증감 에디터 입력창 툴팁 적용
+        const insertQPosTooltip = langData.actions['qb-insert-q-pos-tooltip'];
+        if (insertQPosTooltip) {
+            ['insert-pos-left', 'insert-pos-right'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.setAttribute('title', insertQPosTooltip);
+            });
+        }
+        const insertCPosTooltip = langData.actions['qb-insert-c-pos-tooltip'];
+        if (insertCPosTooltip) {
+            ['insert-choice-pos-left', 'insert-choice-pos-right'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.setAttribute('title', insertCPosTooltip);
+            });
         }
 
         // 현재 렌더링된 뷰가 있다면 제목 등도 다시 갱신
@@ -1310,14 +1327,36 @@ class QuizWizardApp {
             case 'st-lang':         this.setLanguage(); break;                    // 추가 및 변경됨
 
             /* --- Information (정보) --- */
-            case 'in-help':         window.open('./help/help_ko.html', '_blank'); break;
+            case 'in-help':         
+                this.openHelpTab();
+                break;
             case 'in-info-soft':    this.showSoftwareInfo(); break;               // 추가됨
             case 'in-info-copy':    this.showCopyright(); break;                   // 추가됨
             case 'in-info-license': this.showLicense(); break;                     // 추가됨
+            case 'in-info-development': this.showDevInfo(); break;                 // 추가됨
 
             default:
                 console.warn(`No handler defined for action: ${action}`);
         }
+    }
+
+    /**
+     * 도움말 탭을 엽니다. 이미 열려 있는 경우 해당 탭을 활성화합니다.
+     */
+    private openHelpTab() {
+        const helpUrl = chrome.runtime.getURL('help.html');
+        
+        chrome.tabs.query({}, (tabs) => {
+            const existingTab = tabs.find(tab => tab.url === helpUrl);
+            if (existingTab && existingTab.id !== undefined) {
+                chrome.tabs.update(existingTab.id, { active: true });
+                if (existingTab.windowId !== undefined) {
+                    chrome.windows.update(existingTab.windowId, { focused: true });
+                }
+            } else {
+                window.open('./help.html', '_blank');
+            }
+        });
     }
 
     /** 문제은행 작업공간 초기화 
@@ -1367,6 +1406,8 @@ class QuizWizardApp {
         // 버튼 텍스트 및 모드별 버튼 구성
         const toggleBtnText = langData.actions['qb-toggle'] || '토글';
         const toggleBtnTooltip = langData.actions['qb-toggle-tooltip'] || '';
+        const insertQPosTooltip = langData.actions['qb-insert-q-pos-tooltip'] || '';
+        const insertCPosTooltip = langData.actions['qb-insert-c-pos-tooltip'] || '';
         let actionButtonsHtml = "";
 
         if (this.editorMode === 'question') {
@@ -1380,9 +1421,9 @@ class QuizWizardApp {
             const insertBtnTooltip = langData.actions['qb-insert-tooltip'] || "";
 
             actionButtonsHtml = `
-                <input type="number" id="insert-pos-left" style="width: 40px; text-align: center;" min="1">
+                <input type="number" id="insert-pos-left" style="width: 40px; text-align: center;" min="1" title="${insertQPosTooltip}">
                 <span style="margin: 0 5px;">:</span>
-                <input type="number" id="insert-pos-right" style="width: 40px; text-align: center;" min="2">
+                <input type="number" id="insert-pos-right" style="width: 40px; text-align: center;" min="2" title="${insertQPosTooltip}">
                 <button id="insert-question-btn" style="margin-right: 10px; margin-left: 5px;" title="${insertBtnTooltip}">${insertBtnText}</button>
                 <button id="duplicate-question-btn" style="margin-right: 5px;" title="${duplicateBtnTooltip}">${duplicateBtnText}</button>
                 <button id="add-question-btn" style="margin-right: 5px;" title="${addBtnTooltip}">${addBtnText}</button>
@@ -1399,9 +1440,9 @@ class QuizWizardApp {
             const insertBtnTooltip = langData.actions['qb-insert-choice-tooltip'] || "";
 
             actionButtonsHtml = `
-                <input type="number" id="insert-choice-pos-left" style="width: 40px; text-align: center;" min="1">
+                <input type="number" id="insert-choice-pos-left" style="width: 40px; text-align: center;" min="1" title="${insertCPosTooltip}">
                 <span style="margin: 0 5px;">:</span>
-                <input type="number" id="insert-choice-pos-right" style="width: 40px; text-align: center;" min="2">
+                <input type="number" id="insert-choice-pos-right" style="width: 40px; text-align: center;" min="2" title="${insertCPosTooltip}">
                 <button id="insert-choice-btn" style="margin-right: 10px; margin-left: 5px;" title="${insertBtnTooltip}">${insertBtnText}</button>
                 <button id="duplicate-choice-btn" style="margin-right: 5px;" title="${duplicateBtnTooltip}">${duplicateBtnText}</button>
                 <button id="add-choice-btn" style="margin-right: 5px;" title="${addBtnTooltip}">${addBtnText}</button>
@@ -3649,6 +3690,87 @@ class QuizWizardApp {
         titleEl.textContent = langData.actions['in-info-license'];
         msgEl.innerText = langData.actions['in-info-license-text'];
         msgEl.style.whiteSpace = 'pre-line';
+
+        dialog.showModal();
+    }
+
+    /** 개발 정보 대화상자 초기화 */
+    private initDevDialog()
+    {
+        const dialog = document.getElementById('in-info-dev-dialog') as HTMLDialogElement;
+        const confirmBtn = document.getElementById('in-info-dev-confirm-btn');
+
+        confirmBtn?.addEventListener('click', () => {
+            dialog.close();
+        });
+    }
+
+    /** 개발 정보를 보여줍니다. */
+    private showDevInfo()
+    {
+        const dialog = document.getElementById('in-info-dev-dialog') as HTMLDialogElement;
+        const titleEl = document.getElementById('in-info-dev-title');
+        const msgEl = document.getElementById('in-info-dev-msg');
+
+        if (!dialog || !titleEl || !msgEl)
+            { return; }
+
+        const langData = translations[this.currentLang] || translations['ko'];
+        titleEl.textContent = langData.actions['in-info-development'];
+        
+        const libs = [
+            { name: "qrate", license: "Apache 2.0 / MIT" },
+            { name: "cryptocol", license: "Apache 2.0 / MIT" },
+            { name: "rusqlite", license: "MIT" },
+            { name: "docx-rs", license: "MIT" },
+            { name: "rust_xlsxwriter", license: "Apache 2.0 / MIT" },
+            { name: "calamine", license: "MIT" },
+            { name: "serde_json", license: "Apache 2.0 / MIT" },
+            { name: "wasm-bindgen", license: "Apache 2.0 / MIT" },
+            { name: "pdfmake", license: "MIT" }
+        ];
+
+        let libsHtml = `
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; border: 1px solid var(--border-color);">
+                <thead>
+                    <tr style="background-color: var(--card-bg); border-bottom: 1px solid var(--border-color);">
+                        <th style="padding: 8px; text-align: left; border-right: 1px solid var(--border-color);">Library</th>
+                        <th style="padding: 8px; text-align: left;">License</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        libs.forEach(lib => {
+            libsHtml += `
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding-left: 8px; padding-right: 8px; padding-top: 0px; padding-bottom: 0px; border-right: 1px solid var(--border-color);">${lib.name}</td>
+                    <td style="padding-left: 8px; padding-right: 8px; padding-top: 0px; padding-bottom: 0px;">${lib.license}</td>
+                </tr>
+            `;
+        });
+        libsHtml += '</tbody></table>';
+
+        msgEl.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <p style="font-weight: bold; margin-bottom: 5px;">${langData.actions['in-info-dev-tech-title']}</p>
+                <p style="margin: 0; padding-left: 10px;">${langData.actions['in-info-dev-tech-list']}</p>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <p style="font-weight: bold; margin-bottom: 5px;">${langData.actions['in-info-dev-roles-title']}</p>
+                <ul style="margin: 0; padding-left: 20px;">
+                    <li><strong>HTML:</strong> ${langData.actions['in-info-dev-role-html']}</li>
+                    <li><strong>CSS:</strong> ${langData.actions['in-info-dev-role-css']}</li>
+                    <li><strong>TypeScript:</strong> ${langData.actions['in-info-dev-role-ts']}</li>
+                    <li><strong>Rust:</strong> ${langData.actions['in-info-dev-role-rust']}</li>
+                    <li><strong>WebAssembly:</strong> ${langData.actions['in-info-dev-role-wasm']}</li>
+                </ul>
+            </div>
+            <div>
+                <p style="font-weight: bold; margin-bottom: 5px;">${langData.actions['in-info-dev-libs-title']}</p>
+                ${libsHtml}
+            </div>
+        `;
 
         dialog.showModal();
     }
