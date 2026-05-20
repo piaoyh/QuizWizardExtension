@@ -706,11 +706,14 @@ body.theme-blue .header-label {
 /*.header-input-category { flex: 0 0 100px; min-width: 100px; }*/
 .header-textarea-notice {
     flex: 1;
-    height: 400px; /* 높이는 고정(20줄 정도) */
-    padding: 4px 8px; /* 추가: 문제 에디터와 동일한 패딩 설정 */
+    height: 400px;
+    padding: 4px 8px;
     resize: none;
     line-height: 1.5;
     overflow-y: auto;
+    text-overflow: clip;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 #ss-card-container textarea.self-study-notice {
