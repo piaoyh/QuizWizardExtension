@@ -57,6 +57,13 @@ class QuizWizardApp {
     // 대화상자에서 '예'/'아니오'를 눌렀을 때 실행할 보류 중인 작업
     qbPendingAction = null;
     slPendingAction = null;
+    // 테마 목록은 현재 언어 설정을 따름
+    themeLabels = {
+        ko: ['파란색 분위기', '밝은 분위기', '차분한 분위기'],
+        en: ['Blue Theme', 'Light Theme', 'Calm Theme'],
+        ru: ['Синяя тема', 'Светлая тема', 'Спокойная тема'],
+        ky: ['Көк тема', 'Жарык тема', 'Тынч тема']
+    };
     constructor() {
         this.container = document.getElementById('view-container');
         this.pdfMake = window.pdfMake;
@@ -124,10 +131,6 @@ class QuizWizardApp {
         const studyStartMenu = document.querySelector('[data-action="ss-start"]');
         if (studyStartMenu) {
             isBankLoaded ? studyStartMenu.classList.remove('disabled') : studyStartMenu.classList.add('disabled');
-        }
-        // [추가] 현재 자기주도학습 작업공간인 경우 내부 버튼들도 즉시 업데이트
-        if (this.currentMenu === 'self-study') {
-            this.updateSelfStudyUIActivation(isBankLoaded);
         }
     }
     /** 자기주도학습 작업공간 내의 버튼 및 입력 요소 활성화/비활성화 */
@@ -315,11 +318,11 @@ class QuizWizardApp {
                 chrome.storage.local.set({ theme: selected });
             }
             dialog.close();
-            this.renderView(this.lastWorkspace);
+            this.renderView(this.currentMenu);
         });
         cancelBtn.addEventListener('click', () => {
             dialog.close();
-            this.renderView(this.lastWorkspace);
+            this.renderView(this.currentMenu);
         });
     }
     /**
@@ -339,11 +342,11 @@ class QuizWizardApp {
                 this.updateUILanguage();
             }
             dialog.close();
-            this.renderView(this.lastWorkspace);
+            this.renderView(this.currentMenu);
         });
         cancelBtn.addEventListener('click', () => {
             dialog.close();
-            this.renderView(this.lastWorkspace);
+            this.renderView(this.currentMenu);
         });
     }
     /**
@@ -1016,14 +1019,7 @@ class QuizWizardApp {
         }
         // 라디오 버튼 라벨 갱신 (언어)
         const fixedLangLabels = ["한국어", "English", "Русский", "Кыргызча"];
-        // 테마 목록은 현재 언어 설정을 따름
-        const themeLabels = {
-            ko: ['파란색 분위기', '밝은 분위기', '차분한 분위기'],
-            en: ['Blue Theme', 'Light Theme', 'Calm Theme'],
-            ru: ['Синяя тема', 'Светлая тема', 'Спокойная тема'],
-            ky: ['Көк тема', 'Жарык тема', 'Тынч тема']
-        };
-        const currentThemeLabels = themeLabels[this.currentLang] || themeLabels.en;
+        const currentThemeLabels = this.themeLabels[this.currentLang] || this.themeLabels.en;
         const langDialog = document.getElementById('lang-dialog');
         if (langDialog) {
             langDialog.querySelectorAll('.radio-group label').forEach((el, idx) => {
@@ -3402,6 +3398,148 @@ class QuizWizardApp {
         }
         if (menu === 'self-study') {
             this.initializeSelfStudyWorkspace();
+            return;
+        }
+        if (menu === 'settings') {
+            const langData = translations[this.currentLang] || translations['ko'];
+            const title = langData.menus['settings'] || 'Settings';
+            const themeTitle = langData.actions['st-theme'] || 'Theme';
+            const fontTitle = langData.actions['st-font'] || 'Font';
+            const langTitle = langData.actions['st-lang'] || 'Language';
+            const theme_str = this.themeLabels[this.currentLang];
+            const fonts = { "ko": "글꼴", "en": "Fonts", "ru": "Шрифты", "ky": "Шрифттер" };
+            const font_str = fonts[this.currentLang];
+            this.container.innerHTML = `
+                <div class="view-header">
+                    <h2>${title}</h2>
+                </div>
+                <div class="view-content settings-workspace">
+                    <section class="settings-section">
+                        <h3>${themeTitle}</h3>
+                        <div class="settings-options theme-options">
+                            <div class="setting-item" data-action="st-theme" data-value="theme-blue">
+                                <img src="blue_theme.png" alt="Blue Theme">
+                                <span>${theme_str[0]}</span>
+                            </div>
+                            <div class="setting-item" data-action="st-theme" data-value="theme-light">
+                                <img src="light_theme.png" alt="Light Theme">
+                                <span>${theme_str[1]}</span>
+                            </div>
+                            <div class="setting-item" data-action="st-theme" data-value="theme-dark">
+                                <img src="dark_theme.png" alt="Dark Theme">
+                                <span>${theme_str[2]}</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="settings-section" style="margin-top: 20px;">
+                        <h3>${fontTitle}</h3>
+                        <div class="settings-options font-options">
+                            <div class="setting-item" data-action="st-font" data-value="font1">
+                                <img src="font1.png" alt="Font 1">
+                                <span>${font_str} 1</span>
+                            </div>
+                            <div class="setting-item" data-action="st-font" data-value="font2">
+                                <img src="font2.png" alt="Font 2">
+                                <span>${font_str} 2</span>
+                            </div>
+                            <div class="setting-item" data-action="st-font" data-value="font3">
+                                <img src="font3.png" alt="Font 3">
+                                <span>${font_str} 3</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="settings-section" style="margin-top: 20px;">
+                        <h3>${langTitle}</h3>
+                        <div class="settings-options lang-options">
+                            <div class="setting-item" data-action="st-lang" data-value="ko">
+                                <div class="lang-text">한국어 (Korean)</div>
+                            </div>
+                            <div class="setting-item" data-action="st-lang" data-value="en">
+                                <div class="lang-text">English</div>
+                            </div>
+                            <div class="setting-item" data-action="st-lang" data-value="ru">
+                                <div class="lang-text">Русский (Russian)</div>
+                            </div>
+                            <div class="setting-item" data-action="st-lang" data-value="ky">
+                                <div class="lang-text">Кыргызча (Kyrgyz)</div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            `;
+            // 설정 항목 클릭 이벤트 바인딩
+            this.container.querySelectorAll('.setting-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const target = e.currentTarget;
+                    const action = target.dataset.action;
+                    if (action) {
+                        this.handleAction(action);
+                    }
+                });
+            });
+            return;
+        }
+        if (menu === 'information') {
+            if (!this.container)
+                return;
+            const langData = translations[this.currentLang] || translations['ko'];
+            const title = langData.menus['information'] || 'Information';
+            this.container.innerHTML = `
+                <div class="view-header">
+                    <h2>${title}</h2>
+                </div>
+                <div class="view-content" style="padding: 20px;">
+                    <h3>${langData.actions['in-manual-title']}</h3>
+                    <p>${langData.actions['in-manual-desc']}</p>
+                    <section>
+                        <h4>${langData.actions['in-manual-qb-h2']}</h4>
+                        <p>${langData.actions['in-manual-qb-p']}</p>
+                        <ul>
+                            <li>${langData.actions['in-manual-qb-li1']}</li>
+                            <li>${langData.actions['in-manual-qb-li2']}</li>
+                            <li>${langData.actions['in-manual-qb-li3']}</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h4>${langData.actions['in-manual-ex-h2']}</h4>
+                        <p>${langData.actions['in-manual-ex-p']}</p>
+                        <ul>
+                            <li>${langData.actions['in-manual-ex-li1']}</li>
+                            <li>${langData.actions['in-manual-ex-li2']}</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h4>${langData.actions['in-manual-sl-h2']}</h4>
+                        <p>${langData.actions['in-manual-sl-p']}</p>
+                        <ul>
+                            <li>${langData.actions['in-manual-sl-li1']}</li>
+                            <li>${langData.actions['in-manual-sl-li2']}</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h4>${langData.actions['in-manual-ss-h2']}</h4>
+                        <p>${langData.actions['in-manual-ss-p']}</p>
+                        <ul>
+                            <li>${langData.actions['in-manual-ss-li1']}</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h4>${langData.actions['in-manual-st-h2']}</h4>
+                        <p>${langData.actions['in-manual-st-p']}</p>
+                        <ul>
+                            <li>${langData.actions['in-manual-st-li1']}</li>
+                            <li>${langData.actions['in-manual-st-li2']}</li>
+                            <li>${langData.actions['in-manual-st-li3']}</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h4>${langData.actions['in-manual-in-h2']}</h4>
+                        <p>${langData.actions['in-manual-in-p']}</p>
+                    </section>
+                </div>
+            `;
             return;
         }
         const langData = translations[this.currentLang];
