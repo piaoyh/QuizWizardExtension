@@ -177,7 +177,7 @@ export const translations = {
             "ss-set-scoring-rules": "채점 방식 설정",
             "ss-start": "시작",
             "st-theme": "테마",
-            "st-font": "기본 글꼴",
+            "st-font": "글꼴",
             "st-lang": "언어",
             "st-scope-guide": "출제범위와 문항수를 정해 주세요.",
             "st-scope-count-label": "문항수:",

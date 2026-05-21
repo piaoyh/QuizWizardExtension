@@ -146,7 +146,14 @@ body.theme-light .menu-item-container:hover .menu-item.active {
 
 .submenu-item {
     padding: 7px 15px; font-size: var(--font-size); color: var(--nav-text);
-    cursor: default; text-align: left; white-space: nowrap;
+    cursor: default; display: flex; justify-content: space-between; align-items: center;
+    white-space: nowrap;
+}
+.submenu-item::after {
+    content: attr(data-shortcut);
+    margin-left: 20px;
+    opacity: 0.6;
+    font-size: 0.9em;
 }
 .submenu-item:hover { background-color: var(--active-bg); color: var(--active-text); }
 

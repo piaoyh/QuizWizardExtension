@@ -44,7 +44,6 @@ class QuizWizardApp {
     focusedQuestionIndex = null;
     // 현재 포커스된 선택지의 인덱스 (0-based)
     focusedChoiceIndex = null;
-    // [삭제됨]
     // 문제은행 편집 모드 ('question' 또는 'choice')
     editorMode = 'question';
     isDirtyQB = false;
@@ -109,6 +108,48 @@ class QuizWizardApp {
         // 앱 시작 시 문제은행 편집 작업영역으로 시작 (기본 10개 카드 생성)
         this.initializeQuestionBankWorkspace(true);
         this.updateMenuActivation();
+        this.applyPlatformShortcutsUI();
+    }
+    getOS() {
+        // TypeScript의 내장 타입을 위해 확장 유효성 검사
+        const nav = navigator;
+        if (nav.userAgentData) {
+            const platform = nav.userAgentData.platform.toLowerCase();
+            if (platform.includes('win'))
+                return 'Windows';
+            if (platform.includes('mac'))
+                return 'MacOS';
+            if (platform.includes('linux'))
+                return 'Linux';
+        }
+        // 만약 내장 데이터를 지원하지 않는 브라우저라면 2번 레거시 방식으로 폴백(Fallback)
+        return this.getOSLegacy();
+    }
+    getOSLegacy() {
+        const userAgent = window.navigator.userAgent.toLowerCase();
+        // navigator.platform도 함께 체크하면 정확도가 올라갑니다.
+        const platform = window.navigator.platform?.toLowerCase() || '';
+        if (userAgent.includes('win') || platform.includes('win'))
+            return 'Windows';
+        if (userAgent.includes('mac') || platform.includes('mac'))
+            return 'MacOS';
+        if (userAgent.includes('linux') || platform.includes('linux'))
+            return 'Linux';
+        return 'Unknown';
+    }
+    applyPlatformShortcutsUI() {
+        const currentOS = this.getOS();
+        const shortcutElements = document.querySelectorAll('.menu-shortcut');
+        shortcutElements.forEach((el) => {
+            const htmlEl = el;
+            let text = htmlEl.innerText;
+            if (currentOS === 'MacOS') {
+                // MacOS라면 Ctrl을 ⌘ 기호로 변환
+                text = text.replace('Ctrl+', '⌘');
+                htmlEl.innerText = text;
+            }
+            // Windows나 Linux(리눅스 민트)는 기본 작성된 'Ctrl+' 체제를 그대로 유지합니다.
+        });
     }
     /** 메뉴 활성화 상태 업데이트 */
     updateMenuActivation() {
@@ -302,6 +343,16 @@ class QuizWizardApp {
         });
     }
     /**
+     * 테마를 적용하고 설정을 저장합니다.
+     */
+    applyTheme(theme) {
+        if (theme && theme !== this.currentTheme) {
+            this.currentTheme = theme;
+            document.body.className = theme;
+            chrome.storage.local.set({ theme: theme });
+        }
+    }
+    /**
      * 테마 설정 대화상자의 버튼 이벤트를 초기화합니다.
      */
     initThemeDialog() {
@@ -312,10 +363,8 @@ class QuizWizardApp {
             return;
         confirmBtn.addEventListener('click', () => {
             const selected = dialog.querySelector('input[name="theme"]:checked')?.value;
-            if (selected && selected !== this.currentTheme) {
-                this.currentTheme = selected;
-                document.body.className = selected;
-                chrome.storage.local.set({ theme: selected });
+            if (selected) {
+                this.applyTheme(selected);
             }
             dialog.close();
             this.renderView(this.currentMenu);
@@ -324,6 +373,16 @@ class QuizWizardApp {
             dialog.close();
             this.renderView(this.currentMenu);
         });
+    }
+    /**
+     * 언어를 적용하고 설정을 저장한 뒤 UI를 갱신합니다.
+     */
+    applyLanguage(lang) {
+        if (lang && lang !== this.currentLang) {
+            this.currentLang = lang;
+            chrome.storage.local.set({ lang: this.currentLang });
+            this.updateUILanguage();
+        }
     }
     /**
      * 언어 설정 대화상자의 버튼 이벤트를 초기화합니다.
@@ -336,10 +395,8 @@ class QuizWizardApp {
             return;
         confirmBtn.addEventListener('click', () => {
             const selected = dialog.querySelector('input[name="lang"]:checked')?.value;
-            if (selected && selected !== this.currentLang) {
-                this.currentLang = selected;
-                chrome.storage.local.set({ lang: this.currentLang });
-                this.updateUILanguage();
+            if (selected) {
+                this.applyLanguage(selected);
             }
             dialog.close();
             this.renderView(this.currentMenu);
@@ -540,6 +597,9 @@ class QuizWizardApp {
             }
             else if (this.currentMenu === 'self-study') {
                 this.initializeSelfStudyWorkspace();
+            }
+            else if (this.currentMenu === 'settings' || this.currentMenu === 'information') {
+                this.renderView(this.currentMenu);
             }
             else {
                 this.refreshCurrentViewTitle();
@@ -1092,18 +1152,155 @@ class QuizWizardApp {
             }
             item.addEventListener('click', (e) => {
                 const target = e.currentTarget;
+                if (target.classList.contains('disabled'))
+                    return;
                 const action = target.dataset.action;
                 if (action) {
                     this.handleAction(action);
                 }
             });
         });
+        // 단축키 감지
+        window.addEventListener('keydown', (e) => {
+            const isActionDisabled = (action) => {
+                const el = document.querySelector(`.submenu-item[data-action="${action}"]`);
+                return el ? el.classList.contains('disabled') : false;
+            };
+            if (e.ctrlKey) {
+                switch (e.key.toUpperCase()) {
+                    case 'E':
+                        e.preventDefault();
+                        if (e.shiftKey) {
+                            console.log("앱 내부 전용 단축키 감지: 학생명단 편집");
+                            this.renderView('student-list');
+                        }
+                        else {
+                            console.log("앱 내부 전용 단축키 감지: 문제은행 편집");
+                            this.renderView('question-bank');
+                        }
+                        break;
+                    case 'Z':
+                        e.preventDefault();
+                        if (e.shiftKey) {
+                            console.log("앱 내부 전용 단축키 감지: 학생명단 최적화");
+                            // if (isActionDisabled('sl-optimize')) return;
+                            this.optimizeStudentList();
+                        }
+                        else {
+                            console.log("앱 내부 전용 단축키 감지: 문제은행 최적화");
+                            // if (isActionDisabled('qb-optimize')) return;
+                            this.optimizeQuestionBank();
+                        }
+                        break;
+                    case 'O':
+                        e.preventDefault();
+                        if (e.shiftKey) {
+                            console.log("앱 내부 전용 단축키 감지: 학생명단 열기");
+                            this.openStudentList();
+                        }
+                        else {
+                            console.log("앱 내부 전용 단축키 감지: 문제은행 열기");
+                            this.openQuestionBank();
+                        }
+                        break;
+                    case 'S':
+                        e.preventDefault();
+                        if (e.shiftKey) {
+                            console.log("앱 내부 전용 단축키 감지: 학생명단 저장");
+                            // if (isActionDisabled('sl-save')) return;
+                            this.saveStudentList();
+                        }
+                        else {
+                            console.log("앱 내부 전용 단축키 감지: 문제은행 저장");
+                            // if (isActionDisabled('qb-save')) return;
+                            this.saveQuestionBank();
+                        }
+                        break;
+                    case 'W':
+                        e.preventDefault();
+                        if (e.shiftKey) {
+                            console.log("앱 내부 전용 단축키 감지: 학생명단 다른 이름으로 저장");
+                            // if (isActionDisabled('sl-save-as')) return;
+                            this.saveAsStudentList();
+                        }
+                        else {
+                            console.log("앱 내부 전용 단축키 감지: 문제은행 다른 이름으로 저장");
+                            // if (isActionDisabled('qb-save-as')) return;
+                            this.saveAsQuestionBank();
+                        }
+                        break;
+                    case '.':
+                        if (!e.shiftKey) {
+                            e.preventDefault();
+                            console.log("앱 내부 전용 단축키 감지: 문제은행 통계");
+                            // if (isActionDisabled('qb-stat')) return;
+                            this.statQuestionBank();
+                        }
+                        break;
+                    case 'H':
+                        if (!e.shiftKey) {
+                            e.preventDefault();
+                            console.log("앱 내부 전용 단축키 감지: 문제은행 헤더 편집");
+                            // if (isActionDisabled('qb-edit-header')) return;
+                            this.renderView('header-edit');
+                        }
+                        break;
+                    case `G`:
+                        if (!e.shiftKey) {
+                            e.preventDefault();
+                            console.log("앱 내부 전용 단축키 감지: 채점 방식 설정");
+                            if (isActionDisabled('ss-set-scoring-rules'))
+                                return;
+                            this.setScoringRules();
+                        }
+                        break;
+                    case 'Q':
+                        e.preventDefault();
+                        if (e.shiftKey) {
+                            console.log("앱 내부 전용 단축키 감지: 새 학생명단");
+                            this.newStudentList();
+                        }
+                        else {
+                            console.log("앱 내부 전용 단축키 감지: 새 문제은행");
+                            this.newQuestionBank();
+                        }
+                        break;
+                    case 'L':
+                        if (!e.shiftKey) {
+                            e.preventDefault();
+                            console.log("앱 내부 전용 단축키 감지: 자기 주도 학습 시작");
+                            if (isActionDisabled('ss-start'))
+                                return;
+                            this.startSelfstudy();
+                        }
+                        break;
+                    case 'B':
+                        if (!e.shiftKey) {
+                            e.preventDefault();
+                            console.log("앱 내부 전용 단축키 감지: 시험 범위 설정");
+                            if (isActionDisabled('ss-set-scope') && (isActionDisabled('ex-set-scope')))
+                                return;
+                            this.setExamScope();
+                        }
+                        break;
+                    case 'M':
+                        if (!e.shiftKey) {
+                            e.preventDefault();
+                            console.log("앱 내부 전용 단축키 감지: 시험지 저장");
+                            if (isActionDisabled('ex-save-paper'))
+                                return;
+                            this.saveExamPaper();
+                        }
+                        break;
+                }
+            }
+        });
     }
     /**
      * 고유 액션 ID를 기반으로 각기 다른 기능 수행
      */
-    handleAction(action) {
-        console.log(`Action executing: ${action}`);
+    handleAction(action, value) {
+        console.log(`Action executing: ${action}${value ? ` with value: ${value}` : ''}`);
         // [추가] 액션 접두사에 따라 해당하는 주메뉴 작업공간으로 자동 전환
         const prefixMap = {
             'qb-edit-header': 'header-edit',
@@ -1136,23 +1333,25 @@ class QuizWizardApp {
                 break;
             case 'qb-open':
                 this.openQuestionBank();
-                break; // 추가됨
+                break;
             case 'qb-stat':
                 this.statQuestionBank();
-                break; // 추가됨
+                break;
             case 'qb-save':
                 this.saveQuestionBank();
-                break; // 추가됨
+                break;
             case 'qb-save-as':
                 this.saveAsQuestionBank();
-                break; // 추가됨
+                break;
             case 'qb-edit-question-bank':
                 this.renderView('question-bank');
-                break; // [추가]
-            case 'qb-edit-header': /* renderView에서 처리됨 */ break;
+                break;
+            case 'qb-edit-header':
+                this.renderView('header-edit');
+                break;
             case 'qb-optimize':
                 this.optimizeQuestionBank();
-                break; // 추가됨
+                break;
             /* --- Exam Setting (시험 설정) --- */
             case 'ex-load-bank':
                 this.openQuestionBank();
@@ -1184,48 +1383,57 @@ class QuizWizardApp {
                 break;
             case 'sl-edit-student-list':
                 this.renderView('student-list');
-                break; // [추가]
+                break;
             /* --- Self-study (자기 주도 학습) --- */
             case 'ss-load-bank':
                 this.openQuestionBank();
-                break; // 추가됨 (공용 함수 사용)
+                break;
             case 'ss-set-scope':
                 this.setExamScope();
-                break; // 추가됨
+                break;
             case 'ss-set-scoring-rules':
                 this.setScoringRules();
                 break;
             case 'ss-start':
                 this.startSelfstudy();
-                break; // 추가됨
+                break;
             /* --- Settings (설정) --- */
             case 'st-theme':
-                this.setTheme();
-                break; // 추가 및 변경됨
+                if (value) {
+                    this.applyTheme(value);
+                }
+                else {
+                    this.setTheme();
+                }
+                break;
             case 'st-font':
                 this.setFonts();
-                break; // 추가됨
+                break;
             case 'st-lang':
-                this.setLanguage();
-                break; // 추가 및 변경됨
+                if (value) {
+                    this.applyLanguage(value);
+                }
+                else {
+                    this.setLanguage();
+                }
+                break;
             /* --- Information (정보) --- */
             case 'in-help':
                 this.openHelpTab();
                 break;
             case 'in-info-soft':
                 this.showSoftwareInfo();
-                break; // 추가됨
+                break;
             case 'in-info-copy':
                 this.showCopyright();
-                break; // 추가됨
+                break;
             case 'in-info-license':
                 this.showLicense();
-                break; // 추가됨
+                break;
             case 'in-info-development':
                 this.showDevInfo();
-                break; // 추가됨
-            default:
-                console.warn(`No handler defined for action: ${action}`);
+                break;
+            default: console.warn(`No handler defined for action: ${action}`);
         }
     }
     /**
@@ -3474,8 +3682,9 @@ class QuizWizardApp {
                 item.addEventListener('click', (e) => {
                     const target = e.currentTarget;
                     const action = target.dataset.action;
+                    const value = target.dataset.value;
                     if (action) {
-                        this.handleAction(action);
+                        this.handleAction(action, value);
                     }
                 });
             });
