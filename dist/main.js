@@ -419,7 +419,7 @@ class QuizWizardApp {
             const selected = dialog.querySelector('input[name="scoring"]:checked')?.value;
             if (selected) {
                 this.scoring_rules = selected;
-                console.log("주인님, 채점 방식이 변경되었습니다:", this.scoring_rules);
+                console.log("채점 방식이 변경되었습니다:", this.scoring_rules);
             }
             dialog.close();
         });
@@ -613,8 +613,9 @@ class QuizWizardApp {
      * @param skipSave true이면 현재 화면 데이터를 배열에 저장하지 않고 렌더링만 합니다.
      */
     initializeStudentListWorkspace(forceReset = false, skipSave = false) {
-        if (!this.container)
+        if (!this.container) {
             return;
+        }
         // [수정] skipSave가 아닐 때만 현재 데이터를 저장합니다.
         if (this.currentMenu === 'student-list' && !forceReset && !skipSave) {
             this.saveCurrentStudentsToState();
@@ -622,14 +623,23 @@ class QuizWizardApp {
         else if (this.currentMenu === 'question-bank') {
             this.saveCurrentQuestionsToState();
         }
+        else if (this.currentMenu === 'header-edit' && !skipSave) {
+            this.saveCurrentHeaderToState();
+        }
+        else if (this.currentMenu === 'self-study' && !skipSave) {
+            this.saveStudyState();
+        }
         this.currentMenu = 'student-list';
         // 초기화 또는 데이터가 없는 경우 10명의 빈 학생 생성
         if (forceReset || this.studentsData.length === 0) {
             this.studentsData = Array.from({ length: 10 }, () => ({
                 fullName: '', studentId: '', selected: false
             }));
-            if (forceReset)
+            if (forceReset) {
                 this.student_list_file_name = '';
+                // [추가] 초기화 시 WASM 엔진에도 빈 구조를 생성
+                this.syncStudentsToWasm();
+            }
         }
         const langData = translations[this.currentLang] || translations['ko'];
         const title = langData.actions['sl-editing'] || 'Editing Student List';
@@ -783,13 +793,17 @@ class QuizWizardApp {
     isStudyStarted = false;
     /** 자기주도학습 작업공간 초기화 */
     initializeSelfStudyWorkspace() {
-        if (!this.container)
+        if (!this.container) {
             return;
+        }
         if (this.currentMenu === 'question-bank') {
             this.saveCurrentQuestionsToState();
         }
         else if (this.currentMenu === 'student-list') {
             this.saveCurrentStudentsToState();
+        }
+        else if (this.currentMenu === 'header-edit') {
+            this.saveCurrentHeaderToState();
         }
         else if (this.currentMenu === 'self-study') {
             this.saveStudyState();
@@ -843,7 +857,9 @@ class QuizWizardApp {
             document.getElementById('ss-next-btn')?.addEventListener('click', () => this.nextQuestion());
             document.getElementById('ss-submit-btn')?.addEventListener('click', () => {
                 const dialog = document.getElementById('submit-confirm-dialog');
-                dialog?.showModal();
+                if (dialog) {
+                    dialog.showModal();
+                }
             });
             // 학습 중인 상태라면 현재 문제 렌더링
             if (this.isStudyStarted) {
@@ -1470,6 +1486,12 @@ class QuizWizardApp {
         else if (this.currentMenu === 'header-edit' && !skipSave) {
             this.saveCurrentHeaderToState();
         }
+        else if (this.currentMenu === 'student-list' && !skipSave) {
+            this.saveCurrentStudentsToState();
+        }
+        else if (this.currentMenu === 'self-study' && !skipSave) {
+            this.saveStudyState();
+        }
         this.currentMenu = 'question-bank';
         // [수정] forceReset이면 10개, 데이터가 아예 없는 경우(열기/최적화 결과)는 1개의 빈 문제로 초기화
         if (forceReset) {
@@ -1479,6 +1501,8 @@ class QuizWizardApp {
                 choices: Array.from({ length: 4 }, () => ({ text: '', correct: false }))
             }));
             this.question_bank_file_name = ''; // 새 파일이므로 이름 초기화
+            // [추가] 초기화 시 WASM 엔진에도 빈 구조를 생성하여 헤더 편집 등이 가능하게 함
+            this.syncQuestionsToWasm();
         }
         else if (this.questionsData.length === 0) {
             this.questionsData = [{
@@ -1580,9 +1604,7 @@ class QuizWizardApp {
                 item.addEventListener('focusin', handleFocus);
                 // 선택지 입력창들에 대한 개별 포커스 이벤트 (인덱스 저장)
                 item.querySelectorAll('.choice-input').forEach((input, cIdx) => {
-                    input.addEventListener('focus', () => {
-                        this.focusedChoiceIndex = cIdx;
-                    });
+                    input.addEventListener('focus', () => { this.focusedChoiceIndex = cIdx; });
                 });
                 // 만약 이전에 포커스된 인덱스였다면 클래스 복구 및 스크롤 위치 유지
                 if (this.focusedQuestionIndex === idx) {
@@ -1614,19 +1636,22 @@ class QuizWizardApp {
             if (leftInput && rightInput) {
                 leftInput.addEventListener('input', () => {
                     const val = parseInt(leftInput.value);
-                    if (!isNaN(val))
+                    if (!isNaN(val)) {
                         rightInput.value = (val + 1).toString();
+                    }
                 });
                 rightInput.addEventListener('input', () => {
                     const val = parseInt(rightInput.value);
-                    if (!isNaN(val))
+                    if (!isNaN(val)) {
                         leftInput.value = (val - 1).toString();
+                    }
                 });
             }
             document.getElementById('insert-question-btn')?.addEventListener('click', () => {
                 const pos = parseInt(rightInput.value);
-                if (!isNaN(pos))
+                if (!isNaN(pos)) {
                     this.insertQuestion(pos);
+                }
                 else {
                     const msg = translations[this.currentLang].actions['msg-input-insert-pos'];
                     alert(msg);
@@ -1642,21 +1667,25 @@ class QuizWizardApp {
             if (leftInput && rightInput) {
                 leftInput.addEventListener('input', () => {
                     const val = parseInt(leftInput.value);
-                    if (!isNaN(val))
+                    if (!isNaN(val)) {
                         rightInput.value = (val + 1).toString();
+                    }
                 });
                 rightInput.addEventListener('input', () => {
                     const val = parseInt(rightInput.value);
-                    if (!isNaN(val))
+                    if (!isNaN(val)) {
                         leftInput.value = (val - 1).toString();
+                    }
                 });
             }
             document.getElementById('insert-choice-btn')?.addEventListener('click', () => {
                 const pos = parseInt(rightInput.value);
-                if (!isNaN(pos))
+                if (!isNaN(pos)) {
                     this.insertChoice(pos);
-                else
+                }
+                else {
                     alert("삽입할 위치(번호)를 입력해 주세요.");
+                }
             });
             document.getElementById('duplicate-choice-btn')?.addEventListener('click', () => this.duplicateFocusedChoice());
             document.getElementById('add-choice-btn')?.addEventListener('click', () => this.addNewChoice());
@@ -1691,11 +1720,15 @@ class QuizWizardApp {
     }
     /** 헤더 편집 작업공간 초기화 */
     initializeHeaderEditWorkspace() {
-        if (!this.container)
+        if (!this.container) {
             return;
+        }
         // 다른 메뉴에서 돌아오는 경우 데이터 저장
         if (this.currentMenu === 'question-bank') {
             this.saveCurrentQuestionsToState();
+        }
+        else if (this.currentMenu === 'header-edit') {
+            this.saveCurrentHeaderToState();
         }
         else if (this.currentMenu === 'student-list') {
             this.saveCurrentStudentsToState();
@@ -1841,18 +1874,26 @@ class QuizWizardApp {
     }
     /** 현재 화면의 헤더 데이터를 WASM 엔진에 저장 */
     saveCurrentHeaderToState() {
+        // [추가] WASM 엔진에 qbank가 없는 경우(초기 상태)를 위해 동기화 수행
+        if (this.control_tower.get_question_length() === 0 && this.questionsData.length > 0) {
+            this.syncQuestionsToWasm();
+        }
         const titleInput = document.getElementById('header-title');
         const nameInput = document.getElementById('header-name');
         const idInput = document.getElementById('header-id');
         const noticeInput = document.getElementById('header-notice');
-        if (titleInput)
+        if (titleInput) {
             this.control_tower.set_title(titleInput.value);
-        if (nameInput)
+        }
+        if (nameInput) {
             this.control_tower.set_name(nameInput.value);
-        if (idInput)
+        }
+        if (idInput) {
             this.control_tower.set_id(idInput.value);
-        if (noticeInput)
+        }
+        if (noticeInput) {
             this.control_tower.set_notice(noticeInput.value);
+        }
         for (let i = 1; i <= 4; i++) {
             const catInput = document.getElementById(`header-cat-${i}`);
             if (catInput) {
@@ -2336,11 +2377,21 @@ class QuizWizardApp {
     }
     /** 시험문제 제출 작업공간 초기화 */
     initializeExamSettingWorkspace() {
-        if (!this.container)
+        if (!this.container) {
             return;
+        }
         // 다른 메뉴로 이동 전 데이터 저장
         if (this.currentMenu === 'question-bank') {
             this.saveCurrentQuestionsToState();
+        }
+        else if (this.currentMenu === 'header-edit') {
+            this.saveCurrentHeaderToState();
+        }
+        else if (this.currentMenu === 'student-list') {
+            this.saveCurrentStudentsToState();
+        }
+        else if (this.currentMenu === 'self-study') {
+            this.saveStudyState();
         }
         this.currentMenu = 'exam-setting';
         // 현재 선택된 메뉴 강조 업데이트
