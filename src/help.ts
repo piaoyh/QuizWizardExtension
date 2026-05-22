@@ -75,14 +75,15 @@ class QuizWizHelp {
         if (!this.container) return;
         const langData = helpTranslations[this.currentLang];
         const title = langData.actions[action] || action;
+        const content = langData.contents?.[action] || `<p>${title}에 대한 상세 설명이 준비 중입니다.</p>`;
 
-        // 도움말 내용 템플릿 (추후 각 항목별 실제 내용 추가 가능)
+        // 도움말 내용 템플릿
         this.container.innerHTML = `
             <div class="view-header">
                 <h2>${title}</h2>
             </div>
-            <div class="view-content" style="padding: 20px; line-height: 1.6;">
-                <p>${title}에 대한 상세 설명이 준비 중입니다.</p>
+            <div class="view-content" style="padding: 20px; line-height: 1.6; overflow-y: auto; max-height: calc(100vh - 100px);">
+                ${content}
             </div>
         `;
     }
