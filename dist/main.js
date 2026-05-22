@@ -1711,6 +1711,31 @@ class QuizWizardApp {
                 }
             });
         });
+        // [추가] 그룹 번호 입력 제한 리스너 (숫자만, 1~65534)
+        listContainer?.querySelectorAll('.q-group-input').forEach(input => {
+            input.addEventListener('input', (e) => {
+                const el = e.target;
+                // 숫자가 아닌 문자 제거
+                el.value = el.value.replace(/[^0-9]/g, '');
+                if (el.value !== '') {
+                    const v = parseInt(el.value);
+                    if (v > 65534) {
+                        el.value = '65534';
+                    }
+                    else if (v === 0) {
+                        el.value = '1';
+                    }
+                }
+                this.isDirtyQB = true;
+            });
+            // 포커스를 잃을 때 빈 칸이면 기본값(1)으로 채움 (선택 사항)
+            input.addEventListener('blur', (e) => {
+                const el = e.target;
+                if (el.value === '') {
+                    el.value = '1';
+                }
+            });
+        });
         // 체크박스 변경 감지
         listContainer?.querySelectorAll('.choice-check').forEach(chk => {
             chk.addEventListener('change', () => {
@@ -2325,7 +2350,7 @@ class QuizWizardApp {
         `;
         const groupHtml = hideGroup ? '' : `
             <div class="q-group-container">
-                <input type="text" class="q-group-input" maxlength="3" placeholder="Grp" value="${group}" ${readonlyAttr} ${disabled}>
+                <input type="text" inputmode="numeric" class="q-group-input" maxlength="5" placeholder="Grp" value="${group}" ${readonlyAttr} ${disabled}>
                 ${navButtonsHtml}
             </div>
         `;
