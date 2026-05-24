@@ -3590,8 +3590,6 @@ class QuizWizardApp {
             { name: "cryptocol", license: "Apache 2.0 / MIT" },
             { name: "rusqlite", license: "MIT" },
             { name: "docx-rs", license: "MIT" },
-            { name: "rust_xlsxwriter", license: "Apache 2.0 / MIT" },
-            { name: "calamine", license: "MIT" },
             { name: "serde_json", license: "Apache 2.0 / MIT" },
             { name: "wasm-bindgen", license: "Apache 2.0 / MIT" },
             { name: "pdfmake", license: "MIT" }
@@ -3600,8 +3598,8 @@ class QuizWizardApp {
             <table style="width: 100%; border-collapse: collapse; margin-top: 10px; border: 1px solid var(--border-color);">
                 <thead>
                     <tr style="background-color: var(--card-bg); border-bottom: 1px solid var(--border-color);">
-                        <th style="padding: 8px; text-align: left; border-right: 1px solid var(--border-color);">Library</th>
-                        <th style="padding: 8px; text-align: left;">License</th>
+                        <th style="padding: 8px; text-align: left; border-right: 1px solid var(--border-color);">${langData.actions['in-info-dev-libs-library']}</th>
+                        <th style="padding: 8px; text-align: left;">${langData.actions['in-info-dev-libs-license']}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -3618,7 +3616,7 @@ class QuizWizardApp {
         msgEl.innerHTML = `
             <div style="margin-bottom: 20px;">
                 <p style="font-weight: bold; margin-bottom: 5px;">${langData.actions['in-info-dev-tech-title']}</p>
-                <p style="margin: 0; padding-left: 10px;">${langData.actions['in-info-dev-tech-list']}</p>
+                <p style="margin: 0; padding-left: 10px;">HTML + CSS + TypeScript + WebAssembly + Rust</p>
             </div>
             <div style="margin-bottom: 20px;">
                 <p style="font-weight: bold; margin-bottom: 5px;">${langData.actions['in-info-dev-roles-title']}</p>
@@ -3771,58 +3769,18 @@ class QuizWizardApp {
                 return;
             const langData = translations[this.currentLang] || translations['ko'];
             const title = langData.menus['information'] || 'Information';
+            let content = langData.contents?.["in-manual"];
+            if (!content) {
+                const comingSoon = langData.ui['coming-soon'] || '{title}에 대한 상세 설명이 준비 중입니다.';
+                content = `<p>${comingSoon.replace('{title}', title)}</p>`;
+            }
+            // 도움말 내용 템플릿
             this.container.innerHTML = `
                 <div class="view-header">
                     <h2>${title}</h2>
                 </div>
-                <div class="view-content" style="padding: 20px;">
-                    <h3>${langData.actions['in-manual-title']}</h3>
-                    <p>${langData.actions['in-manual-desc']}</p>
-                    <section>
-                        <h4>${langData.actions['in-manual-qb-h2']}</h4>
-                        <p>${langData.actions['in-manual-qb-p']}</p>
-                        <ul>
-                            <li>${langData.actions['in-manual-qb-li1']}</li>
-                            <li>${langData.actions['in-manual-qb-li2']}</li>
-                            <li>${langData.actions['in-manual-qb-li3']}</li>
-                        </ul>
-                    </section>
-                    <section>
-                        <h4>${langData.actions['in-manual-ex-h2']}</h4>
-                        <p>${langData.actions['in-manual-ex-p']}</p>
-                        <ul>
-                            <li>${langData.actions['in-manual-ex-li1']}</li>
-                            <li>${langData.actions['in-manual-ex-li2']}</li>
-                        </ul>
-                    </section>
-                    <section>
-                        <h4>${langData.actions['in-manual-sl-h2']}</h4>
-                        <p>${langData.actions['in-manual-sl-p']}</p>
-                        <ul>
-                            <li>${langData.actions['in-manual-sl-li1']}</li>
-                            <li>${langData.actions['in-manual-sl-li2']}</li>
-                        </ul>
-                    </section>
-                    <section>
-                        <h4>${langData.actions['in-manual-ss-h2']}</h4>
-                        <p>${langData.actions['in-manual-ss-p']}</p>
-                        <ul>
-                            <li>${langData.actions['in-manual-ss-li1']}</li>
-                        </ul>
-                    </section>
-                    <section>
-                        <h4>${langData.actions['in-manual-st-h2']}</h4>
-                        <p>${langData.actions['in-manual-st-p']}</p>
-                        <ul>
-                            <li>${langData.actions['in-manual-st-li1']}</li>
-                            <li>${langData.actions['in-manual-st-li2']}</li>
-                            <li>${langData.actions['in-manual-st-li3']}</li>
-                        </ul>
-                    </section>
-                    <section>
-                        <h4>${langData.actions['in-manual-in-h2']}</h4>
-                        <p>${langData.actions['in-manual-in-p']}</p>
-                    </section>
+                <div class="view-content" style="padding: 20px; line-height: 1.6; overflow-y: auto; max-height: calc(100vh - 100px);">
+                    ${content}
                 </div>
             `;
             return;

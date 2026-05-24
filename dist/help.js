@@ -30,6 +30,11 @@ class QuizWizHelp {
         const langData = helpTranslations[this.currentLang];
         if (!langData)
             return;
+        // 로고 타이틀 적용
+        const helpTitle = document.getElementById('help-title');
+        if (helpTitle && langData.ui['help-title']) {
+            helpTitle.textContent = langData.ui['help-title'];
+        }
         // 주메뉴 텍스트 적용
         document.querySelectorAll('.menu-item').forEach(el => {
             const key = el.dataset.menu;
@@ -62,7 +67,11 @@ class QuizWizHelp {
             return;
         const langData = helpTranslations[this.currentLang];
         const title = langData.actions[action] || action;
-        const content = langData.contents?.[action] || `<p>${title}에 대한 상세 설명이 준비 중입니다.</p>`;
+        let content = langData.contents?.[action];
+        if (!content) {
+            const comingSoon = langData.ui['coming-soon'] || '{title}에 대한 상세 설명이 준비 중입니다.';
+            content = `<p>${comingSoon.replace('{title}', title)}</p>`;
+        }
         // 도움말 내용 템플릿
         this.container.innerHTML = `
             <div class="view-header">
