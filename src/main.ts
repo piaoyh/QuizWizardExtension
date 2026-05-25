@@ -206,7 +206,7 @@ class QuizWizardApp {
             if (currentOS === 'MacOS')
             {
                 // MacOS라면 Ctrl을 ⌘ 기호로 변환
-                text = text.replace('Ctrl+', '⌘');
+                text = text.replace('Ctrl+', '⌘+');
                 htmlEl.innerText = text;
             }
             // Windows나 Linux(리눅스 민트)는 기본 작성된 'Ctrl+' 체제를 그대로 유지합니다.

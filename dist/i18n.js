@@ -205,6 +205,7 @@ export const translations = {
             "in-manual": `
                 <h2>QuizWiz 시작하기</h2>
                 <p>QuizWiz는 효율적인 문제 은행 관리, 시험지 출제, 학생 명단 관리 및 자기 주도 학습을 돕는 크롬 확장앱입니다.</p>
+                <p>본 확장 앱을 크롬 브라우저에 설치한 후에는 크롬 브라우저에서 <strong>ctrl+shift+,</strong> 또는 <strong>⌘+shift+,</strong>로 본 앱을 실행시킬 수 있습니다. 단축키로 ,(쉼표)를 사용한 이유는 한국어에서 쉼표는 '쉬는 표시'라는 뜻입니다. 열심히 일만 하지 마시고 쉬엄쉬엄 일하시라는 뜻입니다.</p>
                 <h3>1. 문제 은행</h3>
                 <p>문제 은행 작업공간에서는 시험 문제를 직접 관리할 수 있습니다.</p>
                 <ul>
@@ -439,6 +440,7 @@ export const translations = {
             "in-manual": `
                 <h2>QuizWiz Quick Start</h2>
                 <p>QuizWiz is a Chrome extension that helps with efficient question bank management, exam creation, student list management, and self-directed learning.</p>
+                <p>After installing this extension in your Chrome browser, you can launch the app using <strong>ctrl+shift+,</strong> or <strong>⌘+shift+,</strong>. The reason for using a comma (,) as the shortcut is that in Korean, a comma signifies a 'resting mark.' It is a gentle reminder not to just work hard constantly, but to take breaks and work at a leisurely pace.</p>
                 <h3>1. Question Bank</h3>
                 <p>You can manage exam questions directly in the Question Bank workspace.</p>
                 <ul>
@@ -673,6 +675,7 @@ export const translations = {
             "in-manual": `
                 <h2>Быстрый старт QuizWiz</h2>
                 <p>QuizWiz — это расширение для Chrome, помогающее эффективно управлять банком вопросов, создавать экзамены, вести списки студентов и организовывать самостоятельное обучение.</p>
+                <p>После установки этого расширения в браузер Chrome вы можете запускать приложение с помощью <strong>ctrl+shift+,</strong> или <strong>⌘+shift+,</strong>. Причина использования запятой (,) в качестве горячей клавиши заключается в том, что в корейском языке запятая означает «знак отдыха». Это пожелание не только усердно работать, но и делать перерывы, работая не спеша.</p>
                 <h3>1. Банк вопросов</h3>
                 <p>Вы можете напрямую управлять экзаменационными вопросами в рабочем пространстве «Банк вопросов».</p>
                 <ul>
@@ -894,6 +897,7 @@ export const translations = {
             "in-manual": `
                 <h2>QuizWiz Тез баштоо</h2>
                 <p>QuizWiz — бул суроолор банкын башкарууну, экзамендерди түзүүнү, студенттердин тизмесин жүргүзүүнү жана өз алдынча окууну жеңилдетүүчү Chrome кеңейтүүсү.</p>
+                <p>Бул кеңейтүүнү Chrome браузерине орноткондон кийин, колдонмону <strong>ctrl+shift+,</strong> же <strong>⌘+shift+,</strong> аркылуу ишке киргизсеңиз болот. Тез баскыч катары үтүр (,) белгисинин тандалганынын себеби, корей тилинде үтүр «эс алуу белгиси» деген маанини билдирет. Бул сиздин тынбай жумуш кыла бербей, анда-санда тыныгуу алып, шашпай иштешиңизди каалаган маанини камтыйт.</p>
                 <h3>1. Суроолор банкы</h3>
                 <p>Сиз сынак суроолорун «Суроолор банкы» жумушчу аймагында түз башкара аласыз.</p>
                 <ul>
