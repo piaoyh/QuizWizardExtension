@@ -127,7 +127,7 @@ export const helpTranslations: Record<SupportedLang, any> = {
                 </ul>
                 <h3>3. 주관식 문제 유형의 정답 및 모범답안 활용</h3>
                 <ul>
-                    <li>3.1. 문제 은행에서 <strong>단답형 주관식</strong> 문제의 복수개의 정답들은 자기 주도 학습의 평가에서 사용자가 입력한 답이 복수개의 정답들 중에 하나라도 일치하면 정답으로 처리된다. 따라서, 같은 답을 여러 가지로 표현가능한 것들은 모두 선택지 란에 기록하는 것이 나중에 답안지 재점에도 유리하고 자기 주도 학습에도 유리하다.</li>
+                    <li>3.1. 문제 은행에서 <strong>단답형 주관식</strong> 문제의 복수개의 정답들은 자기 주도 학습의 평가에서 사용자가 입력한 답이 복수개의 정답들 중에 하나라도 일치하면 정답으로 처리된다. 따라서, 같은 답을 여러 가지로 표현가능한 것들은 모두 선택지 란에 기록하는 것이 나중에 답안지 채점에도 유리하고 자기 주도 학습에도 유리하다.</li>
                     <li>3.2. 문제 은행에서 <strong>논술형 주관식</strong> 문제의 하나 또는 복수개의 모범답안들은 자기 주도 학습의 평가에서는 논술형 주관식 문제 자체가 평가 대상에서 제외되기 때문에 별 의미가 없지만, 나중에 답안지 채점에서는 교수자가 논술형 주관식 문제를 채점할 때에 일관성을 확보하는 데에 유리하다.</li>
                     <li>3.3. 문제 은행에서 모든 선택지가 체크되어 있으면 그 문제는 <strong>단답형 주관식</strong> 문제로 해석되고, 단답형 주관식 문제의 정답은 한정되어 있기 때문에 수험생의 답이 정답들 중 하나와 일치해야 답으로 인정된다. 따라서, 모든 선택지가 체크되는 것이 철학적으로도 의미가 있다.</li>
                     <li>3.4. 문제 은행에서 모든 선택지가 체크 해제되어 있거나 선택지가 아예 없으면 그 문제는 <strong>논술형 주관식</strong> 문제로 해석되고, 논술형 주관식 문제의 정답은 열려 있기 때문에 출제자의 답도 정답이 아니라 모범답안이 된다. 모범답안은 완벽할 수 없고 복수개가 존재할 수도 있다. 따라서, 선택지 란에 쓰여진 출제자의 답은 정답이 아니라 모범답안이므로 모든 선택지가 체크 해제되는 것이 철학적으로도 의미가 있다.</li>
@@ -136,7 +136,7 @@ export const helpTranslations: Record<SupportedLang, any> = {
                 <ul>
                     <li>4.1. 교수자가 학생들을 가르치면서 수시로 문제 은행에 새로운 문제들을 추가하거나 기존의 문제들 중에서 저품질의 문제들을 삭제할 수 있다. 이러한 방법으로 문제 은행은 더 많은 양질의 문제들을 보유할 수 있게 된다.</li>
                     <li>4.2. 교수자는 문제 은행에서 문제들을 약간씩 변형하면서 새로운 문제들을 만들어 같은 그룹에 속하게 할 수 있다. 이러한 방법으로 교수자는 문제 은행을 부풀릴 수 있다.</li>
-                    <li>4.3. 학생들이 공부하는 열심히 하지 않는 상황이라면, 교수자는 문제 은행을 공개하고 학생들이 QuizWiz를 자신의 컴퓨터에 설치한 후에 학생들이 공개된 문제 은행 파일을 내려받아 자기 주도 학습 기능으로 스스로 문제를 풀어가며 자습하는 습관을 이끌어 낼 수 있다.</li>
+                    <li>4.3. 학생들이 공부를 열심히 하지 않는 상황이라면, 교수자는 문제 은행을 공개하고 학생들이 QuizWiz를 자신의 컴퓨터에 설치한 후에 학생들이 공개된 문제 은행 파일을 내려받아 자기 주도 학습 기능으로 스스로 문제를 풀어가며 자습하는 습관을 이끌어 낼 수 있다.</li>
                 </ul>
             `,
             "exam-random": `
@@ -176,37 +176,41 @@ export const helpTranslations: Record<SupportedLang, any> = {
                 </ul>
             `,
             "exam-relationship": `
-            <h3>1. 문제 은행</h3>
-            <ul>
-            <li>1.1. 문제 은행은 시험 문제를 학생들의 수만큼 생성하기 위한 주된 수단이다.</li>
-            <li>1.2. 문제 은행은 시험 문제를 관리하기 위한 직접적 수단이다.</li>
-            <li>1.3. 문제 은행은 학생들에게 서로 다른 고유한 시험지를 부여하기 위한 원천이 된다.</li>
-            </ul>
-            <h3>2. 학생 명단</h3>
-            <ul>
-            <li>2.1. 학생 명단은 시험 문제를 학생들의 수만큼 생성하기 위한 보조 수단이다.</li>
-            <li>2.2. 학생 명단은 학생들을 관리하기 위한 수단이 아니라 수험생들의 목록을 관리하기 위한 수단이다.</li>
-            <li>2.3. 학생 명단은 학생들마다 서로 다른 고유한 시험지가 배당되는 역할을 한다.</li>
-            </ul>
-            <h3>3. 시험 문제 출제</h3>
-            <ul>
-            <li>3.1. 학생 명단에 있는 학생들의 수만큼 문제 세트가 생성된다.</li>
-            <li>3.2. 학생 명단에 있는 모든 학생들에게 서로 다른 문제 세트가 부여된다.</li>
-            <li>3.3. 시험 문제가 학생 명단에 있는 학생들에게 배당될 때에는 미리 설정된 출제 범위와 미리 설정된 출제 문항 수에 따라 학생들마다 문제 은행에서 무작위로 새로 추출하여 문제 세트가 구성된다.</li>
-            <li>3.4. 예를 들면, 한 학생의 시험지에 있는 1번 문제가 다른 학생의 시험지에서 1번 문제가 된다는 보장이 없다. 또한, 그 1번 문제가 다른 학생의 시험지에서 7번 문제가 될 수도 있고 아예 없을 수도 있다.</li>
-            </ul>
+                <h3>1. 문제 은행</h3>
+                <ul>
+                    <li>1.1. 문제 은행은 시험 문제를 학생들의 수만큼 생성하기 위한 주된 수단이다.</li>
+                    <li>1.2. 문제 은행은 시험 문제를 관리하기 위한 직접적 수단이다.</li>
+                    <li>1.3. 문제 은행은 학생들에게 서로 다른 고유한 시험지를 부여하기 위한 원천이 된다.</li>
+                </ul>
+                <h3>2. 학생 명단</h3>
+                <ul>
+                    <li>2.1. 학생 명단은 시험 문제를 학생들의 수만큼 생성하기 위한 보조 수단이다.</li>
+                    <li>2.2. 학생 명단은 학생들을 관리하기 위한 수단이 아니라 수험생들의 목록을 관리하기 위한 수단이다.</li>
+                    <li>2.3. 학생 명단은 학생들마다 서로 다른 고유한 시험지가 배당되는 역할을 한다.</li>
+                </ul>
+                <h3>3. 시험 문제 출제</h3>
+                <ul>
+                    <li>3.1. 학생 명단에 있는 학생들의 수만큼 문제 세트가 생성된다.</li>
+                    <li>3.2. 학생 명단에 있는 모든 학생들에게 서로 다른 문제 세트가 부여된다.</li>
+                    <li>3.3. 시험 문제가 학생 명단에 있는 학생들에게 배당될 때에는 미리 설정된 출제 범위와 미리 설정된 출제 문항 수에 따라 학생들마다 문제 은행에서 무작위로 새로 추출하여 문제 세트가 구성된다.</li>
+                    <li>3.4. 예를 들면, 한 학생의 시험지에 있는 1번 문제가 다른 학생의 시험지에서 1번 문제가 된다는 보장이 없다. 또한, 그 1번 문제가 다른 학생의 시험지에서 7번 문제가 될 수도 있고 아예 없을 수도 있다.</li>
+                </ul>
             `,
             "students-structure": `
                 <h3>1. 학생 명단의 구성</h3>
-                <li>1.1. 학생 명단의 구조는 문제 은행의 구조에 비하면 매우 단순하다.</li>
-                <li>1.2. 학생 명단은 각 학생의 개별 정보들의 배열이다.</li>
-                <li>1.3. 각 학생의 정보는 학생의 성명과 학번으로 구성된다.</li>
+                <ul>
+                    <li>1.1. 학생 명단의 구조는 문제 은행의 구조에 비하면 매우 단순하다.</li>
+                    <li>1.2. 학생 명단은 각 학생의 개별 정보들의 배열이다.</li>
+                    <li>1.3. 각 학생의 정보는 학생의 성명과 학번으로 구성된다.</li>
+                </ul>
                 <h3>2. 학생 카드</h3>
-                <li>2.1. 한 명의 학생의 정보는 하나의 학생 카드에 기록된다.</li>
-                <li>2.2. 학생 카드에는 학생 성명과 학번을 입력할 수 있다.</li>
-                <li>2.3. 학생 성명은 성과 이름을 따로 나누지 않고 전체 이름을 입력한다. 이는 문화마다 성명의 구조 및 순서가 다르기 때문이다.</li>
-                <li>2.4. 학번은 학생의 숫자뿐만 아니라 문자도 포함할 수 있다.</li>
-                <li>2.5. 각각의 학생 카드에는 체크 박스가 있는데, 이는 학생 명단을 편집하기 위한 용도이고 정보의 일부분은 아니다.</li>
+                <ul>
+                    <li>2.1. 한 명의 학생의 정보는 하나의 학생 카드에 기록된다.</li>
+                    <li>2.2. 학생 카드에는 학생 성명과 학번을 입력할 수 있다.</li>
+                    <li>2.3. 학생 성명은 성과 이름을 따로 나누지 않고 전체 이름을 입력한다. 이는 문화마다 성명의 구조 및 순서가 다르기 때문이다.</li>
+                    <li>2.4. 학번은 학생의 숫자뿐만 아니라 문자도 포함할 수 있다.</li>
+                    <li>2.5. 각각의 학생 카드에는 체크 박스가 있는데, 이는 학생 명단을 편집하기 위한 용도이고 정보의 일부분은 아니다.</li>
+                </ul>
             `,
             "students-editing": `
                 <p>학생 명단의 편집에서는 한 명의 학생을 하나의 학생 카드에서 작성하도록 되어 있다.</p>
@@ -248,6 +252,99 @@ export const helpTranslations: Record<SupportedLang, any> = {
                     <li>2.1 자기 주도 학습은 문제 은행을 불러오지 않고는 시작할 수 없다. 따라서 반드시 문제 은행을 불러와야 한다.</li>
                     <li>2.2. 문제 은행을 불러오면 비로소 학습 범위 설정이 활성화되어 학습 범위를 정할 수 있다. 학습 범위를 정하지 않으면 기본 설정으로 전체 범위가 학습 범위로 자동 설정된다.</li>
                     <li>2.3. 문제 은행을 불러오고 학습 범위를 정하면 비로소 자기 주도 학습을 시작할 수 있는 준비가 된 것이다.</li>
+                </ul>
+            `,
+            "selfstudy-scoring": `
+                <h3>1. 자기 주도 학습에서 배제되는 문제</h3>
+                <p>자기 주도 학습에서는 논술형 주관식 문제를 채점하지 않는다.</p>
+                <h3>2. 채점 방식의 종류</h3>
+                <p>채점 방식에는 감점 여부와 부분 점수 여부에 따라 4가지로 나눌 수 있다.</p>
+                <ul>
+                    <li>2.1. <strong>감점이 있고 부분 점수가 있는 채점 방식</strong>: 감점과 부분 점수는 객관식 문제에만 적용되며, 단답형 주관식 문제는 부분 점수가 없고 틀려도 감점되지 않는다.
+                        <ul>
+                            <li>2.1.1. <strong>단일 선택형 객관식</strong>
+                                <ul>
+                                    <li>2.1.1.1. 정답을 맞힌 경우: 배정된 점수가 부여된다.</li>
+                                    <li>2.1.1.2. 답을 선택하지 않거나 두 개 이상의 답을 선택한 경우: 0점이 부여된다.</li>
+                                    <li>2.1.1.3. 하나의 오답을 택한 경우: <strong>배정된 점수</strong>/ (선택지의 개수 - 1)의 감점을 받는다.</li>
+                                </ul>
+                            </li>
+                            <li>2.1.2. <strong>복수 응답형 객관식</strong>
+                                <ul>
+                                    <li>2.1.2.1. 선택한 답의 개수가 정답의 개수와 같고 선택한 모든 답이 정답인 경우: 배정된 점수가 부여된다.</li>
+                                    <li>2.1.2.2. 선택한 답의 개수가 정답의 개수와 다른 경우: 0점이 부여된다.</li>
+                                    <li>2.1.2.3. 선택한 답의 개수가 정답의 개수와 같은 경우: (<strong>선택지에서의 오답의 개수</strong> x <strong>선택한 정답의 개수</strong> - <strong>선택지에서의 정답의 개수</strong> x <strong>선택한 오답의 개수</strong>) x <strong>배정된 점수</strong> / <strong>선택지의 개수</strong> 점이 부여된다.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>2.2. <strong>감점이 있고 부분 점수가 없는 채점 방식</strong>: 감점은 객관식 문제에만 적용되며, 단답형 주관식 문제는 틀려도 감점되지 않는다.
+                        <ul>
+                            <li>2.2.1. <strong>단일 선택형 객관식</strong>
+                                <ul>
+                                    <li>2.2.1.1. 정답을 맞힌 경우: 배정된 점수가 부여된다.</li>
+                                    <li>2.2.1.2. 답을 선택하지 않거나 두 개 이상의 답을 선택한 경우: 0점을 받는다.</li>
+                                    <li>2.2.1.3. 하나의 오답을 택한 경우: <strong>배정된 점수</strong>/ (선택지의 개수 - 1)의 감점을 받는다.</li>
+                                </ul>
+                            </li>
+                            <li>2.2.2. <strong>복수 응답형 객관식</strong>
+                                <ul>
+                                    <li>2.2.2.1. 선택한 답의 개수가 정답의 개수와 같고 선택한 모든 답이 정답인 경우: 배정된 점수가 부여된다.</li>
+                                    <li>2.2.2.2. 선택한 답의 개수가 정답의 개수와 다른 경우: 0점을 받는다.</li>
+                                    <li>2.2.2.3. 선택한 답의 개수가 정답의 개수와 같고 오답을 포함하거나 정답 중 일부를 누락할 경우: <strong>배정된 점수</strong> / (<strong>선택지의 개수</strong> x (<strong>선택지의 개수</strong> - 1))의 감점을 받는다.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>2.3. <strong>감점이 없고 부분 점수가 있는 채점 방식</strong>
+                        <ul>
+                            <li>2.3.1. <strong>단일 선택형 객관식</strong>
+                                <ul>
+                                    <li>2.3.1.1. 정답을 맞힌 경우: 배정된 점수가 부여된다.</li>
+                                    <li>2.3.1.2. 그 외의 경우: 0점을 받는다.</li>
+                                </ul>
+                            </li>
+                            <li>2.3.2. <strong>복수 응답형 객관식</strong>
+                                <ul>
+                                    <li>2.3.2.1. 선택한 답의 개수가 정답의 개수와 같고 선택한 모든 답이 정답인 경우: 배정된 점수가 부여된다.</li>
+                                    <li>2.3.2.2. 선택한 답의 개수가 정답의 개수와 다른 경우: 0점을 받는다.</li>
+                                    <li>2.3.2.3. 선택한 답의 개수가 정답의 개수와 같은 경우: <strong>배정된 점수</strong> x <strong>선택한 정답의 개수</strong> / <strong>선택지에서의 정답의 개수</strong> 점이 부여된다.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>2.4. <strong>감점이 있고 부분 점수가 없는 채점 방식</strong>
+                        <ul>
+                            <li>2.4.1. <strong>단일 선택형 객관식</strong>
+                                <ul>
+                                    <li>2.4.1.1. 정답을 맞힌 경우: 배정된 점수가 부여된다.</li>
+                                    <li>2.4.1.2. 그 외의 경우: 0점을 받는다.</li>
+                                </ul>
+                            </li>
+                            <li>2.4.2. <strong>복수 응답형 객관식</strong>
+                                <ul>
+                                    <li>2.4.2.1. 선택한 답의 개수가 정답의 개수와 같고 선택한 모든 답이 정답인 경우: 배정된 점수가 부여된다.</li>
+                                    <li>2.4.2.2. 그 외의 경우: 0점을 받는다.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <h3>3. 채점 방식의 설정 공유</h3>
+                <p>자기 주도 학습의 채점 방식 설정은 시험 문제 출제의 출제 범위 설정과 설정 값을 공유하므로 시험 문제 출제의 출제 범위 설정을 고치면 자동으로 자기 주도 학습의 채점 방식 설정도 바뀐다.</p>
+            `,
+            "selfstudy-usage": `
+                <h3>1. 교수자</h3>
+                <ul>
+                    <li>1.1. 교수자는 문제 은행을 구축한 후에 스스로 문제 은행의 문제들을 풀어 봄으로써 문제들의 현실성을 가늠할 수 있는 도구로 자기 주도 학습을 활용할 수 있다.</li>
+                    <li>1.2. 교수자는 시험 문제를 출제하기 전에 스스로 출제 범위의 문제들을 풀어 봄으로써 시험의 현실성을 가늠할 수 있는 도구로 자기 주도 학습을 활용할 수 있다.</li>
+                </ul>
+                <h3>2. 학생</h3>
+                <p>이것은 교수자가 문제 은행을 공개할 경우에 의미있는 사항들이다.</p>
+                <ul>
+                    <li>2.1. 학생은 스스로 시험 문제들을 풀어 봄으로써 배운 내용을 복습하는 도구로 자기 주도 학습을 활용할 수 있다.</li>
+                    <li>2.2. 학생은 시험 전에 스스로 시험 범위의 문제들을 풀어 봄으로써 시험을 준비하는 도구로 자기 주도 학습을 활용할 수 있다.</li>
+                    <li>2.3. 교수자가 문제 은행을 공개하지 않은 경우에는, 학생은 배운 내용에 대하여 스스로 문제를 만들어 자신이 만든 문제를 풀어 봄으로써 실전 연습을 할 수도 있다.</li>
                 </ul>
             `
         }
@@ -329,7 +426,7 @@ export const helpTranslations: Record<SupportedLang, any> = {
             "qbank-editing": `
                 <p>In Question Bank editing, each question is created in its own Question Card.</p>
                 <h3>1. User Input Items</h3>
-                <p>On a Question Card, users enter the group number, question text, choice text, and check marks.</p>
+                <p>On a Question Card, users must enter the group number, question text, choice text, and check marks.</p>
                 <ul>
                     <li>1.1. <strong>Group Number</strong>: A number that defines the group the question belongs to. Only digits are allowed, from 1 to 65,534.</li>
                     <li>1.2. <strong>Question Text</strong>: You can freely enter multi-line question text.</li>
@@ -441,15 +538,19 @@ export const helpTranslations: Record<SupportedLang, any> = {
             `,
             "students-structure": `
                 <h3>1. Composition of Student List</h3>
-                <li>1.1. The structure of the Student List is very simple compared to the Question Bank.</li>
-                <li>1.2. The Student List is an array of individual information for each student.</li>
-                <li>1.3. Each student's information consists of the student's full name and student ID number.</li>
+                <ul>
+                    <li>1.1. The structure of the Student List is very simple compared to the Question Bank.</li>
+                    <li>1.2. The Student List is an array of individual information for each student.</li>
+                    <li>1.3. Each student's information consists of the student's full name and student ID number.</li>
+                </ul>
                 <h3>2. Student Card</h3>
-                <li>2.1. Information for one student is recorded on one Student Card.</li>
-                <li>2.2. You can enter the student's name and ID number on the Student Card.</li>
-                <li>2.3. Enter the full name without separating the first and last names. This is because the structure and order of names vary by culture.</li>
-                <li>2.4. The student ID number can include characters as well as numbers.</li>
-                <li>2.5. Each Student Card has a checkbox, which is used for editing the list and is not part of the information itself.</li>
+                <ul>
+                    <li>2.1. Information for one student is recorded on one Student Card.</li>
+                    <li>2.2. You can enter the student's name and ID number on the Student Card.</li>
+                    <li>2.3. Enter the full name without separating the first and last names. This is because the structure and order of names vary by culture.</li>
+                    <li>2.4. The student ID number can include characters as well as numbers.</li>
+                    <li>2.5. Each Student Card has a checkbox, which is used for editing the list and is not part of the information itself.</li>
+                </ul>
             `,
             "students-editing": `
                 <p>In Student List editing, each student's information is entered on an individual Student Card.</p>
@@ -491,6 +592,99 @@ export const helpTranslations: Record<SupportedLang, any> = {
                     <li>2.1. Self-study cannot be started without loading a Question Bank. Therefore, you must load a Question Bank.</li>
                     <li>2.2. Once a Question Bank is loaded, the study scope setting becomes active, allowing you to define the study range. If no scope is set, the entire range is automatically set as the study scope by default.</li>
                     <li>2.3. Once a Question Bank is loaded and the study scope is defined, you are ready to begin self-study.</li>
+                </ul>
+            `,
+            "selfstudy-scoring": `
+                <h3>1. Questions Excluded from Self-study</h3>
+                <p>In self-study, essay-type subjective questions (Essay questions) are not scored.</p>
+                <h3>2. Types of Scoring Methods</h3>
+                <p>Scoring methods can be divided into four types based on whether there is negative marking and whether partial credit is given.</p>
+                <ul>
+                    <li>2.1. <strong>Scoring with negative marking and partial credit</strong>: Negative marking and partial credit apply only to objective questions; short answer subjective questions have no partial credit and are not penalized for incorrect answers.
+                        <ul>
+                            <li>2.1.1. <strong>Single-choice objective question</strong>
+                                <ul>
+                                    <li>2.1.1.1. Correct answer: Assigned points are awarded.</li>
+                                    <li>2.1.1.2. No answer or multiple answers: 0 points are awarded.</li>
+                                    <li>2.1.1.3. One wrong answer: A deduction of <strong>assigned points</strong> / (number of choices - 1) is applied.</li>
+                                </ul>
+                            </li>
+                            <li>2.1.2. <strong>Multiple-choice objective question</strong>
+                                <ul>
+                                    <li>2.1.2.1. Correct number of answers and all selected are correct: Assigned points are awarded.</li>
+                                    <li>2.1.2.2. Number of selected answers differs from correct count: 0 points are awarded.</li>
+                                    <li>2.1.2.3. Correct number of answers selected: (<strong>number of wrong options</strong> x <strong>number of selected correct answers</strong> - <strong>number of correct options</strong> x <strong>number of selected wrong answers</strong>) x <strong>assigned points</strong> / <strong>number of choices</strong> points are awarded.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>2.2. <strong>Scoring with negative marking and without partial credit</strong>: Negative marking applies only to objective questions; short answer subjective questions are not penalized for incorrect answers.
+                        <ul>
+                            <li>2.2.1. <strong>Single-choice objective question</strong>
+                                <ul>
+                                    <li>2.2.1.1. Correct answer: Assigned points are awarded.</li>
+                                    <li>2.2.1.2. No answer or multiple answers: 0 points are received.</li>
+                                    <li>2.2.1.3. One wrong answer: A deduction of <strong>assigned points</strong> / (number of choices - 1) is applied.</li>
+                                </ul>
+                            </li>
+                            <li>2.2.2. <strong>Multiple-choice objective question</strong>
+                                <ul>
+                                    <li>2.2.2.1. Correct number of answers and all selected are correct: Assigned points are awarded.</li>
+                                    <li>2.2.2.2. Number of selected answers differs from correct count: 0 points are received.</li>
+                                    <li>2.2.2.3. Correct number of answers selected but contains errors or omissions: A deduction of <strong>assigned points</strong> / (<strong>number of choices</strong> x (<strong>number of choices</strong> - 1)) is applied.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>2.3. <strong>Scoring without negative marking and with partial credit</strong>
+                        <ul>
+                            <li>2.3.1. <strong>Single-choice objective question</strong>
+                                <ul>
+                                    <li>2.3.1.1. Correct answer: Assigned points are awarded.</li>
+                                    <li>2.3.1.2. Otherwise: 0 points are received.</li>
+                                </ul>
+                            </li>
+                            <li>2.3.2. <strong>Multiple-choice objective question</strong>
+                                <ul>
+                                    <li>2.3.2.1. Correct number of answers and all selected are correct: Assigned points are awarded.</li>
+                                    <li>2.3.2.2. Number of selected answers differs from correct count: 0 points are received.</li>
+                                    <li>2.3.2.3. Correct number of answers selected: <strong>assigned points</strong> x <strong>number of selected correct answers</strong> / <strong>number of correct options</strong> points are awarded.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>2.4. <strong>Scoring without negative marking and without partial credit</strong>
+                        <ul>
+                            <li>2.4.1. <strong>Single-choice objective question</strong>
+                                <ul>
+                                    <li>2.4.1.1. Correct answer: Assigned points are awarded.</li>
+                                    <li>2.4.1.2. Otherwise: 0 points are received.</li>
+                                </ul>
+                            </li>
+                            <li>2.4.2. <strong>Multiple-choice objective question</strong>
+                                <ul>
+                                    <li>2.4.2.1. Correct number of answers and all selected are correct: Assigned points are awarded.</li>
+                                    <li>2.4.2.2. Otherwise: 0 points are received.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <h3>3. Sharing Scoring Rule Settings</h3>
+                <p>Since the scoring rule settings for self-study share values with the exam scope settings in exam creation, changing the exam scope settings will automatically update the self-study scoring rule settings.</p>
+            `,
+            "selfstudy-usage": `
+                <h3>1. Instructor</h3>
+                <ul>
+                    <li>1.1. After building the Question Bank, instructors can use self-study as a tool to gauge the practicality of the questions by solving them themselves.</li>
+                    <li>1.2. Before creating an exam, instructors can use self-study as a tool to gauge the realism of the exam by solving questions within the exam scope themselves.</li>
+                </ul>
+                <h3>2. Student</h3>
+                <p>These are meaningful items if the instructor chooses to disclose the Question Bank.</p>
+                <ul>
+                    <li>2.1. Students can use self-study as a tool to review what they have learned by solving exam questions themselves.</li>
+                    <li>2.2. Before an exam, students can use self-study as a tool to prepare for the exam by solving questions within the exam scope themselves.</li>
+                    <li>2.3. If the instructor does not disclose the Question Bank, students can create their own questions about the learned content and solve them for practical practice.</li>
                 </ul>
             `
         }
@@ -591,7 +785,7 @@ export const helpTranslations: Record<SupportedLang, any> = {
                     <li>2.7. Кнопка <strong>+ Добавить вариант</strong>: Добавляет вариант ответа в конец текущей карточки вопроса.</li>
                     <li>2.8. Кнопка <strong>- Удалить вариант</strong>: Удаляет текущий вариант ответа.</li>
                     <li>2.9. Кнопка <strong>= Дублировать вариант</strong>: Вставляет вариант между текущим и следующим, копируя всё содержимое. Полезно для быстрого создания похожих вариантов.</li>
-                    <li>2.10. Кнопка <strong>->V<- Вставить вариант</strong>: Вставляет пустой вариант между номерами вариантов, введёнными в двух полях сле라 от неё.</li>
+                    <li>2.10. Кнопка <strong>->V<- Вставить вариант</strong>: Вставляет пустой вариант между номерами вариантов, введёнными в двух полях слера от неё.</li>
                     <li>2.11. <strong>Два поля ввода номера варианта</strong>: Работают аналогично полям ввода номера вопроса, определяя место вставки нового варианта.</li>
                     <li>2.12. Кнопка <strong>Вверх</strong>: Поскольку порядок вопросов связан с прогрессом обучения, вам может потребоваться изменить их порядок. Эта кнопка меняет текущий вопрос местами с предыдущим. Фокус остается на перемещённой карточке.</li>
                     <li>2.13. Кнопка <strong>Вниз</strong>: Меняет текущий вопрос местами со следующим. Фокус остается на перемещённой карточке.</li>
@@ -684,15 +878,19 @@ export const helpTranslations: Record<SupportedLang, any> = {
             `,
             "students-structure": `
                 <h3>1. Структура списка студентов</h3>
-                <li>1.1. Структура списка студентов очень проста по сравнению со структурой банка вопросов.</li>
-                <li>1.2. Список студентов представляет собой массив индивидуальных данных каждого студента.</li>
-                <li>1.3. Информация о каждом студенте состоит из Ф.И.О. и номера студенческого билета.</li>
+                <ul>
+                    <li>1.1. Структура списка студентов очень проста по сравнению со структурой банка вопросов.</li>
+                    <li>1.2. Список студентов представляет собой массив индивидуальных данных каждого студента.</li>
+                    <li>1.3. Информация о каждом студенте состоит из Ф.И.О. и номера студенческого билета.</li>
+                </ul>
                 <h3>2. Карточка студента</h3>
-                <li>2.1. Информация об одном студенте записывается в одну карточку студента.</li>
-                <li>2.2. В карточку студента можно ввести имя и номер студенческого билета.</li>
-                <li>2.3. Вводите Ф.И.О. полностью, не разделяя фамилию и имя. Это связано с тем, что структура и порядок имён различаются в разных культурах.</li>
-                <li>2.4. Номер студенческого билета может содержать как цифры, так и буквы.</li>
-                <li>2.5. На каждой карточке студента есть флажок (чекбокс), который используется для редактирования списка и не является частью самой информации.</li>
+                <ul>
+                    <li>2.1. Информация об одном студенте записывается в одну карточку студента.</li>
+                    <li>2.2. В карточку студента можно ввести имя и номер студенческого билета.</li>
+                    <li>2.3. Вводите Ф.И.О. полностью, не разделяя фамилию и имя. Это связано с тем, что структура и порядок имён различаются в разных культурах.</li>
+                    <li>2.4. Номер студенческого билета может содержать как цифры, так и буквы.</li>
+                    <li>2.5. На каждой карточке студента есть флажок (чекбокс), который используется для редактирования списка и не является частью самой информации.</li>
+                </ul>
             `,
             "students-editing": `
                 <p>При редактировании списка студентов данные каждого студента вводятся в отдельной карточке студента.</p>
@@ -735,6 +933,99 @@ export const helpTranslations: Record<SupportedLang, any> = {
                     <li>2.2. Только после загрузки банка вопросов активируется настройка области обучения, позволяющая определить диапазон изучаемого материала. Если область не задана, по умолчанию автоматически устанавливается весь диапазон.</li>
                     <li>2.3. Когда банк вопросов загружен и область обучения определена, всё готово к началу самостоятельного обучения.</li>
                 </ul>
+            `,
+            "selfstudy-scoring": `
+                <h3>1. Вопросы, исключаемые из самостоятельного обучения</h3>
+                <p>В самостоятельном обучении задания с развёрнутым ответом (эссе) не оцениваются.</p>
+                <h3>2. Типы систем оценивания</h3>
+                <p>Системы оценивания можно разделить на четыре типа в зависимости от наличия штрафных баллов и частичного зачёта.</p>
+                <ul>
+                    <li>2.1. <strong>Система оценивания со штрафными баллами и частичными баллами</strong>: Штрафные баллы и частичный зачёт применяются только к тестам; задания с кратким ответом не имеют частичного зачёта и не штрафуются за ошибки.
+                        <ul>
+                            <li>2.1.1. <strong>Тест с одним правильным ответом</strong>
+                                <ul>
+                                    <li>2.1.1.1. Правильный ответ: Начисляются заданные баллы.</li>
+                                    <li>2.1.1.2. Нет ответа или выбрано несколько вариантов: Начисляется 0 баллов.</li>
+                                    <li>2.1.1.3. Один неправильный ответ: Вычитается <strong>количество баллов</strong> / (количество вариантов - 1).</li>
+                                </ul>
+                            </li>
+                            <li>2.1.2. <strong>Тест с несколькими правильными ответами</strong>
+                                <ul>
+                                    <li>2.1.2.1. Количество ответов верно и все они правильные: Начисляются заданные баллы.</li>
+                                    <li>2.1.2.2. Количество выбранных ответов не совпадает с количеством правильных: Начисляется 0 баллов.</li>
+                                    <li>2.1.2.3. Количество выбранных ответов совпадает с количеством правильных: Начисляется (<strong>число неправильных вариантов</strong> x <strong>число выбранных правильных ответов</strong> - <strong>число правильных вариантов</strong> x <strong>число выбранных неправильных ответов</strong>) x <strong>количество баллов</strong> / <strong>общее число вариантов</strong> баллов.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>2.2. <strong>Система оценивания со штрафными баллами без частичных баллов</strong>: Штрафные баллы применяются только к тестам; задания с кратким ответом не штрафуются за ошибки.
+                        <ul>
+                            <li>2.2.1. <strong>Тест с одним правильным ответом</strong>
+                                <ul>
+                                    <li>2.2.1.1. Правильный ответ: Начисляются заданные баллы.</li>
+                                    <li>2.2.1.2. Нет ответа или выбрано несколько вариантов: Получает 0 баллов.</li>
+                                    <li>2.2.1.3. Один неправильный ответ: Вычитается <strong>количество баллов</strong> / (количество вариантов - 1).</li>
+                                </ul>
+                            </li>
+                            <li>2.2.2. <strong>Тест с несколькими правильными ответами</strong>
+                                <ul>
+                                    <li>2.2.2.1. Количество ответов верно и все они правильные: Начисляются заданные баллы.</li>
+                                    <li>2.2.2.2. Количество выбранных ответов не совпадает с количеством правильных: Получает 0 баллов.</li>
+                                    <li>2.2.2.3. Количество выбранных ответов совпадает с количеством правильных, но есть ошибки или пропуски: Вычитается <strong>количество баллов</strong> / (<strong>общее число вариантов</strong> x (<strong>общее число вариантов</strong> - 1)) баллов.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>2.3. <strong>Система оценивания без штрафных баллов с частичными баллами</strong>
+                        <ul>
+                            <li>2.3.1. <strong>Тест с одним правильным ответом</strong>
+                                <ul>
+                                    <li>2.3.1.1. Правильный ответ: Начисляются заданные баллы.</li>
+                                    <li>2.3.1.2. В остальных случаях: Получает 0 баллов.</li>
+                                </ul>
+                            </li>
+                            <li>2.3.2. <strong>Тест с несколькими правильными ответами</strong>
+                                <ul>
+                                    <li>2.3.2.1. Количество ответов верно и все они правильные: Начисляются заданные баллы.</li>
+                                    <li>2.3.2.2. Количество выбранных ответов не совпадает с количеством правильных: Получает 0 баллов.</li>
+                                    <li>2.3.2.3. Количество выбранных ответов совпадает с количеством правильных: Начисляется <strong>количество баллов</strong> x <strong>число выбранных правильных ответов</strong> / <strong>общее число правильных вариантов</strong> баллов.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>2.4. <strong>Система оценивания без штрафных баллов и без частичных баллов</strong>
+                        <ul>
+                            <li>2.4.1. <strong>Тест с одним правильным ответом</strong>
+                                <ul>
+                                    <li>2.4.1.1. Правильный ответ: Начисляются заданные баллы.</li>
+                                    <li>2.4.1.2. В остальных случаях: Получает 0 баллов.</li>
+                                </ul>
+                            </li>
+                            <li>2.4.2. <strong>Тест с несколькими правильными ответами</strong>
+                                <ul>
+                                    <li>2.4.2.1. Количество ответов верно и все они правильные: Начисляются заданные баллы.</li>
+                                    <li>2.4.2.2. В остальных случаях: Получает 0 баллов.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <h3>3. Совместное использование настроек системы оценивания</h3>
+                <p>Поскольку настройки системы оценивания для самостоятельного обучения используют те же значения, что и настройки области экзамена при его создании, изменение настроек области экзамена автоматически обновит настройки системы оценивания для самостоятельного обучения.</p>
+            `,
+            "selfstudy-usage": `
+                <h3>1. Преподаватель</h3>
+                <ul>
+                    <li>1.1. После создания банка вопросов преподаватели могут использовать самообучение как инструмент для оценки реалистичности вопросов, решая их самостоятельно.</li>
+                    <li>1.2. Перед созданием экзамена преподаватели могут использовать самообучение как инструмент для оценки реалистичности экзамена, самостоятельно решая вопросы в рамках области экзамена.</li>
+                </ul>
+                <h3>2. Студент</h3>
+                <p>Эти пункты имеют значение в том случае, если преподаватель открывает доступ к банку вопросов. </p>
+                <ul>
+                    <li>2.1. Студенты могут использовать самообучение как инструмент для повторения изученного материала, самостоятельно решая экзаменационные вопросы.</li>
+                    <li>2.2. Перед экзаменом студенты могут использовать самообучение как инструмент для подготовки к экзамену, самостоятельно решая вопросы в рамках области экзамена.</li>
+                    <li>2.3. Если преподаватель не открывает доступ к банку вопросов, студент может самостоятельно создавать вопросы по изученному материалу и решать их для практической тренировки.</li>
+                </ul>
             `
         }
     },
@@ -776,29 +1067,29 @@ export const helpTranslations: Record<SupportedLang, any> = {
                     <li>1.2.3. <strong>ID</strong>: Студенттин уникалдуу идентификатору. «Билет номери» деп киргизсеңиз, ал баракта «Билет номери:» болуп көрүнөт.</li>
                     <li>1.2.4. <strong>Бир жооптуу тест</strong>: Эгер сиз «А варианты» деп киргизсеңиз, ал суроо номеринин алдында «[А варианты]» деп басылып чыгат. Бул студентке суроо А түрүнө кирерин билдирет. Бош калтырсаңыз, жөн гана кашаалар [ ] пайда болот.</li>
                     <li>1.2.5. <strong>Бир нече жооптуу тест</strong>: Эгер сиз «Б варианты» деп киргизсеңиз, ал суроо номеринин алдында «[Б варианты]» деп басылып чыгат. Бул студентке суроо Б түрүнө кирерин билдирет. Бош калтырсаңыз, жөн гана кашаалар [ ] пайда болот.</li>
-                    <li>1.2.6. <strong>Кыска жооп</strong>: 에гер сиз «В варианты» деп киргизсеңиз, ал суроо номеринин алдында «[В варианты]» деп басылып чыгат. Бул студентке суроо В түрүнө кирерин билдирет. Бош калтырсаңыз, жөн га나 кашаалар [ ] пайда болот.</li>
-                    <li>1.2.7. <strong>Кеңири жооп</strong>: Эгер сиз «Г варианты» деп киргизсеңиз, ал суроо 노меринин алдында «[Г варианты]» деп басылып чыгат. Бул 학생ге суроо Г түрүнө кирерин билдирет. Бош 가лтырсаңыз, жөн 가나 кашаалар [ ] пайда болот.</li>
-                    <li>1.2.8. <strong>Эскертүү</strong>: Сынактын эрежелери. Экзамен өткөрүү эрежелерин киргизиңиз. Аты-жөнү жана ID аталыштын астында көрсөтүлөт, андан кийин эскертүү мазмуну келет, андан соң суроолор башталат. Эгерде өзгөчө эч нер세 кошуунун кереги жок болсо, жөн га나 «Ийгилик!» деп жазсаңыз болот.</li>
+                    <li>1.2.6. <strong>Кыска жооп</strong>: Эгер сиз «В варианты» деп киргизсеңиз, ал суроо номеринин алдында «[В варианты]» деп басылып чыгат. Бул студентке суроо В түрүнө кирерин билдирет. Бош калтырсаңыз, жөн гана кашаалар [ ] пайда болот.</li>
+                    <li>1.2.7. <strong>Кеңири жооп</strong>: Эгер сиз «Г варианты» деп киргизсеңиз, ал суроо номеринин алдында «[Г варианты]» деп басылып чыгат. Бул студентке суроо Г түрүнө кирерин билдирет. Бош калтырсаңыз, жөн гана кашаалар [ ] пайда болот.</li>
+                    <li>1.2.8. <strong>Эскертүү</strong>: Сынактын эрежелери. Экзамен өткөрүү эрежелерин киргизиңиз. Аты-жөнү жана ID аталыштын астында көрсөтүлөт, андан кийин эскертүү мазмуну келет, андан соң суроолор башталат. Эгерде өзгөчө эч нерсе кошуунун кереги жок болсо, жөн гана «Ийгилик!» деп жазсаңыз болот.</li>
                 </ul>
-                <p>1.3. <strong>Демейки мазмун</strong> баскычы: Бул баскы치ты басуу «Баш сөздөн» тышкары бардык талааларды тандалган «Тилге» жараша алдын ала сакталган мазмун менен автоматтык түрдө толтурат. Колдонуучулар керектүү бөлүктөрүн 가나 өзгөртө алышат. «Эскертүү» бөлүмү колдонуучу тандаган «Баалоо эрежесине» жана «Тилге» жараша суроо түрлөрүнүн сүрөттөлүшү жана баалоо эрежеле리 менен автоматтык түрдө толтурулат.</p>
+                <p>1.3. <strong>Демейки мазмун</strong> баскычы: Бул баскычты басуу «Баш сөздөн» тышкары бардык талааларды тандалган «Тилге» жараша алдын ала сакталган мазмун менен автоматтык түрдө толтурат. Колдонуучулар керектүү бөлүктөрүн гана өзгөртө алышат. «Эскертүү» бөлүмү колдонуучу тандаган «Баалоо эрежесине» жана «Тилге» жараша суроо түрлөрүнүн сүрөттөлүшү жана баалоо эрежелери менен автоматтык түрдө толтурулат.</p>
                 <h3>2. Суроолор</h3>
-                <p>2.1. Суроолордун төрт түрү колдоо алынат: <strong>Бир жооптуу тест</strong>, <strong>Бир нече жооптуу тест</strong>, <strong>Кыска жооп</strong> жана <strong>Кеңири жооп</strong>. Учурда шайкештикти текшерүүчү суроолор колдоо алынбайт. «Туура/Ката» түрүндөгү суроолор두 эки варианттуу тест катары ишке ашырса болот.</p>
+                <p>2.1. Суроолордун төрт түрү колдоо алынат: <strong>Бир жооптуу тест</strong>, <strong>Бир нече жооптуу тест</strong>, <strong>Кыска жооп</strong> жана <strong>Кеңири жооп</strong>. Учурда шайкештикти текшерүүчү суроолор колдоо алынбайт. «Туура/Ката» түрүндөгү суроолорду эки варианттуу тест катары ишке ашырса болот.</p>
                 <ul>
                     <li>2.1.1. <strong>Бир жооптуу тест</strong>: Бир гана варианты туура болгон тест.</li>
                     <li>2.1.2. <strong>Бир нече жооптуу тест</strong>: Эки же андан көп варианты туура болгон тест.</li>
                     <li>2.1.3. <strong>Кыска жооп</strong>: Жообу бир сөз же кыска сөз айкашы болгон субъективдүү суроо.</li>
                     <li>2.1.4. <strong>Кеңири жооп</strong>: Жообу бир же бир нече абзацтан турган субъективдүү суроо.</li>
                 </ul>
-                <p>2.2. Массивдеги ар бир суроо суроо 노меринен, топ номеринен, суроонун текстинен, жооп варианттарынан жана ар бир вариант үчүн белгиден турат.</p>
+                <p>2.2. Массивдеги ар бир суроо суроо номеринен, топ номеринен, суроонун текстинен, жооп варианттарынан жана ар бир вариант үчүн белгиден турат.</p>
                 <ul>
-                    <li>2.2.1. <strong>Суроо 노мери</strong>: Массивде기 суроолордун тартибине ылайык келет. Суроо 노мерлерин окуунун жүрүшүнө жараша көбөйтүү сунушталат, анткени экзамендин чөйрөсү суро오 номерле리 боюнча аныкталат. Максималдуу 65 534 суроо болушу мүмкүн.</li>
-                    <li>2.2.2. <strong>Топ номери</strong>: Бир топко кирген суроолор маңызы боюнча бир эле суроо, би록 ар кандай берилген. Экзамен үчүн топтон бир га나 суроо туш келди тандалат. Бул ар бир студентке ар башка, би록 бирдей деңгээлде기 суроолорду берүүгө мүмкүндүк берет. <strong>Оптималдаштыруу</strong> аткарылганда, топтун 노мери автоматтык түрдө ошол топтун эң кичине суроо номерине барабар болуп белгиленет.</li>
+                    <li>2.2.1. <strong>Суроо номери</strong>: Массивдеги суроолордун тартибине ылайык келет. Суроо номерлерин окуунун жүрүшүнө жараша көбөйтүү сунушталат, анткени экзамендин чөйрөсү суроо номерлери боюнча аныкталат. Максималдуу 65 534 суроо болушу мүмкүн.</li>
+                    <li>2.2.2. <strong>Топ номери</strong>: Бир топко кирген суроолор маңызы боюнча бир эле суроо, бирок ар кандай берилген. Экзамен үчүн топтон бир гана суроо туш келди тандалат. Бул ар бир студентке ар башка, бирок бирдей деңгээлдеги суроолорду берүүгө мүмкүндүк берет. <strong>Оптималдаштыруу</strong> аткарылганда, топтун номери автоматтык түрдө ошол топтун эң кичине суроо номерине барабар болуп белгиленет.</li>
                     <li>2.2.3. <strong>Суроо тексти</strong>: Суроонун өзүнүн тексти. Бир нече сапты киргизүүгө болот, бирок учурда сүрөттөр колдоо алынбайт.</li>
                     <li>2.2.4. <strong>Жооп варианттары</strong>: Бир суроого 0дөн 255ке чейин жооп варианты болушу мүмкүн.</li>
                     <li>2.2.5. <strong>Белги</strong>: Ар бир жооп вариантында бирден белги болот.
                         <ul>
-                            <li>Тесттер: Белгиленген варианттар туура жооптор болуп саналат.</li>
-                            <li>Кыска жооп: Бардык варианттар белгилениши керек; 에герде студенттин жообу алардын бирине дал келсе, ал туура деп эсептелет.</li>
+                            <li>Тесттер: Белгиленген варианттар туура жооптор болуп салат.</li>
+                            <li>Кыска жооп: Бардык варианттар белгилениши керек; эгерде студенттин жообу алардын бирине дал келсе, ал туура деп эсептелет.</li>
                             <li>Кеңири жооп: Варианттар болбошу керек же бардык белгилер алынып салынышы керек.</li>
                         </ul>
                     </li>
@@ -808,100 +1099,100 @@ export const helpTranslations: Record<SupportedLang, any> = {
                     <li>2.3.1. Варианттары жок суроолор: <strong>Кеңири жооп</strong></li>
                     <li>2.3.2. Бардык белгилери коюлган варианттары бар суроолор: <strong>Кыска жооп</strong></li>
                     <li>2.3.3. Бардык белгилери алынган варианттары бар суроолор: <strong>Кеңири жооп</strong></li>
-                    <li>2.3.4. 2 же андан көп варианты бар жана бирөө га나 белгиленген суроолор: <strong>Бир жооптуу тест</strong></li>
-                    <li>2.3.5. Калгандары (2 же андан көп вариант, бир 몇 белги): <strong>Бир нече жооптуу тест</strong></li>
+                    <li>2.3.4. 2 же андан көп варианты бар жана бирөө гана белгиленген суроолор: <strong>Бир жооптуу тест</strong></li>
+                    <li>2.3.5. Калгандары (2 же андан көп вариант, бир нече белги): <strong>Бир нече жооптуу тест</strong></li>
                 </ul>
             `,
             "qbank-editing": `
                 <p>Суроолор банкын түзөтүүдө ар бир суроо өзүнүн суроо карточкасында түзүлөт.</p>
                 <h3>1. Колдонуучу киргизүүчү элементтер</h3>
-                <p>Суроо карточкасында колдонуучулар топ номерин, суроо текстин, жооп вариантын киргизип, белгилерди коюшат.</p>
+                <p>Суроо карточкасында колдонуучулар топ номерин, суроо текستين, жооп вариантын киргизип, белгилерди коюшат.</p>
                 <ul>
-                    <li>1.1. <strong>Топ номери</strong>: Суроо кирген топту аныктаган сан. 1ден 65 534кө чейинки сандар га나 жарамдуу.</li>
-                    <li>1.2. <strong>Суроо тексти</strong>: Сиз суроонун текстин бир 몇 сапта эркин киргизе аласыз.</li>
-                    <li>1.3. <strong>Вариант тексти</strong>: Сиз жооп вариантынын текстин бир 몇 сапта эркин киргиزه аласыз.</li>
+                    <li>1.1. <strong>Топ номери</strong>: Суроо кирген топту аныктаган сан. 1ден 65 534кө чейинки сандар гана жарамдуу.</li>
+                    <li>1.2. <strong>Суроо тексти</strong>: Сиз суроонун текстин бир нече сапта эркин киргизе аласыз.</li>
+                    <li>1.3. <strong>Вариант тексти</strong>: Сиз жооп вариантынын текстин бир нече сапта эркин киргизе аласыз.</li>
                     <li>1.4. <strong>Белги</strong>: Белгини коюу же алып салуу үчүн чычкан менен басыңыз.</li>
                 </ul>
                 <h3>2. Түзөтүү куралдары</h3>
-                <p>Жого루дагы тилкеде기 түзөтүү куралдары나 эки суроо 노мерин киргизүү талаасы, <strong>->V<- Суроо киргизүү</strong> баскычы, <strong>= Суроону көчүрүү</strong> ба스크ычы, <strong>+ Суроо кошуу</strong> ба스크ычы, <strong>- Су로ону өчүрүү</strong> баскычы жана <strong>Которуу</strong> ба스크ычы кирет. <strong>Которуу</strong> баскычын басканда алар эки вариант 노мерин киргизүү талаасына, <strong>->V<- Вариант киргизүү</strong> ба스크ычына, <strong>= Вариантты көчүрүү</strong> ба스크ычына, <strong>+ Вариант кошуу</strong> баскычына жана <strong>- Вариантты өчүрүү</strong> ба스크ычына алмашат. Бирин치 суроо карточкасында <strong>Төмөн</strong> баскычы, акыркысында <strong>Өйдө</strong> баскычы, ал эми калгандарында <strong>Өйдө</strong> жана <strong>Төмөн</strong> ба스크ычтары бар.</p>
+                <p>Жогорудагы тилкедеги түзөтүү куралдарына эки суроо номерин киргизүү талаасы, <strong>->V<- Суроо киргизүү</strong> баскычы, <strong>= Суроону көчүрүү</strong> баскычы, <strong>+ Суроо кошуу</strong> баскычы, <strong>- Суроону өчүрүү</strong> баскычы жана <strong>Которуу</strong> баскычы кирет. <strong>Которуу</strong> баскычын басканда алар эки вариант номерин киргизүү талаасына, <strong>->V<- Вариант киргизүү</strong> баскычына, <strong>= Вариантты көчүрүү</strong> баскычына, <strong>+ Вариант кошуу</strong> баскычына жана <strong>- Вариантты өчүрүү</strong> баскычына алмашат. Биринчи суроо карточкасында <strong>Төмөн</strong> баскычы, акыркысында <strong>Өйдө</strong> баскычы, ал эми калгандарында <strong>Өйдө</strong> жана <strong>Төмөн</strong> баскычтары бар.</p>
                 <ul>
-                    <li>2.1. <strong>+ Суроо кошуу</strong> баскычы: Аягына жаңы суроо карточкасын кошот. Кошулган карточканын топ 노мери анын суроо 노мерине барабар болот.</li>
-                    <li>2.2. <strong>- Суроону өчүрүү</strong> ба스크ычы: Учурда фокуста турган суроо карточкасын өчүрөт.</li>
-                    <li>2.3. <strong>= Суроону көчүрүү</strong> ба스크ычы: Учурдагы жана кийинки карточканын ор토суна жаңы суро오 карточкасын киргизип, учурдагы карточканын бардык мазмунун жаңысына көчүрөт. Бул окшош суроолорду түзүүдө у바кытты үнөмдөө үчүн пайдалуу. Жаңы карточка баштапкы карточканын топ номерин алат, аны кийин колдонуучу өзгөртө алат. Бир эле топтун алкагында ар кандай формулировкада기 бирдей суроолорду түзүү үчүн идеалдуу.</li>
-                    <li>2.4. <strong>->V<- Суроо киргизүү</strong> баскычы: Анын сол жагындагы эки талаага киргизилген су로о 노мерлеринин ор토суна жаңы бош суроо карточкасын киргизет. Киргизилген карточканын топ номери анын суроо номерине барабар болот.</li>
-                    <li>2.5. <strong>Эки суроо 노мерин киргизүү талаасы</strong>: Сол жактагы талаага мурунку суроонун номерин, оң жактагы талаага кийинки суроонун номерин киргизиңиз. Бир талаага киргизгенде, экинчиси автоматтык түрдө жаңыланат. <strong>->V<- Суроо киргизүү</strong> баскычын басуу бул эки 노меринин ор토суна жаңы карточканы жайгаштырат.</li>
-                    <li>2.6. <strong>Которуу</strong> баскычы: Су로олорду түзөтүү режими 및 варианттарды түзөтүү режиминин ор토сунда которуштуруу.</li>
-                    <li>2.7. <strong>+ Вариант кошуу</strong> баскычы: Учурдагы суро오 карточкасынын 아ягына жооп вариантын кошот.</li>
+                    <li>2.1. <strong>+ Суроо кошуу</strong> баскычы: Аягына жаңы суроо карточкасын кошот. Кошулган карточканын топ номери анын суроо номерине барабар болот.</li>
+                    <li>2.2. <strong>- Суроону өчүрүү</strong> баскычы: Учурда фокуста турган суроо карточкасын өчүрөт.</li>
+                    <li>2.3. <strong>= Суроону көчүрүү</strong> баскычы: Учурдагы жана кийинки карточканын ортосуна жаңы суроо карточкасын киргизип, учурдагы карточканын бардык мазмунун жаңысына көчүрөт. Бул окшош суроолорду түзүүдө убакытты үнөмдөө үчүн пайдалуу. Жаңы карточка баштапкы карточканын топ номерин алат, аны кийин колдонуучу өзгөртө алат. Бир эле топтун алкагында ар кандай формулировкадагы бирдей суроолорду түзүү үчүн идеалдуу.</li>
+                    <li>2.4. <strong>->V<- Суроо киргизүү</strong> баскычы: Анын сол жагындагы эки талаага киргизилген суроо номерлеринин ортосуна жаңы бош суроо карточкасын киргизет. Киргизилген карточканын топ номери анын суроо номерине барабар болот.</li>
+                    <li>2.5. <strong>Эки суроо номерин киргизүү талаасы</strong>: Сол жактагы талаага мурунку суроонун номерин, оң жактагы талаага кийинки суроонун номерин киргизиңиз. Бир талаага киргизгенде, экинчиси автоматтык түрдө жаңыланат. <strong>->V<- Суроо киргизүү</strong> баскычын басуу бул эки номердин ортосуна жаңы карточканы жайгаштырат.</li>
+                    <li>2.6. <strong>Которуу</strong> баскычы: Суроолорду түзөтүү режими жана варианттарды түзөтүү режиминин ор토сунда которуштуруу.</li>
+                    <li>2.7. <strong>+ Вариант кошуу</strong> баскычы: Учурдагы суроо карточкасынын аягына жооп вариантын кошот.</li>
                     <li>2.8. <strong>- Вариантты өчүрүү</strong> баскычы: Учурдагы жооп вариантын өчүрөт.</li>
-                    <li>2.9. <strong>= Вариантты көчүрүү</strong> баскычы: Учурдагы жана кийинки варианттын ор토суна вариант киргизип, бардык мазмунду көчүрөт. Окшош варианттарды тез түзүү үчүн пайдалуу.</li>
-                    <li>2.10. <strong>->V<- Вариант киргизүү</strong> ба스크ычы: Анын сол жагындагы эки талаага киргизилген вариант 노мерлеринин ор토суна бош вариант киргизет.</li>
+                    <li>2.9. <strong>= Вариантты көчүрүү</strong> баскычы: Учурдагы жана кийинки варианттын ортосуна вариант киргизип, бардык мазмунду көчүрөт. Окшош варианттарды тез түзүү үчүн пайдалуу.</li>
+                    <li>2.10. <strong>->V<- Вариант киргизүү</strong> баскычы: Анын сол жагындагы эки талаага киргизилген вариант номерлеринин ортосуна бош вариант киргизет.</li>
                     <li>2.11. <strong>Эки вариант номерин киргизүү талаасы</strong>: Жаңы вариант кайда киргизилиши керектигин аныктап, суроо номерин киргизүү талаалары сыяктуу эле иштейт.</li>
-                    <li>2.12. <strong>Өйдө</strong> баскычы: Суроолордун тартиби окуунун жүрүшүнө байланыштуу болгондуктан, алардын тартибин өзгөртүү керек болушу мүмкүн. Бул баскыч учурдагы суроону мурунку су로о менен алмаштырат. Фокус жылдырылган карточкада калат.</li>
-                    <li>2.13. <strong>Төмөн</strong> баскычы: Учурдагы суроону кийинки суро오 менен алмаштырат. Фокус жылдырылган карточкада 가лат.</li>
+                    <li>2.12. <strong>Өйдө</strong> баскычы: Суроолордун тартиби окуунун жүрүшүнө байланыштуу болгондуктан, алардын тартибин өзгөртүү керек болушу мүмкүн. Бул баскыч учурдагы суроону мурунку суроо менен алмаштырат. Фокус жылдырылган карточкада калат.</li>
+                    <li>2.13. <strong>Төмөн</strong> баскычы: Учурдагы суроону кийинки суроо менен алмаштырат. Фокус жылдырылган карточкада калат.</li>
                 </ul>
             `,
             "qbank-usage": `
                 <p>Суроолор банкын окуунун жүрүшүнө жараша жүргүзүү — студенттерди сапаттуу суроолор менен баалоонун эң сонун жолу.</p>
                 <h3>1. Топтор тутумун колдонуу</h3>
                 <ul>
-                    <li>1.1. Топтор тутумунун максаты — суроолор банкында бир 몇 эквиваленттүү варианттарына ээ болуу. Бул тапшырмаларды ар тараптуу кылууга мүмкүндүк берет жана 학생들 ар башка, бирок тең маанилүү суроолорду алгандык탄, көчүрүүнү кыйындатат. Экзамен алуучу көзөмөلدөп турган чыңалган кырдаалда, студент үчүн досунун баракчасындагы суро오 өзүнүн баракчасындагы суро오 менен маанилеш экенин, болгону башкача берилгенин байкап 가луу өтө кыйын가 турат.</li>
-                    <li>1.2. Кээ데 бир суроо башка суроого кокустан ишарат (подсказка) камтышы мүмкүн. Мындай су로олорду бир топко топтоо менен алар эч качан бир экзамен барагында чогуу чыкпасын кепилдейсиз.</li>
+                    <li>1.1. Топтор тутумунун максаты — суроолор банкында бир нече эквиваленттүү варианттарына ээ болуу. Бул тапшырмаларды ар тараптуу кылууга мүмкүндүк берет жана студенттер ар башка, бирок тең маанилүү суроолорду алгандыктан, көчүрүүнү кыйындатат. Экзамен алуучу көзөмөلدөп турган чыңалган кырдаалда, студент үчүн досунун баракчасындагы суроо өзүнүн баракчасындагы суроо менен маанилеш экенин, болгону башкача берилгенин байкап калуу өтө кыйынга турат.</li>
+                    <li>1.2. Кээде бир суроо башка суроого кокустан ишарат (подсказка) камтышы мүмкүн. Мындай суроолорду бир топко топтоо менен алар эч качан бир экзамен барагында чогуу чыкпасын кепилдейсиз.</li>
                     <li>1.3. Сиздин оюңузча, бир экзаменде чогуу чыкпоого тийиш болгон бардык суроолорду бир топко жайгаштыруу менен алардын чогуу чыгышын алдын алсаңыз болот.</li>
                 </ul>
-                <h3>2. Суроолор банкынын статистикасын кол도нуу</h3>
+                <h3>2. Суроолор банкынын статистикасын колдонуу</h3>
                 <ul>
-                    <li>2.1. Белгиленген диапазондон суроолорду туш келди тандоо үчүн псевдо-туш келди сандардын генератору (PRNG) керек. Бул продуктта колдонулган PRNG статистикалык 및 криптографиялык жактан коопсуз. Ошентип, суроолор банкында туура жооптордун бөлүштүрүлүшү бир жактуу болсо да, чыныгы экзаменде суроолорду тандоонун жана жоопторду бөлүштүрүүнүн кокустугу кепилденет. Бирок баштапкы банктагы тең салмактуу бөлүштүрүү бул кокустукту ого бетер күчөтөт.</li>
-                    <li>2.2. Сиз тесттер үчүн туура жооптордун бөлүштүрүлүшүнүн статистикасын көрүп, су로олор банкын ошого жараша оңдой аласыз.</li>
-                    <li>2.3. Суроолордун төрт түрү (<strong>Бир жооптуу тест</strong>, <strong>Бир нече жооптуу тест</strong>, <strong>Кыска жооп</strong> 및 <strong>Кеңири жооп</strong>) боюнча статистика суроолор банкын системалуу башкарууга жардам берет.</li>
+                    <li>2.1. Белгиленген диапазондон суроолорду туш келди тандоо үчүн псевдо-туш келди сандардын генератору (PRNG) керек. Бул продуктта колдонулган PRNG статистикалык жана криптографиялык жактан коопсуз. Ошентип, суроолор банкында туура жооптордун бөлүштүрүлүшү бир жактуу болсо да, чыныгы экзаменде суроолорду тандоонун жана жоопторду бөлүштүрүүнүн кокустугу кепилденет. Бирок баштапкы банктагы тең салмактуу бөлүштүрүү бул кокустукту ого бетер күчөтөт.</li>
+                    <li>2.2. Сиз тесттер үчүн туура жооптордун бөлүштүрүлүшүнүн статистикасын көрүп, суроолор банкын ошого жараша оңдой аласыз.</li>
+                    <li>2.3. Суроолордун төрт түрү (<strong>Бир жооптуу тест</strong>, <strong>Бир нече жооптуу тест</strong>, <strong>Кыска жооп</strong> жана <strong>Кеңири жооп</strong>) боюнча статистика суроолор банкын системалуу башкарууга жардам берет.</li>
                 </ul>
-                <h3>3. Субъективдүү суроолор үчүн жооптор두 및 үлгүлүү жоопторду кол도нуу</h3>
+                <h3>3. Субъективдүү суроолор үчүн жоопторду жана үлгүлүү жоопторду колдонуу</h3>
                 <ul>
-                    <li>3.1. <strong>Кыска жооптуу тапшырмалар</strong> үчүн 학생тин жообу суроолор банкында жазылган бир 몇 жооптун бирине дал келсе, туура деп эсептелет. Бир эле жооптун ар кандай варианттарын жазып коюу өз алдынча окуу үчүн да, кийинчерээк кол менен текшерүү үчүн да пайдалуу.</li>
-                    <li>3.2. <strong>Кеңири жооптуу тапшырмалар</strong> үчүн үлгүлүү жооптор берилет. Мындай тапшырмалар өз алдын차 окууну автоматташтырылган баалоодон чыгарылса да, үлгүлүү жооптор окутуучулорго кол менен текшерүүдө ырааттуулукту 사ктоого жардам берет.</li>
-                    <li>3.3. Философиялык жактан алганда, бардык варианттары белгиленген суроо <strong>Кыска жооп</strong> катары чечмеленет, анткени жооп чектелген 및 сунушталган варианттардын бирине дал келиши керек.</li>
-                    <li>3.4. Варианттары жок же бардык белгилери алынган суроо <strong>Кеңири жооп</strong> 가тары чечмеленет. Мындай тапшырмалардын жооптору ачык болгондуктан, окутуучу тарабынан берилген жооптор так «туура жооп» эмес, «үлгүлүү жооп» болуп саналат. Үлгүлүү жооптор бир 몇 болушу мүмкүн 및 алар эч 가чан толук бүткөн болуп эсептелбейт, ошондуктан аларда белгилердин жоктугу философиялык мааниге ээ.</li>
+                    <li>3.1. <strong>Кыска жооптуу тапшырмалар</strong> үчүн студенттин жообу суроолор банкында жазылган бир нече жооптун бирине дал келсе, туура деп эсептелет. Бир эле жооптун ар кандай варианттарын жазып коюу өз алдынча окуу үчүн да, кийинчерээк кол менен текшерүү үчүн да пайдалуу.</li>
+                    <li>3.2. <strong>Кеңири жооптуу тапшырмалар</strong> үчүн үлгүлүү жооптор берилет. Мындай тапшырмалар өз алдынча окууну автоматташтырылган баалоодон чыгарылса да, үлгүлүү жооптор окутуучулорго кол менен текшерүүдө ырааттуулукту сактоого жардам берет.</li>
+                    <li>3.3. Философиялык жактан алганда, бардык варианттары белгиленген суроо <strong>Кыска жооп</strong> катары чечмеленет, анткени жооп чектелген жана сунушталган варианттардын бирине дал келиши керек.</li>
+                    <li>3.4. Варианттары жок же бардык белгилери алынган суроо <strong>Кеңири жооп</strong> катары чечмеленет. Мындай тапшырмалардын жооптору ачык болгондуктан, окутуучу тарабынан берилген жооптор так «туура жооп» эмес, «үлгүлүү жооп» болуп саналат. Үлгүлүү жооптор бир нече болушу мүмкүн жана алар эч качан толук бүткөн болуп эсептелбейт, ошондуктан аларда белгилердин жоктугу философиялык мааниге ээ.</li>
                 </ul>
-                <h3>4. Суроолор банкынын өсүшү 및 өнүгүшү</h3>
+                <h3>4. Суроолор банкынын өсүшү жана өнүгүшү</h3>
                 <ul>
-                    <li>4.1. Окутуучулор окутуу тажрыйбасынын негизинде жаңы суроолорду кошуп 및 сапатсыз суроолор두 өчүрүү менен банкты тынымсыз жакшырта алышат.</li>
-                    <li>4.2. Окутуучулор бар суроолордун варианттарын түзүп, аларды бир топко топтоо менен банктын ар түрдүүлүгүн кеңейте алышат.</li>
-                    <li>4.3. Эгерде 학생들이 кыйналып жатышса, окутуучу суроолор банкынын файлын бөлүшө алат. Андан кийин 학생들 өз компьютерлеринде QuizWizдин өз алдын차 окуу функциясын колдонуп машыгып, жакшы окуу көндүмдөрүн 가лыптандыра алышат.</li>
+                    <li>4.1. Окутуучулар окутуу тажрыйбасынын негизинде жаңы суроолорду кошуп жана сапатсыз суроолорду өчүрүү менен банкты тынымсыз жакшырта алышат.</li>
+                    <li>4.2. Окутуучулар бар суроолордун варианттарын түзүп, аларды бир топко топтоо менен банктын ар түрдүүлүгүн кеңейте алышат.</li>
+                    <li>4.3. Эгерде студенттер кыйналып жатышса, окутуучу суроолор банкынын файлдарын бөлүшө алат. Андан кийин студенттер өз компьютерлеринде QuizWizдин өз алдынча окуу функциясын колдонуп машыгып, жакшы окуу көндүмдөрүн калыптандыра алышат.</li>
                 </ul>
             `,
             "exam-random": `
                 <h3>1. Суроолор банкынан экзамен суроолорун алуу</h3>
                 <ul>
-                    <li>1.1. <strong>Экзамендин чөйрөсү</strong>: Суроолор банкында기 суроо номеринин диапазону менен аныкталат.</li>
-                    <li>1.2. <strong>Туш келди тандоо</strong>: Чөйрөнүн ичиндеги суроолор белгиленген санда, статистикалык 및 криптографиялык жактан коопсуз ыкма менен туш келди тандалып алынат.</li>
-                    <li>1.3. <strong>Суроолордун саны</strong>: Тандалып алынган суроолордун саны чөйрөдө기 топтордун жалпы санынан ашпоого тийиш.</li>
+                    <li>1.1. <strong>Экзамендин чөйрөсү</strong>: Суроолор банкындагы суроо номеринин диапазону менен аныкталат.</li>
+                    <li>1.2. <strong>Туш келди тандоо</strong>: Чөйрөнүн ичиндеги суроолор белгиленген санда, статистикалык жана криптографиялык жактан коопсуз ыкма менен туш келди тандалып алынат.</li>
+                    <li>1.3. <strong>Суроолордун саны</strong>: Тандалып алынган суроолордун саны чөйрөдөгү топтордун жалпы санынан ашпоого тийиш.</li>
                     <li>1.4. <strong>Топтогу суроолордун саны</strong>: Бир топтон 0 же 1 суроо тандалат; бир эле топтон эки же андан көп суроо эч качан бир экзаменге кирбейт.</li>
-                    <li>1.5. <strong>Суроолордун иретин аралаштыруу</strong>: Тандалган суроолордун тартиби статистикалык 및 криптографиялык жактан коопсуз ыкма менен туш келди аралаштырылат.</li>
-                    <li>1.6. <strong>Варианттардын иретин аралаштыруу</strong>: Ар бир тандалган су로онун жооп варианттарынын тартиби да статистикалык 및 криптографиялык жактан коопсуз ыкма менен туш келди аралаштырылат.</li>
+                    <li>1.5. <strong>Суроолордун иретин аралаштыруу</strong>: Тандалган суроолордун тартиби статистикалык жана криптографиялык жактан коопсуз ыкма менен туш келди аралаштырылат.</li>
+                    <li>1.6. <strong>Варианттардын иретин аралаштыруу</strong>: Ар бир тандалган суроонун жооп варианттарынын тартиби да статистикалык жана криптографиялык жактан коопсуз ыкма менен туш келди аралаштырылат.</li>
                 </ul>
                 <h3>2. Тандалган суроолордун туура жооптору</h3>
                 <ul>
-                    <li>2.1. <strong>Жооптордун өзгөрүшү</strong>: Тесттик суроолор үчүн, суроолор туш келди тандалып 및 ирети аралаштырылгандыктан, ошондой эле ар бир суроонун жооп варианттарынын тартиби да өзгөртүлгөндүктөн, тандалган суроолордун туура жооптору су로олор банкындагы түпнуска суроолордун жоопторунан айырмаланат.</li>
+                    <li>2.1. <strong>Жооптордун өзгөрүшү</strong>: Тесттик суроолор үчүн, суроолор туш келди тандалып жана ирети аралаштырылгандыктан, ошондой эле ар бир суроонун жооп варианттарынын тартиби да өзгөртүлгөндүктөн, тандалган суроолордун туура жооптору суроолор банкындагы түпнуска суроолордун жоопторунан айырмаланат.</li>
                     <li>2.2. <strong>Жооптордун топтомун берүү</strong>: Тандалган суроолордун топтому үчүн туура жооптордун топтому да кошо берилет.</li>
                 </ul>
             `,
             "exam-scope": `
                 <h3>1. Суроолор банкындагы суроолордун тартиби</h3>
                 <ul>
-                    <li>1.1. Албетте, экзамендин чөйрөсүн аныктоо окуунун жүрүшү менен тыгыз байланыштуу. Ошондук탄, суроолор банкындагы суроолордун тартиби окуунун жүрүшүнө шайкеш келиши керек.</li>
-                    <li>1.2. Экзамендин чөйрөсү «суроолор банкында기 X-суроодон Y-суроого чейин» деген форматта аныкталат.</li>
-                    <li>1.3. Эгерде банктагы суроолордун тартиби окуунун жүрүшүнө дал кел베се, экзамендин чөйрөсүн туура тандоо абдан кыйын болуп калат.</li>
+                    <li>1.1. Албетте, экзамендин чөйрөсүн аныктоо окуунун жүрүшү менен тыгыз байланыштуу. Ошондуктан, суроолор банкындагы суроолордун тартиби окуунун жүрүшүнө шайкеш келиши керек.</li>
+                    <li>1.2. Экзамендин чөйрөсү «суроолор банкында X-суроодон Y-суроого чейин» деген форматта аныкталат.</li>
+                    <li>1.3. Эгерде банктагы суроолордун тартиби окуунун жүрүшүнө дал келбесе, экзамендин чөйрөсүн туура тандоо абдан кыйын болуп калат.</li>
                 </ul>
                 <h3>2. Экзамендин чөйрөсүн орнотуу</h3>
                 <ul>
-                    <li>2.1. Экзамен барактарын түзүү үчүн экзамендин чөйрөсү 및 өз алдын차 окуу үчүн окуу чөйрөсү бирдей маалыматты бөлүшөт.</li>
-                    <li>2.2. Экзамендин чөйрөсүнүн форматы — суроолор банкында기 X-суроодон Y-суроого чейин.</li>
-                    <li>2.3. Экзамендин чөйрөсү ар дайым башталгыч 및 акыркы номерлерди камтыйт. Мисалы, эгер чөйрө 50дөн 100гө чейин деп белгиленсе, 50- 및 100-суроолор тең чөйрөгө киргизилет 및 алар экзаменде чыгышы мүмкүн.</li>
+                    <li>2.1. Экзамен барактарын түзүү үчүн экзамендин чөйрөсү жана өз алдынча окуу үчүн окуу чөйрөсү бирдей маалыматты бөлүшөт.</li>
+                    <li>2.2. Экзамендин чөйрөсүнүн форматы — суроолор банкында X-суроодон Y-суроого чейин.</li>
+                    <li>2.3. Экзамендин чөйрөсү ар дайым башталгыч жана акыркы номерлерди камтыйт. Мисалы, эгер чөйрө 50дөн 100гө чейин деп белгиленсе, 50- жана 100-суроолор тең чөйрөгө киргизилет жана алар экзаменде чыгышы мүмкүн.</li>
                 </ul>
-                <h3>3. Экзаменде기 суроолордун саны</h3>
+                <h3>3. Экзамендеги суроолордун саны</h3>
                 <ul>
-                    <li>3.1. Экзаменде기 суроолордун саны суроолор банкында기 белгиленген чөй르өдө기 суроолордун жалпы санынан ашпоого тийиш.</li>
-                    <li>3.2. Экзаменде기 суроолордун саны белгиленген чөй르өдө기 суроолор кирген топтордун санынан ашпоого тийиш.</li>
-                    <li>3.3. <strong>Экзаменде기 сурооло르дун саны</strong> &le; <strong>Белгиленген чөйрөдө기 топтордун саны</strong> &le; <strong>Белгиленген чөйрөдө기 суроолордун саны</strong></li>
+                    <li>3.1. Экзамендеги суроолордун саны суроолор банкында белгиленген чөйрөдөгү суроолордун жалпы санынан ашпоого тийиш.</li>
+                    <li>3.2. Экзамендеги суроолордун саны белгиленген чөйрөдөгү суроолор кирген топтордун санынан ашпоого тийиш.</li>
+                    <li>3.3. <strong>Экзамендеги суроолордун саны</strong> &le; <strong>Белгиленген чөйрөдөгү топтордун саны</strong> &le; <strong>Белгиленген чөйрөдөгү суроолордун саны</strong></li>
                 </ul>
             `,
             "exam-relationship": `
@@ -909,7 +1200,7 @@ export const helpTranslations: Record<SupportedLang, any> = {
                 <ul>
                     <li>1.1. Суроолор банкы — студенттердин санына жараша экзамендик суроолорду түзүүнүн негизги каражаты.</li>
                     <li>1.2. Суроолор банкы — экзамендик суроолорду башкаруунун түздөн-түз каражаты.</li>
-                    <li>1.3. Суроолор банкы студенттерге ар кандай уникалдуу экзамен барактарын берүү үчүн булак болуп саналат.</li>
+                    <li>1.3. Суроолор банкы студенттерге ар кандай уникалдуу экзамен барактарын берүү үчүн булак болуп салат.</li>
                 </ul>
                 <h3>2. Студенттердин тизмеси</h3>
                 <ul>
@@ -921,62 +1212,159 @@ export const helpTranslations: Record<SupportedLang, any> = {
                 <ul>
                     <li>3.1. Студенттердин тизмесиндеги студенттердин санына жараша суроолор топтому түзүлөт.</li>
                     <li>3.2. Студенттердин тизмесиндеги бардык студенттерге ар башка суроолор топтому берилет.</li>
-                    <li>3.3. Экзамен суроолору студенттерге бөлүштүрүлгөндө, алдын ала белгиленген диапазонго жана суроолордун санына ылайык, ар бир студент үчүн суроолор банкынан туш келди жаңыдан тандалып алынган суроолор топтому түзүлөт.</li>
-                    <li>3.4. Мисалы, бир студенттин экзамен барагындагы 1-суроо башка студенттин барагында 1-수роо болоруна кепилдик жок. Ошондой эле, ал 1-수роо башка студенттин барагында 7-수роо болушу мүмкүн же такыр жок болушу мүмкүн.</li>
+                    <li>3.3. Экзамен суроолору студенттерге бөлүштүрүлгөндө, алдын ала белгиленген диапазонго жана су로олордун санына ылайык, ар бир студент үчүн суроолор банкынан туш келди жаңыдан тандалып алынган суроолор топтому түзүлөт.</li>
+                    <li>3.4. Мисалы, бир студенттин экзамен барагында 1-суроо башка студенттин барагында 1-суроо болоруна кепилдик жок. Ошондой эле, ал 1-суроо башка студенттин барагында 7-суроо болушу мүмкүн же такыр жок болушу мүмкүн.</li>
                 </ul>
             `,
             "students-structure": `
                 <h3>1. Студенттердин тизмесинин түзүлүшү</h3>
-                <li>1.1. Студенттердин тизмесинин түзүлүшү суроолор банкына салыштырмалуу абдан жөнөкөй.</li>
-                <li>1.2. Студенттердин тизмеси ар бир студенттин жеке маалыматтарынын массиви болуп саналат.</li>
-                <li>1.3. Ар бир студенттин маалыматы студенттин аты-жөнүнөн жана студенттик билет 노меринен турат.</li>
+                <ul>
+                    <li>1.1. Студенттердин тизмесинин түзүлүшү суроолор банкына салыштырмалуу абдан жөнөкөй.</li>
+                    <li>1.2. Студенттердин тизмеси ар бир студенттин жеке маалыматтарының массиви болуп салат.</li>
+                    <li>1.3. Ар бир студенттин маалыматы студенттин аты-жөнүнөн жана студенттик билет номеринен 투рат.</li>
+                </ul>
                 <h3>2. Студенттин карточкасы</h3>
-                <li>2.1. Бир студенттин маалыматы бир студенттик карточкага жазылат.</li>
-                <li>2.2. Студенттик карточкага студенттин атын жана билет номерин киргизүүгө болот.</li>
-                <li>2.3. Аты-жөнүн фамилияга жана ысымга бөлбөстөн толук киргизиңиз. Бул ар кандай маданияттарда ысымдардын түзүлүшү жана тартиби ар башка болгондугуна байланыштуу.</li>
-                <li>2.4. Студенттик билет 노мери цифраларды да, тамгаларды да камтышы мүмкүн.</li>
-                <li>2.5. Ар бир студенттик карточкада тизмени түзөтүү үчүн колдонулган белгилөө кутучасы (чекбокс) бар, ал маалыматтын өзүнө кирбейт.</li>
+                <ul>
+                    <li>2.1. Бир студенттин маалыматы бир студенттик карточкага жазылат.</li>
+                    <li>2.2. Студенттик карточкага студенттин атын жана билет номерин киргизүүгө болот.</li>
+                    <li>2.3. Аты-жөнүн фамилияга жана ысымга бөлбөстөн толук киргизиңиз. Бул ар кандай маданияттарда ысымдардын түзүлүшү жана тартиби ар башка болгондугуна байланыштуу.</li>
+                    <li>2.4. Студенттик билет номери цифраларды да, тамгаларды да камтышы мүмкүн.</li>
+                    <li>2.5. Ар бир студенттик карточкада тизмени түзөтүү үчүн колдонулган белгилөө кутучасы (чекбокс) бар, ал маалыматтын өзүнө кир베йт.</li>
+                </ul>
             `,
             "students-editing": `
                 <p>Студенттердин тизмесин түзөтүүдө ар бир студенттин маалыматы жеке студенттик карточкага киргизилет.</p>
                 <h3>1. Колдонуучу киргизүүчү элементтер</h3>
-                <p>Студенттик карточкада кол도нуучу аты-жөнүн жана студенттик билетин киргизиши керек.</p>
+                <p>Студенттик карточкада колдонуучу аты-жөнүн жана студенттик билетин киргизиши керек.</p>
                 <ul>
-                    <li>1.1. <strong>Аты-жөн이</strong>: Студенттин толук 아ты-жөнү. Фамилиясы, аты жана атасынын 아ты (эгер бар болсо) чогуу киргизилет. Ар кандай маданияттарда жана этникалык топтордо ысымдарды коюу салты ар башка болгондуктан, студенттерди башкарууга караганда суроолор банкынын башкаруусу башкы максат болгондуктан, ысымдын бөлүктөрүн бөлүп отурбоо ыңгайлуураак.</li>
-                    <li>1.2. <strong>Билет 노мери</strong>: Цифраларды да, тамгаларды да киргизүүгө болот.</li>
-                    <li>1.3. <strong>Белгилөө кутучасы (чек보кс)</strong>: Бул маалымат киргизүүчү элемент эмес, түзөтүү куралы.</li>
+                    <li>1.1. <strong>Аты-жөнү</strong>: Студенттин толук аты-жөнү. Фамилиясы, аты жана атасынын аты (эгер бар болсо) чогуу киргизилет. Ар кандай маданияттарда и этникалык топтордо ысымдарды коюу салты ар башка болгондуктан, студенттерди башкарууга караганда суроолор банкынын башкаруусу башкы максат болгондуктан, ысымдын бөлүктөрүн бөлүп отурбоо ыңгайлуураак.</li>
+                    <li>1.2. <strong>Билет номери</strong>: Цифраларды да, тамгаларды да киргизүүгө болот.</li>
+                    <li>1.3. <strong>Белгилөө кутучасы (чекбокс)</strong>: Бул маалымат киргизүүчү элемент эмес, түзөтүү куралы.</li>
                 </ul>
                 <h3>2. Түзөтүү куралдары</h3>
-                <p>Түзөтүү куралдарына жогорудагы тилкедеги <strong>Баарын тандоо</strong>, <strong>Тандоону которуу</strong>, <strong>+ Студент кошуу</strong> жана <strong>- Студенттерди алып салуу</strong> ба스크ычтары, ошондой эле ар бир студенттик карточкадагы белгилөө кутучасы кирет.</p>
+                <p>Түзөтүү куралдарына жогорудагы тилкедеги <strong>Баарын тандоо</strong>, <strong>Тандоону которуу</strong>, <strong>+ Студент кошуу</strong> жана <strong>- Студенттерди алып салуу</strong> баскычтары, ошондой эле ар бир студенттик карточкадагы белгилөө кутучасы кирет.</p>
                 <ul>
                     <li>2.1. <strong>+ Студент кошуу</strong> баскычы: Тизменин эң аягына жаңы студенттик карточканы кошот.</li>
-                    <li>2.2. <strong>- Студенттерди алып салуу</strong> ба스크ычы: Учурда фоку스타 турган студенттик карточканы өчүрөт.</li>
+                    <li>2.2. <strong>- Студенттерди алып салуу</strong> баскычы: Учурда фо쿠ста турган студенттик карточканы өчүрөт.</li>
                     <li>2.3. <strong>Белгилөө кутучасы</strong>: Белгилөө кутучасын басканда белги пайда болуп, студент тандалганын билдирет. Аны кайра бассаңыз, белги жоголуп, студент тандалбаганын билдирет.</li>
-                    <li>2.4. <strong>Баарын тандоо</strong> баскычы: Бардык студенттик карточкаларды бир убакта тандайт. Эгер сизге саналуу студенттерден башкасынын баарын тандоо керек болсо, анда баарын тандап, андан кийин керексиз 학생дердин белгисин кол менен алып салсаңыз болот.</li>
-                    <li>2.5. <strong>Тандоону которуу</strong> баскычы: Бардык студенттер үчүн тандоо абалын карама-каршысына өзгөртөт. 에гер көп студентти тандоо керек болсо, адеген데 тизмеден чыгаргыңыз келгендерди белгилеп, андан кийин <strong>Тандоону которуу</strong> ба스크ычын басып, тандоону тескери кылып алсаңыз болот.</li>
+                    <li>2.4. <strong>Баарын тандоо</strong> баскычы: Бардык студенттик карточкаларды бир убакта тандайт. Эгер сизге саналуу студенттерден башкасынын баарын тандоо керек болсо, анда баарын тандап, андан кийин керексиз студенттердин белгисин кол менен алып салсаңыз болот.</li>
+                    <li>2.5. <strong>Тандоону которуу</strong> баскычы: Бардык студенттер үчүн тандоо абалын карама-каршысына өзгөртөт. Эгер көп студентти тандоо керек болсо, адегенде тизмеден чыгаргыңыз келгендерди белгилеп, андан кийин <strong>Тандоону которуу</strong> баскычын басып, тандоону тескери кылып алсаңыз болот.</li>
                     <li>2.6. <strong>Оптималдаштыруу</strong>: Бардык бош студенттик карточкаларды өчүрөт.</li>
                 </ul>
             `,
             "students-usage": `
                 <h3>1. Максаты</h3>
-                <p>Студенттердин тизмеси ар бир студентке ар башка экзамен барагын берүү аркылуу көчүрүүнү (ал도ону) алдын алуу үчүн колдонулат.</p>
+                <p>Студенттердин тизмеси ар бир студентке ар башка экзамен барагын берүү аркылуу көчүрүүнү (алдоону) алдын алуу үчүн колдонулат.</p>
                 <h3>2. Жекелештирилген басып чыгаруу</h3>
                 <p>Экзамен барактарын басып чыгарууда тизмедеги студенттердин аты-жөнү жана билет номерлери ар бир тиешелүү баракка жекече басылып чыгат.</p>
                 <h3>3. Кайра тапшырууну башкаруу</h3>
-                <p>Экзаменди кайра тапшыра турган 학생дердин тизмесин өзүнчө файл катары сактап алуу, кайра тапшыруу барактарын даярдоо жана басып чыгаруу үчүн ыңгайлуура악.</p>
+                <p>Экзаменди кайра тапшыра турган студенттердин тизмесин өзүнчө файл катары сактап алуу, кайра тапшыруу барактарын даярдоо жана басып чыгаруу үчүн ыңгайлуураак.</p>
             `,
             "selfstudy-prep": `
                 <h3>1. Өз алдынча окуунун максаты</h3>
                 <ul>
-                    <li>1.1. Окутуучунун студенттин позициясынан машыгуу экзаменин тапшырып көрүүсү аркылуу убакытты бөлүштүрүүнү, суроолордун татаалдык деңгээлин жана экзамен шартындагы толкунданууну сезүүсү, ошону менен суроолор банкын оңдоо же суроолордун санын реалдуу түрдө жөнгө салуу мүмкүнчүлүгүн берүү максатын көздөйт.</li>
-                    <li>1.2. Дагы бир максаты — окуу адаты калыптана элек студенттерге жардам берүү. Окутуучу суроолор банкынын файлдарын студенттерге таратып берип, алар суроолорду өз алдынча чечүүсү аркылуу окуу материалын өздөштүрүүгө жана окуу адатын калыптандырууга жардам берет.</li>
-                    <li>1.3. Ошондой эле, студенттердин окууга болгон умтулуусу төмөн болгон учурда алардын экзаменге даيارдануусуна көмөктөшүү максатын да камтыйт.</li>
+                    <li>1.1. Максаты — окутуучуга студенттин көз карашы менен машыгуу экзаменин тапшырып көрүүгө, убакытты бөлүштүрүүнү, суроолордун татаалдык деңгээлин жана экзамен учурундагы толкунданууну сезүүгө мүмкүнчүлүк берүү. Бул суроолор банкын өзгөртүүгө же суроолордун санын реалдуу түрдө жөнгө салууга жардам берет.</li>
+                    <li>1.2. Дагы бир максаты — окууга көнө элек студенттерге жардам берүү. Окутуучу су로олор банкынын 파일дарын студенттерге таратып берип, алар суроолорду өз алдынча чечүүсү аркылуу окуу материалын өздөштүрүүгө жана окуу адатын калыптандырууга көмөктөшөт.</li>
+                    <li>1.3. Студенттердин окууга болгон умтулуусу төмөн болгон учурда экзамендерге даярданууга жардам берүү — бул дагы бир максат болуп салат.</li>
                 </ul>
                 <h3>2. Өз алдынча окуу үчүн алдын ала шарттар</h3>
                 <ul>
                     <li>2.1. Өз алдынча окууну суроолор банкын жүктөбөстөн баштоо мүмкүн эмес. Ошондуктан, сөзсүз түрдө суроолор банкын жүктөө керек.</li>
-                    <li>2.2. Суроолор банкы жүктөлгөндөн кийин га나 окуу диапазонун орнотуу 기능и активдешип, окуу чөйрөсүн аныктоого мүмкүндүк берет. Эгерде диапазон белгиленбесе, демейки жөндөө боюнча бардык диапазон автоматтык түрдө окуу чөйрөсү катары белгиленет.</li>
+                    <li>2.2. Суроолор банкы жүктөлгөндөн кийин гана окуу диапазонун орнотуу функциясы активдешип, окуу чөйрөсүн аныктоого мүмкүндүк берет. Эгерде диапазон белгиленбесе, демейки жөндөө боюнча бардык диапазон автоматтык түрдө окуу чөйрөсү катары белгиленет.</li>
                     <li>2.3. Суроолор банкы жүктөлүп жана окуу диапазону аныкталгандан кийин гана өз алдынча окууну баштоого даярдык бүткөн болуп эсептелет.</li>
+                </ul>
+            `,
+            "selfstudy-scoring": `
+                <h3>1. Өз алдынча окуудан чыгарылган суроолор</h3>
+                <p>Өз алдынча окууда кеңири жооптуу тапшырмалар (эссе) бааланбайт.</p>
+                <h3>2. Баалоо тутумдарының түрлөрү</h3>
+                <p>Баалоо тутумдары айып упайларынын жана жарым-жартылай упайлардын болушуна жараша төрт түргө бөлүнөт.</p>
+                <ul>
+                    <li>2.1. <strong>Айып упайлары жана жарым-жартылай упайлар менен баалоо тутуму</strong>: Айып упайлары жана жарым-жартылай упайлар тесттерге гана колдонулат; кыска жооптуу тапшырмаларда жарым-жартылай упайлар берилбейт жана ката жооп үчүн айып упайлары чегерилбейт.
+                        <ul>
+                            <li>2.1.1. <strong>Бир жооптуу тест</strong>
+                                <ul>
+                                    <li>2.1.1.1. Туура жооп: Белгиленген упай берилет.</li>
+                                    <li>2.1.1.2. Жооп тандалбаса же эки же андан көп жооп тандалса: 0 упай берилет.</li>
+                                    <li>2.1.1.3. Бир туура эмес жооп тандалса: <strong>белгиленген упай</strong> / (варианттардын саны - 1) өлчөмүндө айып упайы чегерилет.</li>
+                                </ul>
+                            </li>
+                            <li>2.1.2. <strong>Бир нече жооптуу тест</strong>
+                                <ul>
+                                    <li>2.1.2.1. Тандалган жооптордун саны туура жооптордун санына дал келсе жана бардык тандалган жооптор туура болсо: Белгиленген упай берилет.</li>
+                                    <li>2.1.2.2. Тандалган жооптордун саны туура жооптордун санынан айырмаланса: 0 упай берилет.</li>
+                                    <li>2.1.2.3. Тандалган жооптордун саны туура жооптордун санына дал келсе: (<strong>варианттардагы туура эмес жооптордун саны</strong> x <strong>тандалган туура жооптордун саны</strong> - <strong>варианттардагы туура жооптордун саны</strong> x <strong>тандалган туура эмес жооптордун саны</strong>) x <strong>белгиленген упай</strong> / <strong>варианттардын жалпы саны</strong> упай берилет.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>2.2. <strong>Айып упайлары бар жана жарым-жартылай упайларсыз баалоо тутуму</strong>: Айып упайлары тесттерге гана колдонулат; кыска жооптуу тапшырмаларда ката жооп үчүн айып упайлары чегерилбейт.
+                        <ul>
+                            <li>2.2.1. <strong>Бир жооптуу тест</strong>
+                                <ul>
+                                    <li>2.2.1.1. Туура жооп: Белгиленген упай берилет.</li>
+                                    <li>2.2.1.2. Жооп тандалбаса же эки же андан көп жооп тандалса: 0 упай алынат.</li>
+                                    <li>2.2.1.3. Бир туура эмес жооп тандалса: <strong>белгиленген упай</strong> / (варианттардын саны - 1) өлчөмүндө айып упайы чегерилет.</li>
+                                </ul>
+                            </li>
+                            <li>2.2.2. <strong>Бир нече жооптуу тест</strong>
+                                <ul>
+                                    <li>2.2.2.1. Тандалган жооптордун саны туура жооптордун санына дал келсе жана бардык тандалган жооптор туура болсо: Белгиленген упай берилет.</li>
+                                    <li>2.2.2.2. Тандалган жооптордун саны туура жооптордун санынан айырмаланса: 0 упай алынат.</li>
+                                    <li>2.2.2.3. Тандалган жооптордун саны туура жооптордун санына дал келсе, бирок туура эмес жооп тандалса же туура жооптордун айрымдары калып калса: <strong>белгиленген упай</strong> / (<strong>варианттардын саны</strong> x (<strong>варианттардын саны</strong> - 1)) өлчөмүндө айып упайы чегерилет.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>2.3. <strong>Айып упайлары жок жана жарым-жартылай упайлар менен баалоо тутуму</strong>
+                        <ul>
+                            <li>2.3.1. <strong>Бир жооптуу тест</strong>
+                                <ul>
+                                    <li>2.3.1.1. Туура жооп: Белгиленген упай берилет.</li>
+                                    <li>2.3.1.2. Калган учурларда: 0 упай алынат.</li>
+                                </ul>
+                            </li>
+                            <li>2.3.2. <strong>Бир нече жооптуу тест</strong>
+                                <ul>
+                                    <li>2.3.2.1. Тандалган жооптордун саны туура жооптордун санына дал келсе жана бардык тандалган жооптор туура болсо: Белгиленген упай берилет.</li>
+                                    <li>2.3.2.2. Тандалган жооптордун саны туура жооптордун санынан айырмаланса: 0 упай алынат.</li>
+                                    <li>2.3.2.3. Тандалган жооптордун саны туура жооптордун санына дал келсе: <strong>белгиленген упай</strong> x <strong>тандалган туура жооптордун саны</strong> / <strong>варианттардагы туура жооптордун саны</strong> упай берилет.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>2.4. <strong>Айып упайларысыз жана жарым-жартылай упайларсыз баалоо тутуму</strong>
+                        <ul>
+                            <li>2.4.1. <strong>Бир жооптуу тест</strong>
+                                <ul>
+                                    <li>2.4.1.1. Туура жооп: Белгиленген упай берилет.</li>
+                                    <li>2.4.1.2. Калган учурларда: 0 упай алынат.</li>
+                                </ul>
+                            </li>
+                            <li>2.4.2. <strong>Бир нече жооптуу тест</strong>
+                                <ul>
+                                    <li>2.4.2.1. Тандалган жооптордун саны туура жооптордун санына дал келсе жана бардык тандалган жооптор туура болсо: Белгиленген упай берилет.</li>
+                                    <li>2.4.2.2. Калган учурларда: 0 упай алынат.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <h3>3. Баалоо эрежелеринин жөндөөлөрүн бөлүшүү</h3>
+                <p>Өз алдынча окуунун баалоо эрежелеринин жөндөөлөрү экзамен түзүүдөгү экзамендин чөйрөсүнүн жөндөөлөрү менен маанилерди бөлүшөт, ошондуктан экзамендин чөйрөсүнүн жөндөөлөрүн өзгөртүү өз алдынча окуунун баалоо эрежелеринин жөндөөлөрүн автоматтык түрдө жаңылайт.</p>
+            `,
+            "selfstudy-usage": `
+                <h3>1. Окутуучу</h3>
+                <ul>
+                    <li>1.1. Окутуучу суроолор банкын түзгөндөн кийин, суроолордун реалдуулугун баалоо куралы катары өз алдынча окууну колдонуп, суроолорду өздөрү чечип көрө алышат.</li>
+                    <li>1.2. Экзамен суроолорун түзүүдөн мурун, окутуучулар экзамендин реалдуулугун баалоо куралы катары өз алдынча окууну колдонуп, экзамен чөйрөсүндөгү суроолорду өздөрү чечип көрө алышат.</li>
+                </ul>
+                <h3>2. Студент</h3>
+                <p>Бул окутуучу суроолор банкын ачыкка чыгарган учурда маанилүү болгон жагдайлар.</p>
+                <ul>
+                    <li>2.1. Студент өз алдынча экзамен суроолорун чечүү менен үйрөнгөн материалдарын кайталоо куралы катары өз алдынча окууну колдоно алат.</li>
+                    <li>2.2. Экзамендин алдында студент өз алдынча экзамен чөйрөсүндөгү суроолорду чечүү менен экзаменге даярдануу куралы катары өз алдынча окууну колдоно алат.</li>
+                    <li>2.3. Эгерде окутуучу суроолор банкын ачыкка чыгарбаса, студент үйрөнгөн мазмуну боюнча өзү суроолорду түзүп, өзү түзгөн суроолорду чечүү менен тажрыйба топтой алат.</li>
                 </ul>
             `
         }
