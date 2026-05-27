@@ -2948,8 +2948,16 @@ class QuizWizardApp {
         } catch (err: any) {
             if (err.name !== 'AbortError') {
                 console.error("문제은행 파일 열기 중 오류 발생:", err);
-                const msg = translations[this.currentLang].actions['msg-file-open-error'].replace('{error}', err.message || err);
-                alert(msg);
+                if (err == 0)
+                {
+                    const msg = translations[this.currentLang].actions['msg-invalid-version-error']
+                    alert(msg);
+                }
+                else
+                {
+                    const msg = translations[this.currentLang].actions['msg-file-open-error'].replace('{error}', err.message || err);
+                    alert(msg);
+                }
             }
         }
     }
@@ -3018,8 +3026,11 @@ class QuizWizardApp {
     }
 
     private statQuestionBank() {
-        if (!this.control_tower) return;
-        
+        if (!this.control_tower)
+            return;
+
+        this.saveCurrentQuestionsToState(); // 현재 화면의 변경사항을 먼저 저장하여 통계에 반영되도록 함
+        this.syncQuestionsToWasm(); // WASM 엔진 데이터 갱신
         const langData = translations[this.currentLang] || translations['ko'];
         const total = this.control_tower.get_question_length();
         const categoryCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };

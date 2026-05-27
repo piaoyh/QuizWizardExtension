@@ -1,8 +1,8 @@
 {
   "name": "QuizWiz",
-  "description": "Quiz Generator based on Question Bank",
+  "description": "Quiz (Exams) Generator based on Question Bank",
   "manifest_version": 3,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "permissions": ["storage", "tabs"],
   "background": {
     "service_worker": "background.js",
