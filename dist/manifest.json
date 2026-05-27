@@ -1,6 +1,7 @@
 {
-  "name": "QuizWiz",
-  "description": "Quiz (Exams) Generator based on Question Bank",
+  "name": "__MSG_appName__",
+  "description": "__MSG_appDesc__",
+  "default_locale": "en",
   "manifest_version": 3,
   "version": "1.0.1",
   "permissions": ["storage", "tabs"],

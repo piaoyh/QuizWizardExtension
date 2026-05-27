@@ -23,7 +23,7 @@ chrome.action.onClicked.addListener(async () => {
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('Quiz Wizard extension installed.');
+  console.log('QuizWiz extension installed.');
 });
 
 export {};

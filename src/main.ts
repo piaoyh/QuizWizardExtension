@@ -42,7 +42,7 @@ type ScoringRules =
     'no-negative-marking-no-partial-credit';
     
 
-class QuizWizardApp {
+class QuizWizApp {
     private pdfMake: any = null;
     private random_seeds = new BigUint64Array(16);
     private envLang = navigator.language;
@@ -4340,4 +4340,4 @@ class QuizWizardApp {
     }
 }
 
-window.addEventListener('DOMContentLoaded', () => new QuizWizardApp());
+window.addEventListener('DOMContentLoaded', () => new QuizWizApp());

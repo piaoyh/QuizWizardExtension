@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 import { translations } from './i18n.js';
 import init, { ControlTower, NameId, ChoiceMark, QuestionData } from './pkg/qrate_wasm.js';
-class QuizWizardApp {
+class QuizWizApp {
     pdfMake = null;
     random_seeds = new BigUint64Array(16);
     envLang = navigator.language;
@@ -3811,4 +3811,4 @@ class QuizWizardApp {
         }
     }
 }
-window.addEventListener('DOMContentLoaded', () => new QuizWizardApp());
+window.addEventListener('DOMContentLoaded', () => new QuizWizApp());

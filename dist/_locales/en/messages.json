@@ -1,0 +1,8 @@
+{
+    "appName": {
+        "message": "QuizWiz"
+    },
+    "appDesc": {
+        "message": "An exam generator that automatically extracts different exam questions for each examinee based on a question bank."
+    }
+}
