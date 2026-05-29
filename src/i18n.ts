@@ -199,7 +199,7 @@ export const translations: Record<SupportedLang, any> = {
             "msg-input-insert-pos": "삽입할 위치(번호)를 입력해 주세요.",
             "msg-select-question-to-remove": "삭제할 문제를 선택해 주세요.",
             "msg-confirm-delete-content-question": "내용이 있는 문제입니다. 정말 삭제하시겠습니까?",
-            "msg-invalid-version-error": "QBDB 파일이 상위 버전입니다. 본 앱을 최신 버전으로 업데이트해 주세요.",
+            "msg-invalid-version-error": "파일이 상위 버전입니다. 본 앱을 최신 버전으로 업데이트해 주세요.",
             "msg-file-open-error": "파일을 여는 중 오류가 발생했습니다: {error}",
             "msg-file-save-error": "저장 중 오류가 발생했습니다: {error}",
             "msg-unsupported-file-format": "지원하지 않는 파일 형식입니다.",

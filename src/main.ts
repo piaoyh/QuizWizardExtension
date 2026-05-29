@@ -1533,7 +1533,8 @@ class QuizWizApp {
         for (const [prefix, menu] of Object.entries(prefixMap)) {
             if (action.startsWith(prefix)) {
                 // [수정] 대화상자만 띄우는 액션들은 뷰 전환을 건너뜁니다.
-                if (action === 'in-info-copy' || action === 'in-info-license' || 
+                if (action === 'in-info-soft' || action === 'in-info-copy' || 
+                    action === 'in-info-license' || action === 'in-info-development' || 
                     action === 'st-theme' || action === 'st-lang') {
                     break;
                 }
@@ -2956,7 +2957,7 @@ class QuizWizApp {
             this.updateMenuActivation();
         } catch (err: any) {
             if (err.name !== 'AbortError') {
-                console.error("문제은행 파일 열기 중 오류 발생:", err);
+                console.error("문제 은행 파일 열기 중 오류 발생:", err);
                 if (err == 0)
                 {
                     const msg = translations[this.currentLang].actions['msg-invalid-version-error']
@@ -3346,7 +3347,17 @@ class QuizWizApp {
             }
         } catch (err: any) {
             if (err.name !== 'AbortError') {
-                console.error("파일 접근 오류:", err);
+                console.error("학생 명단 파일 열기 중 오류 발생:", err);
+                if (err == 0)
+                {
+                    const msg = translations[this.currentLang].actions['msg-invalid-version-error']
+                    alert(msg);
+                }
+                else
+                {
+                    const msg = translations[this.currentLang].actions['msg-file-open-error'].replace('{error}', err.message || err);
+                    alert(msg);
+                }
             }
         }
     }
