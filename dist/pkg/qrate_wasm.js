@@ -1,5 +1,12 @@
 /* @ts-self-types="./qrate_wasm.d.ts" */
 
+/**
+ * Represents a choice answer for a quiz question, containing the text of the
+ * choice and a flag indicating whether it is the correct answer. This struct
+ * provides methods to create a new choice answer, retrieve the text, and check
+ * if it is correct. The `ChoiceMark` struct is designed to be used in a
+ * WebAssembly context, allowing it to be easily manipulated from JavaScript.
+ */
 export class ChoiceMark {
     static __wrap(ptr) {
         const obj = Object.create(ChoiceMark.prototype);
@@ -68,7 +75,7 @@ export class ChoiceMark {
      * * `text` - The text of the choice answer.
      * * `is_correct` - A boolean indicating whether this choice is the correct answer.
      *
-     * # Output
+     * # Returns
      * `Self` - A new instance of `ChoiceAnswer`.
      *
      * # Examples
@@ -1561,21 +1568,63 @@ export class ControlTower {
 if (Symbol.dispose) ControlTower.prototype[Symbol.dispose] = ControlTower.prototype.free;
 
 /**
+ * An enumeration of error messages that can occur in the Qrate application.
+ * This enum is designed to be used in a WebAssembly context, allowing it to
+ * be easily manipulated from JavaScript. Each variant represents a specific
+ * error that may occur during the execution of the application, such as
+ * issues with opening files, receiving data from memory,
  * @enum {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}
  */
 export const ErrorMessage = Object.freeze({
+    /**
+     * Represents an error where the version of the application is invalid.
+     */
     InvalidVersion: 0, "0": "InvalidVersion",
+    /**
+     * Represents an error where the application failed to open a question bank file.
+     */
     FailedToOpenQBank: 1, "1": "FailedToOpenQBank",
+    /**
+     * Represents an error where the application failed to open a student bank file.
+     */
     FailedToOpenSBank: 2, "2": "FailedToOpenSBank",
+    /**
+     * Represents an error where the application failed to open a question Excel file.
+     */
     FailedToOpenQExcel: 3, "3": "FailedToOpenQExcel",
+    /**
+     * Represents an error where the application failed to open a student Excel file.
+     */
     FailedToOpenSExcel: 4, "4": "FailedToOpenSExcel",
+    /**
+     * Represents an error where the application failed to receive a question bank from memory.
+     */
     FailedToReceiveQBankFromMemory: 5, "5": "FailedToReceiveQBankFromMemory",
+    /**
+     * Represents an error where the application failed to receive a student bank from memory.
+     */
     FailedToReceiveSBankFromMemory: 6, "6": "FailedToReceiveSBankFromMemory",
+    /**
+     * Represents an error where the application failed to write a question bank to memory.
+     */
     FailedToWriteQBankToMemory: 7, "7": "FailedToWriteQBankToMemory",
+    /**
+     * Represents an error where the application failed to write a student bank to memory.
+     */
     FailedToWriteSBankToMemory: 8, "8": "FailedToWriteSBankToMemory",
+    /**
+     * Represents an error where the application failed to generate an exam.
+     */
     FailedToGenerateExam: 9, "9": "FailedToGenerateExam",
 });
 
+/**
+ * Represents a name and ID pair, commonly used for students and questions.
+ * This struct provides methods to create a new `NameId`, retrieve the name
+ * and ID, and create an empty `NameId`. The `NameId` struct is designed to
+ * be used in a WebAssembly context, allowing it to be easily manipulated
+ * from JavaScript.
+ */
 export class NameId {
     static __wrap(ptr) {
         const obj = Object.create(NameId.prototype);
@@ -1701,6 +1750,13 @@ export class NameId {
 }
 if (Symbol.dispose) NameId.prototype[Symbol.dispose] = NameId.prototype.free;
 
+/**
+ * Represents the data for a quiz question, including the question number,
+ * category, question text, and a list of choices. This struct provides methods
+ * to create a new `QuestionData` instance, retrieve the question number,
+ * category, question text, and choices. The `QuestionData` struct is designed
+ * to be used in a WebAssembly context, allowing it to be easily
+ */
 export class QuestionData {
     static __wrap(ptr) {
         const obj = Object.create(QuestionData.prototype);
@@ -1882,6 +1938,23 @@ export class QuestionData {
 if (Symbol.dispose) QuestionData.prototype[Symbol.dispose] = QuestionData.prototype.free;
 
 /**
+ * A simple function to demonstrate WebAssembly integration. This function
+ * takes a string as input and returns a formatted string indicating that
+ * an exam has been generated with the given input data. This function is
+ * designed to be called from JavaScript in a WebAssembly context.
+ *
+ * # Arguments
+ * * `input_data` - A string containing the input data for generating the exam.
+ *
+ * # Returns
+ * A `String` indicating that the exam has been generated with the provided input data.
+ *
+ * # Examples
+ * ```
+ * use qrate::generate_exam_wasm;
+ * let result = generate_exam_wasm("Sample Data");
+ * assert_eq!(result, "Generated Exam Sample Data");
+ * ```
  * @param {string} input_data
  * @returns {string}
  */
