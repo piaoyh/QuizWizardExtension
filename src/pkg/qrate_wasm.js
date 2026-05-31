@@ -565,12 +565,12 @@ export class ControlTower {
      * Returns the next question data in the self-study session.
      *
      * This method returns the next question data in the self-study session
-     * from the `Generator` instance. If the `Generator` instance is not
+     * from the `SelfStudy` instance. If the `SelfStudy` instance is not
      * initialized, it returns `None`.
      *
      * # Returns
      * - `Some(QuestionData)` if the next question data is retrieved successfully.
-     * - `None` if the `Generator` instance is not initialized.
+     * - `None` if the `SelfStudy` instance is not initialized.
      *
      * # Examples
      * ```
@@ -621,12 +621,12 @@ export class ControlTower {
      * Returns the previous question data in the self-study session.
      *
      * This method returns the previous question data in the self-study session
-     * from the `Generator` instance. If the `Generator` instance is not
+     * from the `SelfStudy` instance. If the `SelfStudy` instance is not
      * initialized, it returns `None`.
      *
      * # Returns
      * - `Some(QuestionData)` if the previous question data is retrieved successfully.
-     * - `None` if the `Generator` instance is not initialized.
+     * - `None` if the `SelfStudy` instance is not initialized.
      *
      * # Examples
      * ```
@@ -685,16 +685,12 @@ export class ControlTower {
      * Returns the question data from question bank (QBank)
      * for the specified question number.
      *
-     * This method returns the question data from question bank (QBank)
-     * for the specified question number. If the `Generator` instance is not
-     * initialized, it returns `None`.
-     *
      * # Arguments
      * * `num` - The question number to retrieve.
      *
      * # Returns
      * - `Some(QuestionData)` if the question data is retrieved successfully.
-     * - `None` if the `Generator` instance is not initialized.
+     * - `None` if the QBank is not loaded.
      *
      * # Examples
      * ```
@@ -739,12 +735,12 @@ export class ControlTower {
      * Returns the number of questions in the self-study session.
      *
      * This method returns the number of questions in the self-study session
-     * from the `Generator` instance. If the `Generator` instance is not
+     * from the `SelfStudy` instance. If the `SelfStudy` instance is not
      * initialized, it returns `0`.
      *
      * # Returns
      * - The number of questions in the self-study session.
-     * - `0` if the `Generator` instance is not initialized.
+     * - `0` if the `SelfStudy` instance is not initialized.
      *
      * # Examples
      * ```
@@ -763,7 +759,7 @@ export class ControlTower {
      * Returns the question data for the specified question number.
      *
      * This method returns the question data for the specified question number
-     * from the `Generator` instance. If the `Generator` instance is not
+     * from the `SelfStudy` instance. If the `SelfStudy` instance is not
      * initialized, it returns `None`.
      *
      * # Arguments
@@ -771,7 +767,7 @@ export class ControlTower {
      *
      * # Returns
      * - `Some(QuestionData)` if the question data is retrieved successfully.
-     * - `None` if the `Generator` instance is not initialized.
+     * - `None` if the `SelfStudy` instance is not initialized.
      *
      * # Examples
      * ```
@@ -788,6 +784,13 @@ export class ControlTower {
     get_self_study_question(num) {
         const ret = wasm.controltower_get_self_study_question(this.__wbg_ptr, num);
         return ret === 0 ? undefined : QuestionData.__wrap(ret);
+    }
+    /**
+     * @returns {number}
+     */
+    get_self_study_score() {
+        const ret = wasm.controltower_get_self_study_score(this.__wbg_ptr);
+        return ret;
     }
     /**
      * Retrieves the name and ID of a student by their 1-based index from the SBank.
@@ -876,7 +879,7 @@ export class ControlTower {
      * Creates a new instance of `ControlTower` with default values.
      *
      * The `question_db` and `student_db` fields are initialized
-     * to `AbstractDB::None`, and the `qbank`, `sbank`, and `generator`
+     * to `AbstractDB::None`, and the `qbank`, `sbank`, and `self_study`
      * fields are initialized to `None`.
      *
      * # Returns
@@ -889,7 +892,7 @@ export class ControlTower {
      * assert!(control_tower.student_db.is_none());
      * assert!(control_tower.qbank.is_none());
      * assert!(control_tower.sbank.is_none());
-     * assert!(control_tower.generator.is_none());
+     * assert!(control_tower.self_study.is_none());
      * ```
      */
     constructor() {
@@ -1417,6 +1420,32 @@ export class ControlTower {
         }
     }
     /**
+     * @param {number} num
+     * @param {Uint8Array} answers
+     */
+    set_self_study_choices_answer(num, answers) {
+        const ptr0 = passArray8ToWasm0(answers, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.controltower_set_self_study_choices_answer(this.__wbg_ptr, num, ptr0, len0);
+    }
+    /**
+     * @param {string} rule
+     */
+    set_self_study_scoring_rule(rule) {
+        const ptr0 = passStringToWasm0(rule, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.controltower_set_self_study_scoring_rule(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
+     * @param {number} num
+     * @param {string} answer
+     */
+    set_self_study_short_answer(num, answer) {
+        const ptr0 = passStringToWasm0(answer, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.controltower_set_self_study_short_answer(this.__wbg_ptr, num, ptr0, len0);
+    }
+    /**
      * Sets the name and ID of a student by their 1-based index in the SBank.
      *
      * If the SBank is not loaded or the student number is out of bounds,
@@ -1474,7 +1503,7 @@ export class ControlTower {
     /**
      * Starts a self-study session with the specified parameters.
      *
-     * This method creates a `Generator` instance using the loaded QBank and
+     * This method creates a `SelfStudy` instance using the loaded QBank and
      * starts the self-study session with the specified parameters.
      *
      * If the QBank is not loaded, it returns `false`.
