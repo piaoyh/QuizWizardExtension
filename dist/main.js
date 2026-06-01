@@ -1176,6 +1176,13 @@ class QuizWizApp {
                 }
             });
         });
+        window.addEventListener('beforeunload', (event) => {
+            // 저장되지 않은 변경 사항이 있을 때만 경고창을 띄움
+            if (this.isDirtyQB || this.isDirtySL) {
+                // 표준에 따라 브라우저가 기본 경고 시스템을 활성화하도록 설정
+                event.preventDefault();
+            }
+        });
         // 단축키 감지
         window.addEventListener('keydown', (e) => {
             const isActionDisabled = (action) => {
