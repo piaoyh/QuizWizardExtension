@@ -3354,6 +3354,7 @@ class QuizWizApp {
             } else {
                 this.initializeStudentListWorkspace(false, true);
             }
+            this.updateMenuActivation();
         } catch (err: any) {
             if (err.name !== 'AbortError') {
                 console.error("학생 명단 파일 열기 중 오류 발생:", err);
@@ -3503,6 +3504,7 @@ class QuizWizApp {
             // 데이터 수집 후 저장 실행
             await this.saveStudentList();
             this.initializeStudentListWorkspace(false, true);
+            this.updateMenuActivation();
         } catch (err: any) {
             if (err.name !== 'AbortError') {
                 console.error("다른 이름으로 저장 중 오류 발생:", err);
@@ -3571,8 +3573,14 @@ class QuizWizApp {
 
     private async saveExamPaperAsPdf()
     {
-        const bytes = this.control_tower.generate_exam_in_pdf(this.scope_start, this.scope_end, this.scope_count, this.random_seeds);
-        await this.savePdfFile(bytes);
+        try {
+            const bytes = this.control_tower.generate_exam_in_pdf(this.scope_start, this.scope_end, this.scope_count, this.random_seeds);
+            await this.savePdfFile(bytes);
+        } catch (err: any) {
+            console.error("PDF 생성 중 오류 발생:", err);
+            const msg = translations[this.currentLang].actions['msg-file-save-error'].replace('{error}', err.toString());
+            alert(msg);
+        }
     }
 
     private async saveFile(bytes: any)
