@@ -538,6 +538,28 @@ export class ControlTower {
         }
     }
     /**
+     * Retrieves the maximum number of choices across all questions in the QBank.
+     *
+     * If the QBank is not loaded, it returns `0`.
+     *
+     * # Returns
+     * - `usize`: The maximum number of choices for any question in the QBank.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_max_choices(), 0);
+     * // After loading a QBank with questions that have up to 4 choices
+     * // assert_eq!(control_tower.get_max_choices(), 4);
+     * ```
+     * @returns {number}
+     */
+    get_max_choices() {
+        const ret = wasm.controltower_get_max_choices(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
      * Retrieves the name of the QBank.
      *
      * If the QBank is not loaded, it returns an empty string.
@@ -622,6 +644,83 @@ export class ControlTower {
         } finally {
             wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
         }
+    }
+    /**
+     * Retrieves the number of groups in the QBank.
+     *
+     * If the QBank is not loaded, it returns `0`.
+     *
+     * # Returns
+     * - `usize`: The number of groups in the QBank.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_number_of_groups(), 0);
+     * // After loading a QBank, it will return the number of groups
+     * assert_eq!(control_tower.get_number_of_groups(), 1);
+     * ```
+     * @returns {number}
+     */
+    get_number_of_groups() {
+        const ret = wasm.controltower_get_number_of_groups(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
+     * Retrieves the number of questions in a specific category.
+     *
+     * If the QBank is not loaded, it returns `0`.
+     *
+     * # Arguments
+     * * `cat` - The category to check.
+     *
+     * # Returns
+     * - `usize`: The number of questions in the specified category.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_number_of_questions_in_category(1), 0);
+     * // After loading a QBank with questions in category 1
+     * // assert_eq!(control_tower.get_number_of_questions_in_category(1), 2);
+     * ```
+     * @param {number} cat
+     * @returns {number}
+     */
+    get_number_of_questions_in_category(cat) {
+        const ret = wasm.controltower_get_number_of_questions_in_category(this.__wbg_ptr, cat);
+        return ret >>> 0;
+    }
+    /**
+     * Retrieves the number of questions with a specific number
+     * of correct answers.
+     *
+     * If the QBank is not loaded, it returns `0`.
+     *
+     * # Arguments
+     * * `answer` - The number of correct answers to check for.
+     *   This is a 1-based index representing the choice number.
+     *
+     * # Returns
+     * - `usize`: The number of questions with the specified number
+     *   of correct answers.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * assert_eq!(control_tower.get_number_of_questions_with_answer(1), 0);
+     * // After loading a QBank with questions that have 1 correct answer
+     * // assert_eq!(control_tower.get_number_of_questions_with_answer(1), 3);
+     * ```
+     * @param {number} answer
+     * @returns {number}
+     */
+    get_number_of_questions_with_answer(answer) {
+        const ret = wasm.controltower_get_number_of_questions_with_answer(this.__wbg_ptr, answer);
+        return ret >>> 0;
     }
     /**
      * Returns the previous question data in the self-study session.
@@ -792,6 +891,23 @@ export class ControlTower {
         return ret === 0 ? undefined : QuestionData.__wrap(ret);
     }
     /**
+     * Retrieves the current score of the self-study session.
+     *
+     * This method returns the current score of the self-study session from the
+     * `SelfStudy` instance. If the `SelfStudy` instance is not initialized,
+     * it returns `0.0`.
+     *
+     * # Returns
+     * - The current score of the self-study session as a `f64`.
+     * - `0.0` if the `SelfStudy` instance is not initialized.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * let score = control_tower.get_self_study_score();
+     * println!("Current self-study score: {}", score);
+     * ```
      * @returns {number}
      */
     get_self_study_score() {
@@ -1030,7 +1146,7 @@ export class ControlTower {
         wasm.controltower_push_student(this.__wbg_ptr, ptr0);
     }
     /**
-     * Removes a choice from the Quetion by its 1-based index.
+     * Removes a choice from the Question by its 1-based index.
      *
      * If the QBank is not loaded or the question number is out of bounds,
      * it returns `false`. Otherwise, it removes the choice and returns `true`.
@@ -1426,6 +1542,28 @@ export class ControlTower {
         }
     }
     /**
+     * Sets the user's answers for a multiple-choice question
+     * in the self-study session.
+     *
+     * This method takes the question number and a vector of answers
+     * (where each answer is represented as a `u8`, with `0` for false and
+     * non-zero for true) and sets the user's answers for the specified
+     * question in the `SelfStudy` instance. If the `SelfStudy` instance is
+     * not initialized, this method does nothing.
+     *
+     * # Arguments
+     * * `num` - The question number to set answers for.
+     * * `answers` - A vector of answers (where each answer is represented as
+     *   a `u8`, with `0` for false and non-zero for true).
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.set_self_study_choices_answer(1, vec![1, 0, 0]);
+     * // After starting a self-study session, the user's answers will be updated
+     * control_tower.set_self_study_choices_answer(2, vec![0, 1, 0]);
+     * ```
      * @param {number} num
      * @param {Uint8Array} answers
      */
@@ -1435,6 +1573,24 @@ export class ControlTower {
         wasm.controltower_set_self_study_choices_answer(this.__wbg_ptr, num, ptr0, len0);
     }
     /**
+     * Sets the scoring rule for the self-study session.
+     *
+     * This method sets the scoring rule for the self-study session in the
+     * `SelfStudy` instance. If the `SelfStudy` instance is not initialized,
+     * this method does nothing.
+     *
+     * # Arguments
+     * * `rule` - The scoring rule to set for the self-study session,
+     *   represented as a string.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.set_self_study_scoring_rule("Standard".to_string());
+     * // After starting a self-study session, the scoring rule will be updated
+     * control_tower.set_self_study_scoring_rule("Custom".to_string());
+     * ```
      * @param {string} rule
      */
     set_self_study_scoring_rule(rule) {
@@ -1443,6 +1599,26 @@ export class ControlTower {
         wasm.controltower_set_self_study_scoring_rule(this.__wbg_ptr, ptr0, len0);
     }
     /**
+     * Sets the user's answer for a short-answer question
+     * in the self-study session.
+     *
+     * This method takes the question number and a string answer, and sets the
+     * user's answer for the specified question in the `SelfStudy` instance.
+     * If the `SelfStudy` instance is not initialized, this method does nothing.
+     *
+     * # Arguments
+     * * `num` - The question number to set the answer for.
+     * * `answer` - The user's answer for the short-answer question,
+     *   represented as a string.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.set_self_study_short_answer(1, "Answer to question 1".to_string());
+     * // After starting a self-study session, the user's answer will be updated
+     * control_tower.set_self_study_short_answer(2, "Answer to question 2".to_string());
+     * ```
      * @param {number} num
      * @param {string} answer
      */

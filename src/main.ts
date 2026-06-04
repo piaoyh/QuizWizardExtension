@@ -3044,36 +3044,27 @@ class QuizWizApp {
         return newData;
     }
 
-    private statQuestionBank() {
+    private statQuestionBank()
+    {
         if (!this.control_tower)
             return;
 
         this.saveCurrentQuestionsToState(); // 현재 화면의 변경사항을 먼저 저장하여 통계에 반영되도록 함
         this.syncQuestionsToWasm(); // WASM 엔진 데이터 갱신
+        
         const langData = translations[this.currentLang] || translations['en'];
         const total = this.control_tower.get_question_length();
+        const groupCount = this.control_tower.get_number_of_groups();
+
         const categoryCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
+        const categoryLength: number = Object.keys(categoryCounts).length;
+        for (let cat = 1; cat <= categoryLength; cat++)
+            categoryCounts[cat] = this.control_tower.get_number_of_questions_in_category(cat);
+
         const correctChoiceCounts: Record<number, number> = {};
-        let maxChoices = 0;
-
-        for (let i = 0; i < total; i++) {
-            const qdata = this.control_tower.get_question_data(i + 1); // get_question 대신 사용
-            if (!qdata) continue;
-
-            const cat = qdata.get_category_id();
-            categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
-
-            if (cat === 1 || cat === 2) {
-                const len = qdata.get_choices_length();
-                if (len > maxChoices) maxChoices = len;
-                for (let j = 0; j < len; j++) {
-                    if (qdata.get_choice(j).is_correct()) {
-                        correctChoiceCounts[j + 1] = (correctChoiceCounts[j + 1] || 0) + 1;
-                    }
-                }
-            }
-            qdata.free();
-        }
+        const maxChoices = this.control_tower.get_max_choices();
+        for (let c = 1; c <= maxChoices; c++)
+            correctChoiceCounts[c] = this.control_tower.get_number_of_questions_with_answer(c);
 
         const dialog = document.getElementById('stat-result-dialog') as HTMLDialogElement;
         const dialogTitle = document.getElementById('stat-dialog-title');
@@ -3081,17 +3072,42 @@ class QuizWizApp {
         const categories = document.getElementById('stat-categories');
         const correctAnswers = document.getElementById('stat-correct-answers');
 
-        if (dialog && dialogTitle && summary && categories && correctAnswers) {
-            dialogTitle.textContent = langData.actions['stat-dialog-title'];
-            summary.textContent = langData.actions['stat-total-questions'].replace('{n}', total.toString());
+        if (dialog && dialogTitle && summary && categories && correctAnswers)
+        {
+            dialogTitle.textContent = langData.actions['stat-dialog-title'] || 'Statistics';
             
-            categories.innerHTML = `<div>${langData.actions['stat-category-distribution']}</div>` +
-                [1, 2, 3, 4].map(c => `<div>${langData.actions['qb-header-category-' + c]} ${categoryCounts[c]}</div>`).join('');
+            // 중복 없는 그룹 번호 개수 계산
+            const groups = new Set();
+            if (this.questionsData) {
+                this.questionsData.forEach(q => {
+                    if (q && q.group && typeof q.group === 'string') {
+                        const trimmed = q.group.trim();
+                        if (trimmed !== '') groups.add(trimmed);
+                    }
+                });
+            }
+            // const groupCount = groups.size;
+
+            const totalQuestionsText = (langData.actions['stat-total-questions'] || 'Total Questions: {n}').replace('{n}', total.toString());
+            const totalGroupsText = (langData.actions['stat-total-groups'] || 'Total Groups: {n}').replace('{n}', groupCount.toString());
+
+            summary.innerHTML = `<div>${totalQuestionsText}</div><div>${totalGroupsText}</div>`;
             
-            let correctHtml = `<div>${langData.actions['stat-correct-answer-distribution']}</div>`;
-            for (let j = 1; j <= maxChoices; j++) {
+            categories.style.borderBottom = '1px solid var(--border-color)';
+            categories.style.paddingBottom = '10px';
+            categories.style.marginBottom = '15px';
+            categories.innerHTML = `<div style="font-weight: bold;">${langData.actions['stat-category-distribution'] || '[ Category Distribution ]'}</div>` +
+                [1, 2, 3, 4].map(c => {
+                    const label = langData.actions['qb-header-category-' + c] || `Category ${c}:`;
+                    return `<div>${label} ${categoryCounts[c]}</div>`;
+                }).join('');
+            
+            let correctHtml = `<div style="font-weight: bold;">${langData.actions['stat-correct-answer-distribution'] || '[ Correct Answer Distribution ]'}</div>`;
+            const choiceLabel = langData.actions['stat-choice-label'] || 'Choice {n}: {c} questions';
+            for (let j = 1; j <= maxChoices; j++)
+            {
                 const count = correctChoiceCounts[j] || 0;
-                correctHtml += `<div>${langData.actions['stat-choice-label'].replace('{n}', j.toString()).replace('{c}', count.toString())}</div>`;
+                correctHtml += `<div>${choiceLabel.replace('{n}', j.toString()).replace('{c}', count.toString())}</div>`;
             }
             correctAnswers.innerHTML = correctHtml;
 
