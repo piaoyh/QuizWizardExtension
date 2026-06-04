@@ -164,6 +164,12 @@ class QuizWizApp {
         if (savePaperMenu) {
             canCreateExam ? savePaperMenu.classList.remove('disabled') : savePaperMenu.classList.add('disabled');
         }
+        ['ex-save-paper-docx', 'ex-save-paper-pdf', 'ex-save-paper-txt'].forEach(action => {
+            const el = document.querySelector(`[data-action="${action}"]`);
+            if (el) {
+                canCreateExam ? el.classList.remove('disabled') : el.classList.add('disabled');
+            }
+        });
         const studyScopeMenu = document.querySelector('[data-action="ss-set-scope"]');
         if (studyScopeMenu) {
             isBankLoaded ? studyScopeMenu.classList.remove('disabled') : studyScopeMenu.classList.add('disabled');
@@ -1388,6 +1394,15 @@ class QuizWizApp {
                 break;
             case 'ex-save-paper':
                 this.saveExamPaper();
+                break;
+            case 'ex-save-paper-docx':
+                this.saveExamPaper('docx');
+                break;
+            case 'ex-save-paper-pdf':
+                this.saveExamPaper('pdf');
+                break;
+            case 'ex-save-paper-txt':
+                this.saveExamPaper('txt');
                 break;
             /* --- Student List (학생 명단) --- */
             case 'sl-new':
@@ -2699,8 +2714,8 @@ class QuizWizApp {
             categoryCounts[cat] = this.control_tower.get_number_of_questions_in_category(cat);
         const correctChoiceCounts = {};
         const maxChoices = this.control_tower.get_max_choices();
-        for (let c = 1; c <= maxChoices; c++)
-            correctChoiceCounts[c] = this.control_tower.get_number_of_questions_with_answer(c);
+        for (let cho = 1; cho <= maxChoices; cho++)
+            correctChoiceCounts[cho] = this.control_tower.get_number_of_questions_with_answer(cho);
         const dialog = document.getElementById('stat-result-dialog');
         const dialogTitle = document.getElementById('stat-dialog-title');
         const summary = document.getElementById('stat-summary');
@@ -3096,17 +3111,25 @@ class QuizWizApp {
     }
     /* 시험 및 학습 관련 함수군 */
     /** 시스템 저장 대화상자를 호출하여 시험지를 저장합니다. */
-    async saveExamPaper() {
+    async saveExamPaper(fixedType) {
         try {
             this.generate_seeds();
+            const allTypes = [
+                { description: 'MS Word Document', accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] } },
+                { description: 'Text File', accept: { 'text/plain': ['.txt'] } },
+                { description: 'PDF Document', accept: { 'application/pdf': ['.pdf'] } }
+            ];
+            let types = allTypes;
+            if (fixedType) {
+                types = allTypes.filter(t => {
+                    const extensions = Object.values(t.accept)[0];
+                    return extensions.includes(`.${fixedType}`);
+                });
+            }
             this.handle = await window.showSaveFilePicker({
-                id: 'save-exam-paper', // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
-                suggestedName: 'exam_paper',
-                types: [
-                    { description: 'MS Word Document', accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] } },
-                    { description: 'Text File', accept: { 'text/plain': ['.txt'] } },
-                    { description: 'PDF Document', accept: { 'application/pdf': ['.pdf'] } }
-                ]
+                id: 'save-exam-paper' + (fixedType ? '-' + fixedType : ''), // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
+                suggestedName: 'exam_paper' + (fixedType ? '.' + fixedType : ''),
+                types: types
             });
             // 파일명에서 확장자 추출 (예: 'file.docx' -> 'docx')
             this.doctype = this.handle.name.split('.').pop()?.toLowerCase() || '';

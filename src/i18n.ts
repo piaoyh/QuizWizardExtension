@@ -133,6 +133,9 @@ export const translations: Record<SupportedLang, any> = {
             "ex-load-students": "학생 명단 불러오기",
             "ex-set-scope": "출제 범위 설정",
             "ex-save-paper": "시험지 저장",
+            "ex-save-paper-docx": "docx로 저장",
+            "ex-save-paper-pdf": "pdf로 저장",
+            "ex-save-paper-txt": "txt로 저장",
             "sl-new": "새로 만들기",
             "sl-open": "열기",
             "sl-save": "저장",
@@ -373,6 +376,9 @@ export const translations: Record<SupportedLang, any> = {
             "ex-load-students": "Load a student list",
             "ex-set-scope": "Set Exam Scope",
             "ex-save-paper": "Save exam paper",
+            "ex-save-paper-docx": "Save as docx",
+            "ex-save-paper-pdf": "Save as pdf",
+            "ex-save-paper-txt": "Save as txt",
             "sl-new": "New",
             "sl-open": "Open",
             "sl-save": "Save",
@@ -573,6 +579,9 @@ export const translations: Record<SupportedLang, any> = {
             "ex-set-scope": "Настройка области вопросов",
             "ex-set-scope-tooltip": "Устанавливает область экзамена, определяя диапазон и количество случайных вопросов. Однако, если банк вопросов и список студентов не загружены, это меню недоступно.",
             "ex-save-paper": "Сохранить экзаменационный лист",
+            "ex-save-paper-docx": "Сохранить как docx",
+            "ex-save-paper-pdf": "Сохранить как pdf",
+            "ex-save-paper-txt": "Сохранить как txt",
             "ex-save-paper-tooltip": "Сохранить экзаменационные работы, сгенерированные индивидуально для каждого студента.",
             "student-list-tooltip": "Выполнение задач, связанных со списком студентов. Нажмите 'Список студентов', чтобы открыть рабочее пространство.",
             "sl-new": "Создать",
@@ -810,6 +819,9 @@ export const translations: Record<SupportedLang, any> = {
             "ex-set-scope": "Диапазонду орнотуу",
             "ex-set-scope-tooltip": "Экзамендин чөйрөсүн орнотот, суроолордун диапазонун жана санын белгилейт. Бирок, суроолор банкы жана студенттердин тизмеси жүктөлбөсө, бул меню иштебейт.",
             "ex-save-paper": "Экзамен барагын сактоо",
+            "ex-save-paper-docx": "docx катары сактоо",
+            "ex-save-paper-pdf": "pdf катары сактоо",
+            "ex-save-paper-txt": "txt катары сактоо",
             "ex-save-paper-tooltip": "Ар бир студент үчүн ар башка түзүлгөн экзамен барагын сактайт.",
             "student-list-tooltip": "Студенттердин тизмесине байланыштуу тапшырмаларды аткарат. Иштөө аймагын ачуу үчүн 'Студенттердин тизмеси' менюсун басыңыз.",
             "sl-new": "Жаңы",
@@ -951,3 +963,4 @@ export const translations: Record<SupportedLang, any> = {
         }
     }
 };
+

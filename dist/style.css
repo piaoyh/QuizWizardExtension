@@ -142,7 +142,7 @@ body.theme-light .menu-item-container:hover .menu-item.active {
     min-width: 180px; background-color: var(--nav-bg); border: 1px solid var(--border-color);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15); z-index: 1000;
 }
-.menu-item-container:hover .submenu { display: block; }
+.menu-item-container:hover > .submenu { display: block; }
 
 .submenu-item {
     padding: 7px 15px; font-size: var(--font-size); color: var(--nav-text);
@@ -156,6 +156,39 @@ body.theme-light .menu-item-container:hover .menu-item.active {
     font-size: 0.9em;
 }
 .submenu-item:hover { background-color: var(--active-bg); color: var(--active-text); }
+
+/* 계층형 서브메뉴 스타일 추가 */
+.submenu-item-container {
+    position: relative;
+}
+
+.submenu.nested {
+    display: none;
+    position: absolute;
+    top: -1px;
+    left: 100%;
+    margin-top: 0;
+}
+
+.submenu-item-container:hover > .nested {
+    display: block;
+}
+
+/* 하위 메뉴가 있음을 나타내는 화살표 */
+.has-submenu {
+    position: relative;
+    padding-right: 35px !important; /* 단축키와 삼각형을 위한 공간 확보 */
+}
+
+.has-submenu::before {
+    content: '▶';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7em;
+    opacity: 0.5;
+}
 
 .submenu-item.disabled {
     opacity: 0.5;
