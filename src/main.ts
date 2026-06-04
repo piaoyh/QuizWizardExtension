@@ -1524,6 +1524,33 @@ class QuizWizApp {
                         this.saveExamPaper();
                     }
                     break;
+                case '1':
+                    if (!e.shiftKey)
+                    {
+                        e.preventDefault();
+                        console.log("앱 내부 전용 단축키 감지: docx로 시험지 저장");
+                        if (isActionDisabled('ex-save-paper-docx')) return;
+                        this.saveExamPaper('docx');
+                    }
+                    break;
+                case '2':
+                    if (!e.shiftKey)
+                    {
+                        e.preventDefault();
+                        console.log("앱 내부 전용 단축키 감지: pdf로 시험지 저장");
+                        if (isActionDisabled('ex-save-paper-pdf')) return;
+                        this.saveExamPaper('pdf');
+                    }
+                    break;
+                case '3':
+                    if (!e.shiftKey)
+                    {
+                        e.preventDefault();
+                        console.log("앱 내부 전용 단축키 감지: txt로 시험지 저장");
+                        if (isActionDisabled('ex-save-paper-txt')) return;
+                        this.saveExamPaper('txt');
+                    }
+                    break;
                 }
             }
         });
