@@ -5,19 +5,51 @@
 // <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your option.
 // This file may not be copied, modified, or distributed
 // except according to those terms.
-import { helpTranslations } from "./help_i18n.js";
 class QuizWizHelp {
     container;
     currentLang = 'ko';
+    translations = null; // 다국어 스트링 저장용
     currentTheme = 'theme-blue';
+    currentAction = 'qbank-structure';
     constructor() {
         this.container = document.getElementById('view-container');
         this.initHelp();
     }
+    /**
+     * 다국어 JSON 파일을 로드합니다.
+     */
+    async loadTranslations(lang) {
+        try {
+            const response = await fetch(`./_locales/${lang}/help.json`);
+            if (!response.ok)
+                throw new Error(`HTTP error! status: ${response.status}`);
+            this.translations = await response.json();
+            console.log(`주인님, ${lang} 도움말 언어 팩을 성공적으로 로드했습니다.`);
+        }
+        catch (e) {
+            console.error("도움말 다국어 파일 로드 실패:", e);
+            // 기본값으로 한국어 로드 시도 (도움말은 한국어가 기본일 수도 있음)
+            if (lang !== 'ko') {
+                await this.loadTranslations('ko');
+            }
+        }
+    }
     async initHelp() {
         const data = await chrome.storage.local.get(['theme', 'lang', 'font']);
         this.currentTheme = data.theme || 'theme-blue';
-        this.currentLang = data.lang || 'ko';
+        // 언어 설정 감지 (저장된 설정 -> 브라우저 언어 -> 한국어)
+        let lang;
+        if (data.lang) {
+            lang = data.lang;
+        }
+        else {
+            const browserLang = navigator.language.split('-')[0];
+            const supported = ['ko', 'en', 'ru', 'ky'];
+            lang = supported.includes(browserLang) ? browserLang : 'ko';
+        }
+        this.currentLang = lang;
+        // 다국어 데이터 로드
+        await this.loadTranslations(this.currentLang);
         const currentFont = data.font || '"Segoe UI", sans-serif';
         document.body.className = this.currentTheme;
         document.documentElement.style.setProperty('--app-font', currentFont);
@@ -27,7 +59,7 @@ class QuizWizHelp {
         this.renderView('qbank-structure');
     }
     updateUILanguage() {
-        const langData = helpTranslations[this.currentLang];
+        const langData = this.translations;
         if (!langData)
             return;
         // 로고 타이틀 적용
@@ -61,11 +93,29 @@ class QuizWizHelp {
                 }
             });
         });
+        // [추가] 언어 변경 감지 (storage 변경 시 실시간 반영)
+        chrome.storage.onChanged.addListener(async (changes, area) => {
+            if (area === 'local' && changes.lang) {
+                const newLang = changes.lang.newValue;
+                if (newLang && newLang !== this.currentLang) {
+                    this.currentLang = newLang;
+                    await this.loadTranslations(this.currentLang);
+                    this.updateUILanguage();
+                    // 현재 표시 중인 본문(작업공간) 갱신
+                    if (this.currentAction) {
+                        this.renderView(this.currentAction);
+                    }
+                }
+            }
+        });
     }
     renderView(action) {
         if (!this.container)
             return;
-        const langData = helpTranslations[this.currentLang];
+        this.currentAction = action; // 현재 작업공간 상태 저장
+        const langData = this.translations;
+        if (!langData)
+            return;
         const title = langData.actions[action] || action;
         let content = langData.contents?.[action];
         if (!content) {
@@ -84,3 +134,4 @@ class QuizWizHelp {
     }
 }
 window.addEventListener('DOMContentLoaded', () => new QuizWizHelp());
+export {};
