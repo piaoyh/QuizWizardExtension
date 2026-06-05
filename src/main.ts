@@ -7,9 +7,10 @@
 // except according to those terms.
 ///////////////////////////////////////////////////////////////////////////////
 
+export type SupportedLang = 'ko' | 'en' | 'ru' | 'ky';
 
-import type { SupportedLang } from './i18n.js'; // type 키워드 추가
 import init, { ControlTower, NameId, ChoiceMark, QuestionData } from './pkg/qrate_wasm.js';
+
 
 type AppTheme = 'theme-blue' | 'theme-light' | 'theme-dark';
 

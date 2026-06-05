@@ -6,7 +6,7 @@
 // This file may not be copied, modified, or distributed
 // except according to those terms.
 
-import type { SupportedLang } from "./i18n.js";
+export type SupportedLang = 'ko' | 'en' | 'ru' | 'ky';
 
 type AppTheme = 'theme-blue' | 'theme-light' | 'theme-dark';
 
