@@ -3191,15 +3191,20 @@ class QuizWizApp {
             this.generate_seeds();
             const allTypes = [
                 { description: 'MS Word Document', accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] } },
-                { description: 'Text File', accept: { 'text/plain': ['.txt'] } },
-                { description: 'PDF Document', accept: { 'application/pdf': ['.pdf'] } }
+                { description: 'PDF Document', accept: { 'application/pdf': ['.pdf'] } },
+                { description: 'Text File', accept: { 'text/plain': ['.txt'] } }
             ];
+            let determined = false;
             let types = allTypes;
             if (fixedType) {
                 types = allTypes.filter(t => {
                     const extensions = Object.values(t.accept)[0];
                     return extensions.includes(`.${fixedType}`);
                 });
+                determined = true;
+            }
+            else {
+                fixedType = 'docx';
             }
             this.handle = await window.showSaveFilePicker({
                 id: 'save-exam-paper' + (fixedType ? '-' + fixedType : ''), // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
@@ -3211,25 +3216,46 @@ class QuizWizApp {
             /////////////////////////////
             // switch (this.handle.getFile().type)
             // {
-            // case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': this.doctype = '.docx';   break;
-            // case 'text/plain':          this.doctype = '.txt';   break;
-            // case 'application/pdf':     this.doctype = '.pdf';   break;
+            // case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': this.doctype = 'docx';   break;
+            // case 'text/plain':          this.doctype = 'txt';   break;
+            // case 'application/pdf':     this.doctype = 'pdf';   break;
             // }
             // alert(this.handle.getFile().type);
             console.log("시험지 저장 설정 완료 - 핸들:", this.handle, "형식:", this.doctype);
-            switch (this.doctype) {
-                case 'docx':
-                    await this.saveExamPaperAsDocx();
-                    break;
-                case 'txt':
-                    await this.saveExamPaperAsTxt();
-                    break;
-                case 'pdf':
-                    await this.saveExamPaperAsPdf();
-                    break;
-                default: {
-                    const msg = this.translations.actions['msg-unsupported-file-format'];
-                    alert(msg);
+            if (determined) {
+                // 고정된 형식이 지정된 경우, 해당 형식으로 바로 저장 실행
+                switch (fixedType) {
+                    case 'docx':
+                        await this.saveExamPaperAsDocx();
+                        break;
+                    case 'txt':
+                        await this.saveExamPaperAsTxt();
+                        break;
+                    case 'pdf':
+                        await this.saveExamPaperAsPdf();
+                        break;
+                    default: {
+                        const msg = this.translations.actions['msg-unsupported-file-format'];
+                        alert(msg);
+                    }
+                }
+            }
+            else {
+                // 사용자가 직접 파일 형식을 선택한 경우, 확장자에 따라 저장 방식 결정
+                switch (this.doctype) {
+                    case 'docx':
+                        await this.saveExamPaperAsDocx();
+                        break;
+                    case 'txt':
+                        await this.saveExamPaperAsTxt();
+                        break;
+                    case 'pdf':
+                        await this.saveExamPaperAsPdf();
+                        break;
+                    default: {
+                        const msg = this.translations.actions['msg-unsupported-file-format'];
+                        alert(msg);
+                    }
                 }
             }
         }
