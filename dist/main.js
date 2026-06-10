@@ -56,13 +56,6 @@ class QuizWizApp {
     // 대화상자에서 '예'/'아니오'를 눌렀을 때 실행할 보류 중인 작업
     qbPendingAction = null;
     slPendingAction = null;
-    // 테마 목록은 현재 언어 설정을 따름
-    themeLabels = {
-        ko: ['파란색 분위기', '밝은 분위기', '차분한 분위기'],
-        en: ['Blue Theme', 'Light Theme', 'Calm Theme'],
-        ru: ['Синяя тема', 'Светлая тема', 'Спокойная тема'],
-        ky: ['Көк тема', 'Жарык тема', 'Тынч тема']
-    };
     constructor() {
         this.container = document.getElementById('view-container');
         this.pdfMake = window.pdfMake;
@@ -683,7 +676,7 @@ class QuizWizApp {
         }
         const langData = this.translations;
         const title = langData.actions['sl-editing'] || 'Editing Student List';
-        const addBtnText = langData.actions['sl-add-student'] || "+ 학생 추가";
+        const addBtnText = langData.actions['sl-add-student'] || "+ Add Student";
         const addBtnTooltip = langData.actions['sl-add-student-tooltip'] || "";
         const selectAllText = langData.actions['sl-select-all'] || 'Select All';
         const selectAllTooltip = langData.actions['sl-select-all-tooltip'] || "";
@@ -924,13 +917,7 @@ class QuizWizApp {
                         'Please select a question bank.<br>Self-study cannot be performed without a question bank.'}
             </div>`;
         }
-        const msgs = {
-            ko: '\'시작\' 버튼을 누르시거나 메뉴에서 \'시작\'을 선택하시면 바로 모의시험이 시작됩니다.',
-            en: 'Press the \'Start\' button or select \'Start\' from the menu to begin the mock exam.',
-            ru: 'Нажмите кнопку «Старт» или выберите «Старт» в меню, чтобы начать пробный экзамен.',
-            ky: '\'Баштоо\' баскычын басыңыз же менюдан \'Баштоо\' тандап, пробный экзаменди баштаңыз.'
-        };
-        const msg = msgs[this.currentLang] || msgs.en;
+        const msg = this.translations.actions['msg-ready-to-start-self-study'] || 'Press the \'Start\' button or select \'Start\' from the menu to begin the mock exam.';
         return `<div style="padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #555;">${msg}</div>\n<textarea class="self-study-notice" readonly>${this.control_tower.get_notice()}</textarea>`;
     }
     /** 현재 인덱스의 문제를 카드 영역에 렌더링 */
@@ -1124,18 +1111,11 @@ class QuizWizApp {
         if (scopeCountLabel)
             scopeCountLabel.textContent = langData.actions['st-scope-count-label'];
         const submitMsg = document.getElementById('submit-dialog-msg');
-        if (submitMsg) {
-            const msgs = {
-                ko: "정말로 답안지를 제출하시겠습니까? 제출 후에는 수정할 수 없습니다.",
-                en: "Are you sure you want to submit your answers? You cannot edit them after submission.",
-                ru: "Вы уверены, что хотите сдать ответы? После сдачи редактирование будет невозможно.",
-                ky: "Чын эле жоопторду тапшырууну каалайсызбы? Тапшыргандан кийин аларды түзөтүү мүмкүн эмес."
-            };
-            submitMsg.textContent = msgs[this.currentLang] || msgs.en;
-        }
+        if (submitMsg)
+            submitMsg.textContent = this.translations.actions['msg-submit-answer-sheet-confirm'] || 'Are you sure you want to submit your answers? You cannot edit them after submission.';
         // 라디오 버튼 라벨 갱신 (언어)
         const fixedLangLabels = ["한국어", "English", "Русский", "Кыргызча"];
-        const currentThemeLabels = this.themeLabels[this.currentLang] || this.themeLabels.en;
+        const currentThemeLabels = this.translations.actions['theme-labels'] || ['Blue Theme', 'Light Theme', 'Calm Theme'];
         const langDialog = document.getElementById('lang-dialog');
         if (langDialog) {
             langDialog.querySelectorAll('.radio-group label').forEach((el, idx) => {
@@ -1168,18 +1148,11 @@ class QuizWizApp {
             }
         }
         // 공통 버튼 텍스트 (확인/취소)
-        const btnLabels = {
-            ko: { ok: "확인", cancel: "취소" },
-            en: { ok: "OK", cancel: "Cancel" },
-            ru: { ok: "OK", cancel: "Отмена" },
-            ky: { ok: "OK", cancel: "Жокко чыгаруу" }
-        };
-        const btnText = btnLabels[this.currentLang] || btnLabels.en;
         document.querySelectorAll('.modal-actions button').forEach(btn => {
             if (btn.id.includes('confirm'))
-                btn.textContent = btnText.ok;
+                btn.textContent = this.translations.actions['dlgbx-button-ok'] || "OK";
             if (btn.id.includes('cancel'))
-                btn.textContent = btnText.cancel;
+                btn.textContent = this.translations.actions['dlgbx-button-cancel'] || "Cancel";
         });
     }
     bindEvents() {
@@ -2684,15 +2657,10 @@ class QuizWizApp {
     }
     async performOpenQuestionBank() {
         try {
-            const descriptions = {
-                ko: 'SQLite 문제은행 데이터베이스',
-                en: 'SQLite Question Bank Database',
-                ru: 'База данных банка вопросов SQLite',
-                ky: 'SQLite суроолор банкынын маалымат базасы'
-            };
+            const descriptions = this.translations.actions['dlgbx-qb-file-type-description'] || 'SQLite Question Bank Database';
             const [handle] = await window.showOpenFilePicker({
                 types: [{
-                        description: descriptions[this.currentLang] || descriptions.en,
+                        description: descriptions,
                         accept: { 'application/x-sqlite3': ['.qbdb'] }
                     }],
                 excludeAcceptAllOption: true,
@@ -2852,16 +2820,11 @@ class QuizWizApp {
     }
     async saveAsQuestionBank() {
         try {
-            const descriptions = {
-                ko: 'SQLite 문제은행 데이터베이스',
-                en: 'SQLite Question Bank Database',
-                ru: 'База данных банка вопросов SQLite',
-                ky: 'SQLite суроолор банкынын маалымат базасы'
-            };
+            const descriptions = this.translations.actions['dlgbx-qb-file-type-description'] || 'SQLite Question Bank Database';
             const handle = await window.showSaveFilePicker({
                 suggestedName: this.question_bank_file_name || 'untitled.qbdb',
                 types: [{
-                        description: descriptions[this.currentLang] || descriptions.en,
+                        description: descriptions,
                         accept: { 'application/x-sqlite3': ['.qbdb'] }
                     }]
             });
@@ -3018,15 +2981,10 @@ class QuizWizApp {
     }
     async performOpenStudentList() {
         try {
-            const descriptions = {
-                ko: 'SQLite 학생 명단 데이터베이스',
-                en: 'SQLite Student List Database',
-                ru: 'База данных списка студентов SQLite',
-                ky: 'SQLite студенттер тизмесинин маалымат базасы'
-            };
+            const descriptions = this.translations.actions['dlgbx-sb-file-type-description'] || 'SQLite Student List Database';
             const [handle] = await window.showOpenFilePicker({
                 types: [{
-                        description: descriptions[this.currentLang] || descriptions.en,
+                        description: descriptions,
                         accept: { 'application/x-sqlite3': ['.sbdb'] }
                     }],
                 excludeAcceptAllOption: true,
@@ -3158,16 +3116,11 @@ class QuizWizApp {
     }
     async saveAsStudentList() {
         try {
-            const descriptions = {
-                ko: 'SQLite 학생 명단 데이터베이스',
-                en: 'SQLite Student List Database',
-                ru: 'База данных списка студентов SQLite',
-                ky: 'SQLite студенттер тизмесинин маалымат базасы'
-            };
+            const descriptions = this.translations.actions['dlgbx-sb-file-type-description'] || 'SQLite Student List Database';
             const handle = await window.showSaveFilePicker({
                 suggestedName: this.student_list_file_name || 'untitled.sbdb',
                 types: [{
-                        description: descriptions[this.currentLang] || descriptions.en,
+                        description: descriptions,
                         accept: { 'application/x-sqlite3': ['.sbdb'] }
                     }]
             });
@@ -3268,16 +3221,19 @@ class QuizWizApp {
         }
     }
     async saveExamPaperAsDocx() {
-        const bytes = this.control_tower.generate_exam_in_docx(this.scope_start, this.scope_end, this.scope_count, this.random_seeds);
+        const answer_sheet_title = this.translations.actions['answer-sheet-title'] || 'Answer Sheet';
+        const bytes = this.control_tower.generate_exam_in_docx(this.scope_start, this.scope_end, this.scope_count, answer_sheet_title, this.random_seeds);
         this.saveFile(bytes);
     }
     async saveExamPaperAsTxt() {
-        const bytes = this.control_tower.generate_exam_in_txt(this.scope_start, this.scope_end, this.scope_count, this.random_seeds);
+        const answer_sheet_title = this.translations.actions['answer-sheet-title'] || 'Answer Sheet';
+        const bytes = this.control_tower.generate_exam_in_txt(this.scope_start, this.scope_end, this.scope_count, answer_sheet_title, this.random_seeds);
         this.saveFile(bytes);
     }
     async saveExamPaperAsPdf() {
         try {
-            const bytes = this.control_tower.generate_exam_in_pdf(this.scope_start, this.scope_end, this.scope_count, this.random_seeds);
+            const answer_sheet_title = this.translations.actions['answer-sheet-title'] || 'Answer Sheet';
+            const bytes = this.control_tower.generate_exam_in_pdf(this.scope_start, this.scope_end, this.scope_count, answer_sheet_title, this.random_seeds);
             await this.savePdfFile(bytes);
         }
         catch (err) {
@@ -3863,9 +3819,8 @@ class QuizWizApp {
             const themeTitle = langData.actions['st-theme'] || 'Theme';
             const fontTitle = langData.actions['st-font'] || 'Font';
             const langTitle = langData.actions['st-lang'] || 'Language';
-            const theme_str = this.themeLabels[this.currentLang];
-            const fonts = { "ko": "글꼴", "en": "Fonts", "ru": "Шрифты", "ky": "Шрифттер" };
-            const font_str = fonts[this.currentLang];
+            const theme_str = this.translations.actions['theme-labels'] || ['Blue Theme', 'Light Theme', 'Calm Theme'];
+            const font_str = this.translations.actions['settings-fonts'] || 'Fonts';
             this.container.innerHTML = `
                 <div class="view-header">
                     <h2>${title}</h2>

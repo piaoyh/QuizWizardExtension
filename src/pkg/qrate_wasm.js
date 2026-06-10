@@ -198,6 +198,7 @@ export class ControlTower {
      * * `end` - The ending group number for the exam generation.
      * * `number_of_questions` - The number of questions to select
      *   for each student.
+     * * `answer_sheet_title` - The title to be used for the answer sheet in the generated exam.
      * * `seeds` - A seed array, each element of which is of u64.
      *
      * # Returns
@@ -209,7 +210,7 @@ export class ControlTower {
      * ```
      * use qrate_wasm::ControlTower;
      * let control_tower = ControlTower::new();
-     * if let Ok(exam_data) = control_tower.generate_exam_in_docx(1, 5, 10)
+     * if let Ok(exam_data) = control_tower.generate_exam_in_docx(1, 5, 10, "Answer Sheet".to_string(), &[0u64; 16])
      *     { println!("Exam generated successfully, size: {}", exam_data.len()); }
      * else
      *     { println!("Failed to generate exam: QBank or SBank not loaded"); }
@@ -217,19 +218,22 @@ export class ControlTower {
      * @param {number} start
      * @param {number} end
      * @param {number} number_of_questions
+     * @param {string} answer_sheet_title
      * @param {BigUint64Array} seeds
      * @returns {Uint8Array}
      */
-    generate_exam_in_docx(start, end, number_of_questions, seeds) {
-        const ptr0 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
+    generate_exam_in_docx(start, end, number_of_questions, answer_sheet_title, seeds) {
+        const ptr0 = passStringToWasm0(answer_sheet_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.controltower_generate_exam_in_docx(this.__wbg_ptr, start, end, number_of_questions, ptr0, len0);
+        const ptr1 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_generate_exam_in_docx(this.__wbg_ptr, start, end, number_of_questions, ptr0, len0, ptr1, len1);
         if (ret[3]) {
             throw takeFromExternrefTable0(ret[2]);
         }
-        var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
         wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-        return v2;
+        return v3;
     }
     /**
      * Generates a shuffled exam in PDF format based on the questions
@@ -247,6 +251,7 @@ export class ControlTower {
      * * `end` - The ending group number for the exam generation.
      * * `number_of_questions` - The number of questions to select
      *   for each student.
+     * * `answer_sheet_title` - The title to be used for the answer sheet in the generated exam.
      * * `seeds` - A seed array, each element of which is of u64.
      *
      * # Returns
@@ -258,7 +263,7 @@ export class ControlTower {
      * ```
      * use qrate_wasm::ControlTower;
      * let control_tower = ControlTower::new();
-     * if let Ok(exam_data) = control_tower.generate_exam_in_pdf(1, 5, 10)
+     * if let Ok(exam_data) = control_tower.generate_exam_in_pdf(1, 5, 10, "Answer Sheet".to_string(), &[0u64; 16])
      *     { println!("Exam generated successfully, size: {}", exam_data.len()); }
      * else
      *     { println!("Failed to generate exam: QBank or SBank not loaded"); }
@@ -266,19 +271,22 @@ export class ControlTower {
      * @param {number} start
      * @param {number} end
      * @param {number} number_of_questions
+     * @param {string} answer_sheet_title
      * @param {BigUint64Array} seeds
      * @returns {Uint8Array}
      */
-    generate_exam_in_pdf(start, end, number_of_questions, seeds) {
-        const ptr0 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
+    generate_exam_in_pdf(start, end, number_of_questions, answer_sheet_title, seeds) {
+        const ptr0 = passStringToWasm0(answer_sheet_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.controltower_generate_exam_in_pdf(this.__wbg_ptr, start, end, number_of_questions, ptr0, len0);
+        const ptr1 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_generate_exam_in_pdf(this.__wbg_ptr, start, end, number_of_questions, ptr0, len0, ptr1, len1);
         if (ret[3]) {
             throw takeFromExternrefTable0(ret[2]);
         }
-        var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
         wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-        return v2;
+        return v3;
     }
     /**
      * Generates a shuffled exam in plain text format based on the questions
@@ -315,16 +323,19 @@ export class ControlTower {
      * @param {number} start
      * @param {number} end
      * @param {number} selected
+     * @param {string} answer_sheet_title
      * @param {BigUint64Array} seeds
      * @returns {Uint8Array}
      */
-    generate_exam_in_txt(start, end, selected, seeds) {
-        const ptr0 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
+    generate_exam_in_txt(start, end, selected, answer_sheet_title, seeds) {
+        const ptr0 = passStringToWasm0(answer_sheet_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.controltower_generate_exam_in_txt(this.__wbg_ptr, start, end, selected, ptr0, len0);
-        var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        const ptr1 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_generate_exam_in_txt(this.__wbg_ptr, start, end, selected, ptr0, len0, ptr1, len1);
+        var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
         wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-        return v2;
+        return v3;
     }
     /**
      * Retrieves the category number for a given question number from the QBank.
@@ -1699,6 +1710,7 @@ export class ControlTower {
      *
      * # Returns
      * - `true` if the self-study session is started successfully.
+     * - `false` if the QBank is not loaded.
      * @param {number} start
      * @param {number} end
      * @param {number} number_of_questions
