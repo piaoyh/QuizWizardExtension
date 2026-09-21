@@ -202,7 +202,7 @@
         "msg-confirm-delete-content-question": "This question has content. Are you sure you want to delete it?",
         "msg-invalid-version-error": "The file is from a newer version. Please update this app to the latest version.",
         "msg-file-open-error": "An error occurred while opening the file: {error}",
-        "msg-file-save-error": "An error occurred during saving: {error}",
+        "msg-file-save-error": "An error occurred during saving. Did you edit the header?: {error}",
         "msg-unsupported-file-format": "Unsupported file format.",
         "msg-file-save-success": "The file has been saved successfully.",
         "msg-ready-to-start-self-study": "Press the 'Start' button or select 'Start' from the menu to begin the mock exam.",

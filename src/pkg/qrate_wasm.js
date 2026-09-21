@@ -112,6 +112,20 @@ export class ControlTower {
     }
     /**
      * Clears all database and bank data.
+     * This method resets the `question_db` and `student_db` fields to `AbstractDB::None`,
+     * and sets the `qbank`, `sbank`, and `self_study` fields to `None`.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let mut control_tower = ControlTower::new();
+     * control_tower.clear_all();
+     * assert!(control_tower.question_db.is_none());
+     * assert!(control_tower.student_db.is_none());
+     * assert!(control_tower.qbank.is_none());
+     * assert!(control_tower.sbank.is_none());
+     * assert!(control_tower.self_study.is_none());
+     * ```
      */
     clear_all() {
         wasm.controltower_clear_all(this.__wbg_ptr);
@@ -204,7 +218,7 @@ export class ControlTower {
      * # Returns
      * - A `Result` containing a byte vector with the generated exam
      *   in DOCX format if the QBank and SBank are loaded.
-     * - `ErrorMessage::FailedToGenerateExam` if the QBank or SBank is not loaded.
+     * - `ErrorMessageForWASM::FailedToGenerateExam` if the QBank or SBank is not loaded.
      *
      * # Examples
      * ```
@@ -257,7 +271,7 @@ export class ControlTower {
      * # Returns
      * - A `Result` containing a byte vector with the generated exam
      *   in PDF format if the QBank and SBank are loaded.
-     * - `ErrorMessage::FailedToGenerateExam` if the QBank or SBank is not loaded.
+     * - `ErrorMessageForWASM::FailedToGenerateExam` if the QBank or SBank is not loaded.
      *
      * # Examples
      * ```
@@ -303,6 +317,7 @@ export class ControlTower {
      * * `start` - The starting group number for the exam generation.
      * * `end` - The ending group number for the exam generation.
      * * `selected` - The number of questions to select for each student.
+     * * `answer_sheet_title` - The title to be used for the answer sheet in the generated exam.
      * * `seeds` - A seed array, each element of which is of u64.
      *
      * # Returns
@@ -314,7 +329,7 @@ export class ControlTower {
      * ```
      * use qrate_wasm::ControlTower;
      * let control_tower = ControlTower::new();
-     * let exam_data = control_tower.generate_exam_in_txt(1, 5, 10);
+     * let exam_data = control_tower.generate_exam_in_txt(1, 5, 10, "Answer Sheet".to_string(), &[0u64; 16]);
      * if exam_data.is_empty()
      *     { println!("Failed to generate exam: QBank or SBank not loaded"); }
      * else
@@ -1452,7 +1467,7 @@ export class ControlTower {
      *
      * # Returns
      * - `Ok(())` on success
-     * - `Err(ErrorMessage)` describing the failure on error.
+     * - `Err(ErrorMessageForWASM)` describing the failure on error.
      *
      * # Examples
      * ```
@@ -1526,7 +1541,7 @@ export class ControlTower {
      *
      * # Returns
      * - `Ok(())` on success
-     * - `Err(ErrorMessage)` describing the failure on error.
+     * - `Err(ErrorMessageForWASM)` describing the failure on error.
      *
      * # Examples
      * ```
@@ -1732,7 +1747,7 @@ export class ControlTower {
      *
      * # Returns
      * - `Ok(Vec<u8>)` containing the SQLite database data on success
-     * - `Err(ErrorMessage)` describing the failure on error.
+     * - `Err(ErrorMessageForWASM)` describing the failure on error.
      *
      * # Examples
      * ```
@@ -1764,7 +1779,7 @@ export class ControlTower {
      *
      * # Returns
      * - `Ok(Vec<u8>)` containing the SQLite database data on success
-     * - `Err(ErrorMessage)` describing the failure on error.
+     * - `Err(ErrorMessageForWASM)` describing the failure on error.
      *
      * # Examples
      * ```
@@ -1793,52 +1808,144 @@ if (Symbol.dispose) ControlTower.prototype[Symbol.dispose] = ControlTower.protot
 /**
  * An enumeration of error messages that can occur in the Qrate application.
  * This enum is designed to be used in a WebAssembly context, allowing it to
- * be easily manipulated from JavaScript. Each variant represents a specific
+ * be easily manipulated from TypeScript/JavaScript. Each variant represents a specific
  * error that may occur during the execution of the application, such as
  * issues with opening files, receiving data from memory,
- * @enum {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}
+ * @enum {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32}
  */
-export const ErrorMessage = Object.freeze({
+export const ErrorMessageForWASM = Object.freeze({
     /**
-     * Represents an error where the version of the application is invalid.
+     * Represents an error where the version of the data is invalid or incompatible.
      */
     InvalidVersion: 0, "0": "InvalidVersion",
     /**
-     * Represents an error where the application failed to open a question bank file.
+     * Represents an error where the question bank is empty.
      */
-    FailedToOpenQBank: 1, "1": "FailedToOpenQBank",
+    EmptyQBank: 1, "1": "EmptyQBank",
     /**
-     * Represents an error where the application failed to open a student bank file.
+     * Represents an error where the student bank is empty.
      */
-    FailedToOpenSBank: 2, "2": "FailedToOpenSBank",
+    EmptySBank: 2, "2": "EmptySBank",
     /**
-     * Represents an error where the application failed to open a question Excel file.
+     * Represents an error where the database cannot be opened in memory.
      */
-    FailedToOpenQExcel: 3, "3": "FailedToOpenQExcel",
+    FailedToOpenEmptyDatabaseInMemory: 3, "3": "FailedToOpenEmptyDatabaseInMemory",
     /**
-     * Represents an error where the application failed to open a student Excel file.
+     * Represents an error where the database cannot be opened.
      */
-    FailedToOpenSExcel: 4, "4": "FailedToOpenSExcel",
+    FailedToOpenDatabase: 4, "4": "FailedToOpenDatabase",
     /**
-     * Represents an error where the application failed to receive a question bank from memory.
+     * Represents an error where the database cannot be written.
      */
-    FailedToReceiveQBankFromMemory: 5, "5": "FailedToReceiveQBankFromMemory",
+    FailedToWriteDatabase: 5, "5": "FailedToWriteDatabase",
     /**
-     * Represents an error where the application failed to receive a student bank from memory.
+     * Represents an error where the table for the database cannot be written.
      */
-    FailedToReceiveSBankFromMemory: 6, "6": "FailedToReceiveSBankFromMemory",
+    FailedToMakeTableForDatabase: 6, "6": "FailedToMakeTableForDatabase",
     /**
-     * Represents an error where the application failed to write a question bank to memory.
+     * Represents an error where the database cannot be opened in memory.
      */
-    FailedToWriteQBankToMemory: 7, "7": "FailedToWriteQBankToMemory",
+    FailedToOpenDatabaseInMemory: 7, "7": "FailedToOpenDatabaseInMemory",
     /**
-     * Represents an error where the application failed to write a student bank to memory.
+     * Represents an error where the database cannot be received from memory.
      */
-    FailedToWriteSBankToMemory: 8, "8": "FailedToWriteSBankToMemory",
+    FailedToReceiveDatabaseFromMemory: 8, "8": "FailedToReceiveDatabaseFromMemory",
     /**
-     * Represents an error where the application failed to generate an exam.
+     * Represents an error where the database cannot be written to memory.
      */
-    FailedToGenerateExam: 9, "9": "FailedToGenerateExam",
+    FailedToWriteDatabaseToMemory: 9, "9": "FailedToWriteDatabaseToMemory",
+    /**
+     * Represents an error where the database cannot be closed.
+     */
+    FailedToCloseDatabase: 10, "10": "FailedToCloseDatabase",
+    /**
+     * Represents an error where the database cannot be vacuumed.
+     */
+    FailedToVacuumDatabase: 11, "11": "FailedToVacuumDatabase",
+    /**
+     * Represents an error where the database cannot be opened.
+     */
+    FailedToOpenEmptyQBankInMemory: 12, "12": "FailedToOpenEmptyQBankInMemory",
+    /**
+     * Represents an error where the data format `QBank` is invalid or cannot be parsed.
+     */
+    FailedToOpenQBank: 13, "13": "FailedToOpenQBank",
+    /**
+     * Represents an error where the header for `QBank` cannot be read.
+     */
+    FailedToReadHeaderForQBank: 14, "14": "FailedToReadHeaderForQBank",
+    /**
+     * Represents an error where the `QBank` cannot be written to the database.
+     */
+    FailedToWriteQBank: 15, "15": "FailedToWriteQBank",
+    /**
+     * Represents an error where the header for `QBank` cannot be written.
+     */
+    FailedToWriteHeaderForQBank: 16, "16": "FailedToWriteHeaderForQBank",
+    /**
+     * Represents an error where the table for `QBank` cannot be written to the database.
+     */
+    FailedToMakeTableForQBank: 17, "17": "FailedToMakeTableForQBank",
+    /**
+     * Represents an error where the header for `QBank` cannot be created.
+     */
+    FailedToCreateHeaderForQBank: 18, "18": "FailedToCreateHeaderForQBank",
+    /**
+     * Represents an error where the data format `SBank` is invalid or cannot be parsed.
+     */
+    FailedToOpenSBank: 19, "19": "FailedToOpenSBank",
+    /**
+     * Represents an error where the header for `SBank` cannot be read.
+     */
+    FailedToReadHeaderForSBank: 20, "20": "FailedToReadHeaderForSBank",
+    /**
+     * Represents an error where the `SBank` cannot be written to the database.
+     */
+    FailedToWriteSBank: 21, "21": "FailedToWriteSBank",
+    /**
+     * Represents an error where the table for `SBank` cannot be written to the database.
+     */
+    FailedToMakeTableForSBank: 22, "22": "FailedToMakeTableForSBank",
+    /**
+     * Represents an error where the header for `SBank` cannot be created.
+     */
+    FailedToCreateHeaderForSBank: 23, "23": "FailedToCreateHeaderForSBank",
+    /**
+     * Represents an error where the Excel file for `QBank` cannot be opened or read.
+     */
+    FailedToOpenQExcel: 24, "24": "FailedToOpenQExcel",
+    /**
+     * Represents an error where the `QBank` cannot be written to the Excel file.
+     */
+    FailedToWriteQExcel: 25, "25": "FailedToWriteQExcel",
+    /**
+     * Represents an error where the Excel file for `SBank` cannot be opened or read.
+     */
+    FailedToOpenSExcel: 26, "26": "FailedToOpenSExcel",
+    /**
+     * Represents an error where the `SBank` cannot be written to the Excel file.
+     */
+    FailedToWriteSExcel: 27, "27": "FailedToWriteSExcel",
+    /**
+     * Represents an error where the `QBank` cannot be received from memory.
+     */
+    FailedToReceiveQBankFromMemory: 28, "28": "FailedToReceiveQBankFromMemory",
+    /**
+     * Represents an error where the `QBank` cannot be written to memory.
+     */
+    FailedToWriteQBankToMemory: 29, "29": "FailedToWriteQBankToMemory",
+    /**
+     * Represents an error where the `SBank` cannot be received from memory.
+     */
+    FailedToReceiveSBankFromMemory: 30, "30": "FailedToReceiveSBankFromMemory",
+    /**
+     * Represents an error where the `SBank` cannot be written to memory.
+     */
+    FailedToWriteSBankToMemory: 31, "31": "FailedToWriteSBankToMemory",
+    /**
+     * Represents an error where the exam cannot be generated.
+     */
+    FailedToGenerateExam: 32, "32": "FailedToGenerateExam",
 });
 
 /**

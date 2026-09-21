@@ -3,8 +3,8 @@
   "description": "__MSG_appDesc__",
   "default_locale": "en",
   "manifest_version": 3,
-  "version": "1.0.2",
-  "permissions": ["storage", "tabs"],
+  "version": "1.0.3",
+  "permissions": ["storage", "tabs", "unlimitedStorage"],
   "background": {
     "service_worker": "background.js",
     "type": "module"

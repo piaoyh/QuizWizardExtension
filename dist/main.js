@@ -81,7 +81,7 @@ class QuizWizApp {
             }
         }
     }
-    async loadDefalutTranslations() {
+    async loadDefaultTranslations() {
         try {
             const response = await fetch(`./_locales/en/app.json`);
             if (!response.ok)
@@ -123,7 +123,7 @@ class QuizWizApp {
         this.currentLang = lang;
         // 다국어 데이터 로드
         await this.loadTranslations(this.currentLang);
-        await this.loadDefalutTranslations();
+        await this.loadDefaultTranslations();
         let savedTheme = data.theme;
         this.currentTheme = savedTheme || 'theme-blue';
         this.currentFont = data.font || '"Segoe UI", sans-serif';
@@ -2729,18 +2729,6 @@ class QuizWizApp {
         const correctAnswers = document.getElementById('stat-correct-answers');
         if (dialog && dialogTitle && summary && categories && correctAnswers) {
             dialogTitle.textContent = langData.actions['stat-dialog-title'] || defaultLangData.actions['stat-dialog-title'];
-            // 중복 없는 그룹 번호 개수 계산
-            const groups = new Set();
-            if (this.questionsData) {
-                this.questionsData.forEach(q => {
-                    if (q && q.group && typeof q.group === 'string') {
-                        const trimmed = q.group.trim();
-                        if (trimmed !== '')
-                            groups.add(trimmed);
-                    }
-                });
-            }
-            // const groupCount = groups.size;
             const totalQuestionsText = (langData.actions['stat-total-questions'] || defaultLangData.actions['stat-total-questions']).replace('{n}', total.toString());
             const totalGroupsText = (langData.actions['stat-total-groups'] || defaultLangData.actions['stat-total-groups']).replace('{n}', groupCount.toString());
             summary.innerHTML = `<div>${totalQuestionsText}</div><div>${totalGroupsText}</div>`;
@@ -3774,9 +3762,9 @@ class QuizWizApp {
             this.initializeSelfStudyWorkspace();
             return;
         }
+        const langData = this.translations;
+        const defaultLangData = this.default_translations;
         if (menu === 'settings') {
-            const langData = this.translations;
-            const defaultLangData = this.default_translations;
             const title = langData.menus['settings'] || defaultLangData.menus['settings'];
             const themeTitle = langData.actions['st-theme'] || defaultLangData.actions['st-theme'];
             const fontTitle = langData.actions['st-font'] || defaultLangData.actions['st-font'];
@@ -3858,8 +3846,6 @@ class QuizWizApp {
         if (menu === 'information') {
             if (!this.container)
                 return;
-            const langData = this.translations;
-            const defaultLangData = this.default_translations;
             const title = langData.menus['information'] || defaultLangData.menus['information'];
             let content = langData.contents?.["in-manual"];
             if (!content) {
@@ -3869,23 +3855,21 @@ class QuizWizApp {
             // 도움말 내용 템플릿
             this.container.innerHTML = `
             <div class="view-header">
-            <h2>${title}</h2>
+                <h2>${title}</h2>
             </div>
             <div class="view-content" style="padding: 20px; line-height: 1.6; overflow-y: auto; max-height: calc(100vh - 100px);">
-            ${content}
+                ${content}
             </div>
             `;
             return;
         }
-        const langData = this.translations;
-        const defaultLangData = this.default_translations;
         const title = langData.menus[menu] || defaultLangData.menus[menu];
         this.container.innerHTML = `
         <div class="view-header">
-        <h2>${title}</h2>
+            <h2>${title}</h2>
         </div>
         <div class="view-content">
-        <p>${title} 섹션입니다. 하위 메뉴를 통해 기능을 선택하세요.</p>
+            <p>${title} 섹션입니다. 하위 메뉴를 통해 기능을 선택하세요.</p>
         </div>
         `;
     }

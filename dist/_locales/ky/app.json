@@ -196,7 +196,7 @@
         "msg-file-open-error": "Ачуу катасы: {error}",
         "msg-file-save-error": "Сактоо катасы: {error}",
         "msg-unsupported-file-format": "Формат туура эмес.",
-        "msg-file-save-success": "Ийгиликтүү сакталды.",
+        "msg-file-save-success": "Ийгиликтүү сакталды. Башкы кабарды оңдодуңузбу?",
         "msg-ready-to-start-self-study": "'Баштоо' баскычын басыңыз же менюдан 'Баштоо' тандап, пробный экзаменди баштаңыз.",
         "msg-submit-answer-sheet-confirm": "Чын эле жоопторду тапшырууну каалайсызбы? Тапшыргандан кийин аларды түзөтүү мүмкүн эмес.",
         "msg-warning-to-select-question-bank-for-self-study": "Суроолор банкысын тандаңыз.<br>Суроолор банкысы жок өз алдынча окууну аткаруу мүмкүн эмес."

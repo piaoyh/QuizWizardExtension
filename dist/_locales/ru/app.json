@@ -202,7 +202,7 @@
         "msg-confirm-delete-content-question": "Уверены, что хотите удалить?",
         "msg-invalid-version-error": "Файл создан в более новой версии. Пожалуйста, обновите это приложение до последней версии.",
         "msg-file-open-error": "Ошибка при открытии: {error}",
-        "msg-file-save-error": "Ошибка при сохранении: {error}",
+        "msg-file-save-error": "Ошибка при сохранении. Вы отредактировали заголовок?: {error}",
         "msg-unsupported-file-format": "Неподдерживаемый формат.",
         "msg-file-save-success": "Файл успешно сохранен.",
         "msg-ready-to-start-self-study": "Нажмите кнопку «Старт» или выберите «Старт» в меню, чтобы начать пробный экзамен.",
