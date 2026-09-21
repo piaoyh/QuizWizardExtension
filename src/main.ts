@@ -59,7 +59,7 @@ class QuizWizApp {
     private scope_start: number = 1;
     private scope_end: number = 0;
     private scope_count: number = 0;
-// [추가] 선택된 문제은행 파일의 경로를 저장할 필드
+    // [추가] 선택된 문제은행 파일의 경로를 저장할 필드
     private question_bank_file_name: string = '';
     private question_bank_file_handle: any = null; // [추가] 문제은행 파일 핸들 저장
     private student_list_file_name: string = '';
