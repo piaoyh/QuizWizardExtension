@@ -1540,8 +1540,11 @@ export class ControlTower {
      *   for the student bank
      *
      * # Returns
-     * - `Ok(())` on success
-     * - `Err(ErrorMessageForWASM)` describing the failure on error.
+     * * `Ok(())` on success,
+     * * `Err(ErrorMessageForWASM::InvalidVersion)` when SBank is
+     *   higher version,
+     * * `Err(ErrorMessageForWASM::FailedToReceiveSBankFromMemory)` when faild
+     *   in reading from memory.
      *
      * # Examples
      * ```
@@ -1747,7 +1750,7 @@ export class ControlTower {
      *
      * # Returns
      * - `Ok(Vec<u8>)` containing the SQLite database data on success
-     * - `Err(ErrorMessageForWASM)` describing the failure on error.
+     * - `Err(ErrorMessageForWASM::FailedToWriteQBankToMemory)` describing the failure on error.
      *
      * # Examples
      * ```
@@ -1778,8 +1781,9 @@ export class ControlTower {
      * and then saves the database to a byte vector.
      *
      * # Returns
-     * - `Ok(Vec<u8>)` containing the SQLite database data on success
-     * - `Err(ErrorMessageForWASM)` describing the failure on error.
+     * * `Ok(Vec<u8>)` containing the SQLite database data on success
+     * * `Err(ErrorMessageForWASM::FailedToWriteSBankToMemory)` describing
+     *   the failure on error.
      *
      * # Examples
      * ```

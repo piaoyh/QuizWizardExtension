@@ -644,7 +644,11 @@ class QuizWizApp {
             this.scope_end = parseInt(endInput.value) || this.questionsData.length;
             this.scope_count = parseInt(countInput.value) || 0;
             dialog.close();
-            this.initializeExamSettingWorkspace();
+            if (this.currentMenu === 'self-study') {
+                this.initializeSelfStudyWorkspace();
+            } else {
+                this.initializeExamSettingWorkspace();
+            }
         });
 
         cancelBtn.addEventListener('click', () => {
@@ -1117,11 +1121,9 @@ class QuizWizApp {
         const sidebar = document.getElementById('ss-sidebar');
         if (!sidebar || !this.control_tower) return;
 
-        // 학습 세션이 시작되었으면 세션 문항 수를, 아니면 문제은행 문항 수를 가져옴
-        let totalQuestions = this.control_tower.get_self_study_number_of_questions();
-        if (totalQuestions === 0) {
-            totalQuestions = this.questionsData.length;
-        }
+        // 학습 세션이 시작되었으면 출제된 문항 수를 가져옴
+        const totalQuestions = this.control_tower.get_self_study_number_of_questions();
+        if (totalQuestions === 0) return;
 
         const isLoaded = this.question_bank_file_handle !== null;
         const btnDisabled = isLoaded ? '' : 'disabled';
@@ -1181,6 +1183,7 @@ class QuizWizApp {
                 this.currentQuestionIndex = targetIdx;
                 this.renderSelfStudyQuestion(qdata);
                 this.renderSidebarButtons();
+                this.updateNavButtonsVisibility();
             }
         }
     }
@@ -1201,6 +1204,7 @@ class QuizWizApp {
                 this.currentQuestionIndex = targetIdx;
                 this.renderSelfStudyQuestion(qdata);
                 this.renderSidebarButtons();
+                this.updateNavButtonsVisibility();
             }
         }
     }
@@ -1218,6 +1222,7 @@ class QuizWizApp {
             this.currentQuestionIndex = index;
             this.renderSelfStudyQuestion(qdata);
             this.renderSidebarButtons();
+            this.updateNavButtonsVisibility();
         }
     }
 
@@ -1264,7 +1269,7 @@ class QuizWizApp {
         }
         
         if (nextBtn) {
-            nextBtn.style.visibility = this.currentQuestionIndex === totalQuestions - 1 ? 'hidden' : 'visible';
+            nextBtn.style.visibility = this.currentQuestionIndex >= totalQuestions - 1 ? 'hidden' : 'visible';
         }
     }
 
@@ -4062,12 +4067,20 @@ class QuizWizApp {
     {
         const dialog = document.getElementById('in-info-soft-dialog') as HTMLDialogElement;
         const titleEl = document.getElementById('in-info-soft-title');
+        const versionEl = document.getElementById('in-info-soft-version');
 
         if (!dialog || !titleEl)
             { return; }
 
         const langData = this.translations;
         titleEl.textContent = langData.actions['in-info-soft'];
+
+        if (versionEl) {
+            const version = typeof chrome !== 'undefined' && chrome.runtime?.getManifest ? chrome.runtime.getManifest()?.version : undefined;
+            if (version) {
+                versionEl.textContent = `QuizWiz ver. ${version}`;
+            }
+        }
 
         dialog.showModal();
     }
