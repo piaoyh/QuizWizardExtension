@@ -153,6 +153,7 @@
         "st-scope-guide": "Please set the range and the number of questions.",
         "st-scope-count-label": "Questions:",
         "st-scope-count-max": "(Max {n})",
+        "st-scope-strict": "Issue the same questions to all students, differing only in question and choice order.",
         "st-scope-title": "Scope Setting",
         "in-help": "Help",
         "in-info-soft": "Software Info",

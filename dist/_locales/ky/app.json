@@ -149,6 +149,7 @@
         "st-scope-guide": "Суроолордун санын белгилеңиз.",
         "st-scope-count-label": "Суроолор саны:",
         "st-scope-count-max": "(Максимум {n})",
+        "st-scope-strict": "Бардык студенттерге бирдей суроолор берилет, болгону суроолордун жана варианттардын тартиби гана айырмаланат.",
         "st-scope-title": "Диапазонду орнотуу",
         "in-info-copy-text": "Автордук укук 2026.\nПАК Ёңхо.\nБардык укуктар корголгон.",
         "in-info-license-text": "Бул программалык камсыздоо\nApache 2.0 лицензиясынын (же https://www.apache.org/licenses/LICENSE-2.0)\nже MIT лицензиясынын (же https://opensource.org/licenses/MIT)\nшарттарына ылайык таркатылат.",

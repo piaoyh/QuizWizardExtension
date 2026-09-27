@@ -157,6 +157,7 @@
         "st-scope-guide": "Установите диапазон и количество вопросов.",
         "st-scope-count-label": "Вопросы:",
         "st-scope-count-max": "(Макс {n})",
+        "st-scope-strict": "Задавать всем студентам одинаковые вопросы, различая только порядок вопросов и вариантов ответов.",
         "st-scope-title": "Настройка диапазона",
         "in-info-copy-text": "Авторские права 2026.\nПАК Ёнхо.\nВсе права защищены.",
         "in-info-license-text": "Это программное обеспечение распространяется на условиях лицензии\nApache 2.0 (или https://www.apache.org/licenses/LICENSE-2.0)\nили лицензии MIT (или https://opensource.org/licenses/MIT).",

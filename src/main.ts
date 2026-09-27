@@ -59,6 +59,8 @@ class QuizWizApp {
     private scope_start: number = 1;
     private scope_end: number = 0;
     private scope_count: number = 0;
+    private scope_strict: boolean = false;
+
     // [추가] 선택된 문제은행 파일의 경로를 저장할 필드
     private question_bank_file_name: string = '';
     private question_bank_file_handle: any = null; // [추가] 문제은행 파일 핸들 저장
@@ -572,6 +574,7 @@ class QuizWizApp {
         const startInput = document.getElementById('scope-start') as HTMLInputElement;
         const endInput = document.getElementById('scope-end') as HTMLInputElement;
         const countInput = document.getElementById('scope-count') as HTMLInputElement;
+        const strictInput = document.getElementById('scope-strict') as HTMLInputElement;
 
         if (!dialog || !confirmBtn || !cancelBtn || !startInput || !endInput || !countInput) return;
 
@@ -643,6 +646,9 @@ class QuizWizApp {
             this.scope_start = parseInt(startInput.value) || 1;
             this.scope_end = parseInt(endInput.value) || this.questionsData.length;
             this.scope_count = parseInt(countInput.value) || 0;
+            if (strictInput) {
+                this.scope_strict = strictInput.checked;
+            }
             dialog.close();
             if (this.currentMenu === 'self-study') {
                 this.initializeSelfStudyWorkspace();
@@ -664,12 +670,16 @@ class QuizWizApp {
         const startInput = document.getElementById('scope-start') as HTMLInputElement;
         const endInput = document.getElementById('scope-end') as HTMLInputElement;
         const countInput = document.getElementById('scope-count') as HTMLInputElement;
+        const strictInput = document.getElementById('scope-strict') as HTMLInputElement;
 
         if (!startInput || !endInput || !countInput) return;
 
         // 초기값 설정 (현재 설정값 또는 기본값)
         startInput.value = this.scope_start.toString();
         endInput.value = (this.scope_end || this.questionsData.length).toString();
+        if (strictInput) {
+            strictInput.checked = this.scope_strict;
+        }
 
         // 중복 없는 그룹 번호 개수 계산하여 초기 문항 수 설정
         const start = parseInt(startInput.value);
@@ -1306,6 +1316,9 @@ class QuizWizApp {
         const scopeCountLabel = document.getElementById('scope-count-label');
         if (scopeCountLabel) scopeCountLabel.textContent = langData.actions['st-scope-count-label'] || defaultLangData.actions['st-scope-count-label'];
 
+        const scopeStrictLabel = document.getElementById('scope-strict-label');
+        if (scopeStrictLabel) scopeStrictLabel.textContent = langData.actions['st-scope-strict'] || defaultLangData.actions['st-scope-strict'];
+
         const submitMsg = document.getElementById('submit-dialog-msg');
         if (submitMsg)
             submitMsg.textContent = langData.actions['msg-submit-answer-sheet-confirm'] || defaultLangData.actions['msg-submit-answer-sheet-confirm'];
@@ -1708,16 +1721,19 @@ class QuizWizApp {
         if (!this.container)
             { return; }
         
-        // [수정] skipSave가 아닐 때만 현재 데이터를 저장합니다.
+        // [수정] skipSave가 아니면서 forceReset이 아닐 때만 현재 데이터를 저장합니다.
         // addNewQuestion 등에서 데이터를 수동으로 조작한 후에는 저장하지 않아야 합니다.
-        if (this.currentMenu === 'question-bank' && !forceReset && !skipSave)
-            { this.saveCurrentQuestionsToState(); }
-        else if (this.currentMenu === 'header-edit' && !skipSave)
-            { this.saveCurrentHeaderToState(); }
-        else if (this.currentMenu === 'student-list' && !skipSave)
-            { this.saveCurrentStudentsToState(); }
-        else if (this.currentMenu === 'self-study' && !skipSave)
-            { this.saveStudyState(); }
+        if (!forceReset && !skipSave)
+        {
+            if (this.currentMenu === 'question-bank')
+                { this.saveCurrentQuestionsToState(); }
+            else if (this.currentMenu === 'header-edit')
+                { this.saveCurrentHeaderToState(); }
+            else if (this.currentMenu === 'student-list')
+                { this.saveCurrentStudentsToState(); }
+            else if (this.currentMenu === 'self-study')
+                { this.saveStudyState(); }
+        }
 
         this.currentMenu = 'question-bank';
         
@@ -1731,8 +1747,16 @@ class QuizWizApp {
             }));
             this.question_bank_file_name = ''; // 새 파일이므로 이름 초기화
             
+            // 헤더 및 문제은행 데이터 초기화를 위해 WASM QBank를 비움
+            if (this.control_tower) {
+                this.control_tower.clear_qbank();
+            }
+
             // [추가] 초기화 시 WASM 엔진에도 빈 구조를 생성하여 헤더 편집 등이 가능하게 함
             this.syncQuestionsToWasm();
+
+            // 헤더 편집 데이터 초기화
+            this.resetHeaderData();
         }
         else if (this.questionsData.length === 0)
         {
@@ -2247,6 +2271,16 @@ class QuizWizApp {
         }
     }
 
+    /** 헤더 편집 작업공간 데이터(제목, 이름, ID, 주의사항, 채점 방식)를 초기화합니다. */
+    private resetHeaderData() {
+        this.header_scoring_rules = 'no-negative-marking-no-partial-credit';
+        if (this.control_tower) {
+            this.control_tower.set_title('');
+            this.control_tower.set_name('');
+            this.control_tower.set_id('');
+            this.control_tower.set_notice('');
+        }
+    }
 
     /** 에디터 모드를 전환합니다 (문제 편집 <=> 선택지 편집) */
     private toggleEditorMode() {
@@ -2937,8 +2971,10 @@ class QuizWizApp {
         this.scope_start = 1;
         this.scope_end = 0;
         this.scope_count = 0;
+        this.scope_strict = false;
         this.isDirtyQB = false;
         this.isStudyStarted = false; // [추가] 자기주도학습 상태 초기화
+        this.resetHeaderData();
         this.initializeQuestionBankWorkspace(true);
         this.updateMenuActivation();
     }
@@ -3018,6 +3054,7 @@ class QuizWizApp {
         // 중복 없는 그룹 수를 계산하여 기본 문항 수로 설정 (WASM 생성기 요구사항 충족)
         const groups = new Set(this.questionsData.map(q => q.group).filter(g => g.trim() !== ''));
         this.scope_count = groups.size;
+        this.scope_strict = false;
 
         // [추가] 자기주도학습 상태 초기화
         this.isStudyStarted = false;
@@ -3598,14 +3635,14 @@ class QuizWizApp {
     private async saveExamPaperAsDocx()
     {
         const answer_sheet_title = this.translations.actions['answer-sheet-title'] || 'Answer Sheet';
-        const bytes = this.control_tower.generate_exam_in_docx(this.scope_start, this.scope_end, this.scope_count, answer_sheet_title, this.random_seeds);
+        const bytes = this.control_tower.generate_exam_in_docx(this.scope_start, this.scope_end, this.scope_count, this.scope_strict, answer_sheet_title, this.random_seeds);
         this.saveFile(bytes);
     }
 
     private async saveExamPaperAsTxt()
     {
         const answer_sheet_title = this.translations.actions['answer-sheet-title'] || 'Answer Sheet';
-        const bytes = this.control_tower.generate_exam_in_txt(this.scope_start, this.scope_end, this.scope_count, answer_sheet_title, this.random_seeds);
+        const bytes = this.control_tower.generate_exam_in_txt(this.scope_start, this.scope_end, this.scope_count, this.scope_strict, answer_sheet_title, this.random_seeds);
         this.saveFile(bytes);
     }
 
@@ -3613,7 +3650,7 @@ class QuizWizApp {
     {
         try {
             const answer_sheet_title = this.translations.actions['answer-sheet-title'] || 'Answer Sheet';
-            const bytes = this.control_tower.generate_exam_in_pdf(this.scope_start, this.scope_end, this.scope_count, answer_sheet_title, this.random_seeds);
+            const bytes = this.control_tower.generate_exam_in_pdf(this.scope_start, this.scope_end, this.scope_count, this.scope_strict, answer_sheet_title, this.random_seeds);
             await this.savePdfFile(bytes);
         } catch (err: any) {
             console.error("PDF 생성 중 오류 발생:", err);

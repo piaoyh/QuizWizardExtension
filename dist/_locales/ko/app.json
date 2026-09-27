@@ -153,6 +153,7 @@
         "st-scope-guide": "출제 범위와 문항 수를 정해 주세요.",
         "st-scope-count-label": "문항 수:",
         "st-scope-count-max": "(최대 {n})",
+        "st-scope-strict": "문제 순서와 선택지 순서만 다를 뿐 모든 학생들에게 똑같은 문제를 출제한다.",
         "st-scope-title": "범위 설정",
         "in-help": "도움말",
         "in-info-soft": "소프트웨어 정보",
