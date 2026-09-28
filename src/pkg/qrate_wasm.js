@@ -197,12 +197,12 @@ export class ControlTower {
         return ret !== 0;
     }
     /**
-     * Generates a shuffled exam in PDF format based on the questions
+     * Generates a shuffled exam in DOCX format based on the questions
      * in the QBank and the students in the SBank.
      *
      * This method creates a `Generator` instance using the loaded QBank and
-     * SBank, and then calls the `export_shuffled_exams_in_pdf()` method of
-     * the generator to generate the exam in PDF format. The generated exam
+     * SBank, and then calls the `export_shuffled_exams_in_docx()` method of
+     * the generator to generate the exam in DOCX format. The generated exam
      * is returned as a byte vector.
      *
      * If the QBank or SBank is not loaded, it returns `FailedToGenerateExam`.
