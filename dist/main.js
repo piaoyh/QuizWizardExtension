@@ -659,7 +659,7 @@ class QuizWizApp {
             else if (this.currentMenu === 'self-study') {
                 this.initializeSelfStudyWorkspace();
             }
-            else if (this.currentMenu === 'settings' || this.currentMenu === 'information') {
+            else if (this.currentMenu === 'settings' || this.currentMenu === 'information' || this.currentMenu === 'tools') {
                 this.renderView(this.currentMenu);
             }
             else {
@@ -1404,6 +1404,7 @@ class QuizWizApp {
             'ex-': 'exam-setting',
             'sl-': 'student-list',
             'ss-': 'self-study',
+            'tl-': 'tools',
             'st-': 'settings',
             'in-': 'information'
         };
@@ -1502,6 +1503,19 @@ class QuizWizApp {
                 break;
             case 'ss-start':
                 this.startSelfstudy();
+                break;
+            /* --- Tools (도구) --- */
+            case 'tl-qbdb-to-qb-xlsx':
+                this.convertQbdbToQbXlsx();
+                break;
+            case 'tl-qb-xlsx-to-qbdb':
+                this.convertQbXlsxToQbdb();
+                break;
+            case 'tl-sbdb-to-sb-xlsx':
+                this.convertSbdbToSbXlsx();
+                break;
+            case 'tl-sb-xlsx-to-sbdb':
+                this.convertSbXlsxToSbdb();
                 break;
             /* --- Settings (설정) --- */
             case 'st-theme':
@@ -2046,6 +2060,9 @@ class QuizWizApp {
             this.control_tower.set_name('');
             this.control_tower.set_id('');
             this.control_tower.set_notice('');
+            for (let i = 1; i <= 4; i++) {
+                this.control_tower.set_header_category(i, '');
+            }
         }
     }
     /** 에디터 모드를 전환합니다 (문제 편집 <=> 선택지 편집) */
@@ -2437,9 +2454,7 @@ class QuizWizApp {
             });
             newData.push({ group, text, choices });
         });
-        if (newData.length > 0) {
-            this.questionsData = newData;
-        }
+        this.questionsData = newData;
     }
     /** 하나의 문제 항목 HTML 생성 */
     createQuestionItemHtml(index, data, readOnly = false, hideGroup = false, checkDisabled = true, useUserAnswers = false) {
@@ -2676,14 +2691,14 @@ class QuizWizApp {
             const file = await handle.getFile();
             const buffer = await file.arrayBuffer();
             // WASM 엔진에 데이터 전달 (SQLite 형식)
-            this.control_tower.set_qbank_from_bytes_in_sqlite(new Uint8Array(buffer));
+            this.control_tower.set_qbank_from_bytes_of_sqlite(new Uint8Array(buffer));
             this.putQuestionBankToWorkspace();
             this.updateMenuActivation();
         }
         catch (err) {
             if (err.name !== 'AbortError') {
                 console.error("문제 은행 파일 열기 중 오류 발생:", err);
-                if (err == 0)
+                if (err === 0)
                     alert(this.translations.actions['msg-invalid-version-error'] || this.default_translations.actions['msg-invalid-version-error']);
                 else
                     alert((this.translations.actions['msg-file-open-error'] || this.default_translations.actions['msg-file-open-error']).replace('{error}', err.message || err));
@@ -2735,6 +2750,7 @@ class QuizWizApp {
                     text: choiceObj.get_text(),
                     correct: choiceObj.is_correct()
                 });
+                choiceObj.free(); // WASM 메모리 즉시 해제
             }
             newData.push({
                 group: this.control_tower.get_group(i + 1).toString(),
@@ -2837,7 +2853,7 @@ class QuizWizApp {
             // 1. WASM ControlTower 데이터 갱신 - 현재 화면의 입력값들을 questionsData 배열에 저장하고, 이를 WASM 엔진에 반영
             this.extractQuestionDataFromWorkspace();
             // 2. WASM 엔진으로부터 SQLite 포맷의 바이트 열 추출
-            const bytes = this.control_tower.write_qbank_to_bytes_in_sqlite();
+            const bytes = this.control_tower.write_qbank_to_bytes_of_sqlite();
             // 3. 파일 시스템 writable을 사용하여 데이터 저장
             const writable = await handle.createWritable();
             await writable.write(bytes);
@@ -2854,30 +2870,41 @@ class QuizWizApp {
     }
     /** 현재 questionsData 배열의 내용을 WASM 엔진(ControlTower)에 동기화합니다. */
     syncQuestionsToWasm() {
-        // [개선] 기존 업데이트 방식은 인덱스 오동작 위험이 있으므로, 
-        // 모든 문제를 삭제한 후 현재 순서대로 새로 추가하는 방식을 사용합니다.
         // 1. WASM 엔진의 기존 모든 문제 삭제 (뒤에서부터 삭제하여 인덱스 유지)
         const oldQLen = this.control_tower.get_question_length();
         for (let i = oldQLen; i >= 1; i--) {
             this.control_tower.remove_question(i);
         }
-        // 2. questionsData 배열의 순서대로 문제를 새로 추가
-        const newQLen = this.questionsData.length;
+        // 2. 만약 작업공간의 모든 문제가 비어있거나 문제가 0개이면 1개의 빈 문제만 널스트링으로 채워 동기화
+        let dataToSync = this.questionsData;
+        const isAllEmpty = dataToSync.length === 0 || dataToSync.every(q => (!q.text || q.text.trim() === '') && (!q.choices || q.choices.every(c => !c.text || c.text.trim() === '')));
+        if (isAllEmpty) {
+            dataToSync = [{
+                    group: '1',
+                    text: '',
+                    choices: Array.from({ length: 4 }, () => ({ text: '', correct: false }))
+                }];
+        }
+        // 3. dataToSync 배열의 순서대로 문제를 새로 추가
+        const newQLen = dataToSync.length;
         for (let i = 0; i < newQLen; i++) {
-            const q = this.questionsData[i];
+            const q = dataToSync[i];
             if (!q)
                 continue;
             const qIdx = i + 1; // 1-based index
             // 새 문제 생성 및 데이터 설정
             this.control_tower.push_an_empty_question();
-            this.control_tower.set_question(qIdx, q.text);
-            this.control_tower.set_group(qIdx, parseInt(q.group) || 0);
-            // 선택지 추가
-            for (let j = 0; j < q.choices.length; j++) {
-                const c = q.choices[j];
+            this.control_tower.set_question(qIdx, q.text ?? '');
+            this.control_tower.set_group(qIdx, parseInt(q.group) || (i + 1));
+            // 선택지 추가 (비어있으면 기본 4개의 빈 선택지 추가)
+            const choices = (q.choices && q.choices.length > 0)
+                ? q.choices
+                : Array.from({ length: 4 }, () => ({ text: '', correct: false }));
+            for (let j = 0; j < choices.length; j++) {
+                const c = choices[j];
                 if (!c)
                     continue;
-                this.control_tower.push_choice(qIdx, c.text, c.correct);
+                this.control_tower.push_choice(qIdx, c.text ?? '', Boolean(c.correct));
             }
             // 카테고리 결정
             this.control_tower.determine_category(qIdx);
@@ -2889,6 +2916,12 @@ class QuizWizApp {
             this.saveCurrentHeaderToState();
         else if (this.currentMenu === 'question-bank')
             this.saveCurrentQuestionsToState();
+        // 헤더 카테고리가 비어있으면 널스트링으로 보장
+        for (let i = 1; i <= 4; i++) {
+            if (!this.control_tower.get_header_category(i)) {
+                this.control_tower.set_header_category(i, '');
+            }
+        }
         this.syncQuestionsToWasm();
     }
     optimizeQuestionBank() {
@@ -2984,7 +3017,7 @@ class QuizWizApp {
             this.student_list_file_name = handle.name;
             const file = await handle.getFile();
             const buffer = await file.arrayBuffer();
-            this.control_tower.set_sbank_from_bytes_in_sqlite(new Uint8Array(buffer));
+            this.control_tower.set_sbank_from_bytes_of_sqlite(new Uint8Array(buffer));
             const sLen = this.control_tower.get_student_length();
             const newData = [];
             for (let i = 0; i < sLen; i++) {
@@ -3008,7 +3041,7 @@ class QuizWizApp {
         catch (err) {
             if (err.name !== 'AbortError') {
                 console.error("학생 명단 파일 열기 중 오류 발생:", err);
-                if (err == 0) {
+                if (err === 0) {
                     const msg = this.translations.actions['msg-invalid-version-error'] || this.default_translations.actions['msg-invalid-version-error'];
                     alert(msg);
                 }
@@ -3077,7 +3110,7 @@ class QuizWizApp {
         this.syncStudentsToWasm();
         // 3. 파일로 저장
         try {
-            const bytes = this.control_tower.write_sbank_to_bytes_in_sqlite();
+            const bytes = this.control_tower.write_sbank_to_bytes_of_sqlite();
             if (this.student_list_handle) {
                 const scrollPos = document.getElementById('student-list-container')?.scrollTop;
                 const writable = await this.student_list_handle.createWritable();
@@ -3786,8 +3819,8 @@ class QuizWizApp {
             this.saveStudyState();
         // 2. 새 메뉴로 전환
         this.currentMenu = menu;
-        // [추가] 설정/정보가 아닌 '작업공간' 메뉴인 경우 lastWorkspace 업데이트
-        if (menu !== 'settings' && menu !== 'information')
+        // [추가] 설정/정보/도구가 아닌 '작업공간' 메뉴인 경우 lastWorkspace 업데이트
+        if (menu !== 'settings' && menu !== 'information' && menu !== 'tools')
             this.lastWorkspace = menu;
         if (menu === 'header-edit') {
             this.initializeHeaderEditWorkspace();
@@ -3807,6 +3840,10 @@ class QuizWizApp {
         }
         if (menu === 'self-study') {
             this.initializeSelfStudyWorkspace();
+            return;
+        }
+        if (menu === 'tools') {
+            this.initializeToolsWorkspace();
             return;
         }
         const langData = this.translations;
@@ -3919,6 +3956,126 @@ class QuizWizApp {
             <p>${title} 섹션입니다. 하위 메뉴를 통해 기능을 선택하세요.</p>
         </div>
         `;
+    }
+    /**
+     * 도구 작업공간 초기화
+     */
+    initializeToolsWorkspace() {
+        if (!this.container)
+            return;
+        const langData = this.translations;
+        const defaultLangData = this.default_translations;
+        const title = langData.menus['tools'] || defaultLangData.menus['tools'] || '도구';
+        const qbdbToQbXlsx = langData.actions['tl-qbdb-to-qb-xlsx'] || defaultLangData.actions['tl-qbdb-to-qb-xlsx'] || '.qbdb -> .qb.xlsx 변환';
+        const qbdbToQbXlsxTooltip = langData.actions['tl-qbdb-to-qb-xlsx-tooltip'] || defaultLangData.actions['tl-qbdb-to-qb-xlsx-tooltip'] || '';
+        const qbXlsxToQbdb = langData.actions['tl-qb-xlsx-to-qbdb'] || defaultLangData.actions['tl-qb-xlsx-to-qbdb'] || '.qb.xlsx -> .qbdb 변환';
+        const qbXlsxToQbdbTooltip = langData.actions['tl-qb-xlsx-to-qbdb-tooltip'] || defaultLangData.actions['tl-qb-xlsx-to-qbdb-tooltip'] || '';
+        const sbdbToSbXlsx = langData.actions['tl-sbdb-to-sb-xlsx'] || defaultLangData.actions['tl-sbdb-to-sb-xlsx'] || '.sbdb -> .sb.xlsx 변환';
+        const sbdbToSbXlsxTooltip = langData.actions['tl-sbdb-to-sb-xlsx-tooltip'] || defaultLangData.actions['tl-sbdb-to-sb-xlsx-tooltip'] || '';
+        const sbXlsxToSbdb = langData.actions['tl-sb-xlsx-to-sbdb'] || defaultLangData.actions['tl-sb-xlsx-to-sbdb'] || '.sb.xlsx -> .sbdb 변환';
+        const sbXlsxToSbdbTooltip = langData.actions['tl-sb-xlsx-to-sbdb-tooltip'] || defaultLangData.actions['tl-sb-xlsx-to-sbdb-tooltip'] || '';
+        this.container.innerHTML = `
+            <div class="view-header">
+                <h2>${title}</h2>
+            </div>
+            <div class="view-content tools-workspace" style="padding: 24px; max-width: 860px; margin: 0 auto;">
+                <div class="tools-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                    <div class="tool-card" data-action="tl-qbdb-to-qb-xlsx" style="padding: 20px; border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; cursor: pointer; background: var(--bg-card, #ffffff); box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.15s, box-shadow 0.15s;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 16px; color: var(--primary-color, #1a73e8);">${qbdbToQbXlsx}</h3>
+                        <p style="margin: 0; font-size: 13px; color: var(--text-secondary, #666); line-height: 1.4;">${qbdbToQbXlsxTooltip}</p>
+                    </div>
+                    <div class="tool-card" data-action="tl-qb-xlsx-to-qbdb" style="padding: 20px; border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; cursor: pointer; background: var(--bg-card, #ffffff); box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.15s, box-shadow 0.15s;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 16px; color: var(--primary-color, #1a73e8);">${qbXlsxToQbdb}</h3>
+                        <p style="margin: 0; font-size: 13px; color: var(--text-secondary, #666); line-height: 1.4;">${qbXlsxToQbdbTooltip}</p>
+                    </div>
+                    <div class="tool-card" data-action="tl-sbdb-to-sb-xlsx" style="padding: 20px; border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; cursor: pointer; background: var(--bg-card, #ffffff); box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.15s, box-shadow 0.15s;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 16px; color: var(--primary-color, #1a73e8);">${sbdbToSbXlsx}</h3>
+                        <p style="margin: 0; font-size: 13px; color: var(--text-secondary, #666); line-height: 1.4;">${sbdbToSbXlsxTooltip}</p>
+                    </div>
+                    <div class="tool-card" data-action="tl-sb-xlsx-to-sbdb" style="padding: 20px; border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; cursor: pointer; background: var(--bg-card, #ffffff); box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.15s, box-shadow 0.15s;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 16px; color: var(--primary-color, #1a73e8);">${sbXlsxToSbdb}</h3>
+                        <p style="margin: 0; font-size: 13px; color: var(--text-secondary, #666); line-height: 1.4;">${sbXlsxToSbdbTooltip}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        this.container.querySelectorAll('.tool-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const action = e.currentTarget.dataset.action;
+                if (action)
+                    this.handleAction(action);
+            });
+        });
+    }
+    /** .qbdb -> .qb.xlsx 변환 */
+    async convertQbdbToQbXlsx() {
+        let namein = '';
+        // 1단계: .qbdb 파일 열기
+        try {
+            const descriptions = this.translations.actions['dlgbx-qb-file-type-description'] || 'SQLite Question Bank Database';
+            const [handle] = await window.showOpenFilePicker({
+                types: [{
+                        description: descriptions,
+                        accept: { 'application/x-sqlite3': ['.qbdb'] }
+                    }],
+                excludeAcceptAllOption: true,
+                multiple: false
+            });
+            namein = handle.name;
+            const file = await handle.getFile();
+            const buffer = await file.arrayBuffer();
+            // WASM 엔진에 데이터 전달 (SQLite 형식)
+            this.control_tower.set_qbank_from_bytes_of_sqlite_for_conversion(new Uint8Array(buffer));
+        }
+        catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error("문제 은행 파일 열기 중 오류 발생:", err);
+                if (err === 0)
+                    alert(this.translations.actions['msg-invalid-version-error'] || this.default_translations.actions['msg-invalid-version-error']);
+                else
+                    alert((this.translations.actions['msg-file-open-error'] || this.default_translations.actions['msg-file-open-error']).replace('{error}', err.message || err));
+            }
+            return; // 파일 열기 실패 또는 취소 시 저장 단계로 진입하지 않음
+        }
+        // 2단계: .qb.xlsx 파일로 변환 후 저장
+        try {
+            const descriptions = this.translations.actions['dlgbx-qb-xlsx-file-type-description']
+                || this.default_translations.actions['dlgbx-qb-xlsx-file-type-description']
+                || 'Excel Question Bank';
+            const handle = await window.showSaveFilePicker({
+                suggestedName: namein.replace('.qbdb', '.qb.xlsx') || 'untitled.qb.xlsx',
+                types: [{
+                        description: descriptions,
+                        accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.qb.xlsx'] }
+                    }]
+            });
+            // 1. WASM 엔진으로부터 Excel XLSX 포맷의 바이트 열 추출
+            const bytes = this.control_tower.write_qbank_to_bytes_of_excel_for_conversion();
+            // 2. 파일 시스템 writable을 사용하여 데이터 저장
+            const writable = await handle.createWritable();
+            await writable.write(bytes);
+            await writable.close();
+            console.log("문제은행 저장 완료:", handle.name);
+        }
+        catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error("저장 처리 중 오류 발생:", err);
+                alert((this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err));
+            }
+        }
+        console.log("도구 실행: .qbdb -> .qb.xlsx 변환");
+    }
+    /** .qb.xlsx -> .qbdb 변환 */
+    async convertQbXlsxToQbdb() {
+        console.log("도구 실행: .qb.xlsx -> .qbdb 변환");
+    }
+    /** .sbdb -> .sb.xlsx 변환 */
+    async convertSbdbToSbXlsx() {
+        console.log("도구 실행: .sbdb -> .sb.xlsx 변환");
+    }
+    /** .sb.xlsx -> .sbdb 변환 */
+    async convertSbXlsxToSbdb() {
+        console.log("도구 실행: .sb.xlsx -> .sbdb 변환");
     }
     refreshCurrentViewTitle() {
         const titleEl = this.container?.querySelector('h2');
