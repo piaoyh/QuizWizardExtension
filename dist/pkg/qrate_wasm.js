@@ -2714,6 +2714,10 @@ function __wbg_get_imports() {
             const ret = new Date(arg0 >>> 0, arg1, arg2);
             return ret;
         },
+        __wbg_now_190933fa139cc119: function() {
+            const ret = Date.now();
+            return ret;
+        },
         __wbg_random_33cfffca5c784d5e: function() {
             const ret = Math.random();
             return ret;
