@@ -4254,6 +4254,8 @@ class QuizWizApp {
             { name: "cryptocol", license: "Apache 2.0 / MIT" },
             { name: "rusqlite", license: "MIT" },
             { name: "docx-rs", license: "MIT" },
+            { name: "calamine", license: "MIT" },
+            { name: "rust_xlsxwriter", license: "Apache 2.0 / MIT" },
             { name: "serde_json", license: "Apache 2.0 / MIT" },
             { name: "wasm-bindgen", license: "Apache 2.0 / MIT" },
             { name: "pdfmake", license: "MIT" }
@@ -4283,14 +4285,14 @@ class QuizWizApp {
         msgEl.innerHTML = `
             <div style="margin-bottom: 20px;">
                 <p style="font-weight: bold; margin-bottom: 5px;">${langData.actions['in-info-dev-tech-title'] || defaultLangData.actions['in-info-dev-tech-title']}</p>
-                <p style="margin: 0; padding-left: 10px;">HTML + CSS + TypeScript + WebAssembly + Rust</p>
+                <p style="margin: 0; padding-left: 10px;">HTML + CSS + TypeScript (JavaScript) + WebAssembly + Rust</p>
             </div>
             <div style="margin-bottom: 20px;">
                 <p style="font-weight: bold; margin-bottom: 5px;">${langData.actions['in-info-dev-roles-title'] || defaultLangData.actions['in-info-dev-roles-title']}</p>
                 <ul style="margin: 0; padding-left: 20px;">
                     <li><strong>HTML:</strong> ${langData.actions['in-info-dev-role-html'] || defaultLangData.actions['in-info-dev-role-html']}</li>
                     <li><strong>CSS:</strong> ${langData.actions['in-info-dev-role-css'] || defaultLangData.actions['in-info-dev-role-css']}</li>
-                    <li><strong>TypeScript:</strong> ${langData.actions['in-info-dev-role-ts'] || defaultLangData.actions['in-info-dev-role-ts']}</li>
+                    <li><strong>TypeScript (JavaScript):</strong> ${langData.actions['in-info-dev-role-ts'] || defaultLangData.actions['in-info-dev-role-ts']}</li>
                     <li><strong>Rust:</strong> ${langData.actions['in-info-dev-role-rust'] || defaultLangData.actions['in-info-dev-role-rust']}</li>
                     <li><strong>WebAssembly:</strong> ${langData.actions['in-info-dev-role-wasm'] || defaultLangData.actions['in-info-dev-role-wasm']}
                 </ul>
@@ -4651,7 +4653,7 @@ class QuizWizApp {
             const file = await handle.getFile();
             if (!file.name.toLowerCase().endsWith('.qb.xlsx'))
             {
-                alert('올바른 파일 형식이 아닙니다.\n*.qb.xlsx 확장자를 가진 파일만 선택해 주세요.');
+                alert(this.translations.actions['msg-invalid-qb-xlsx-file-type'] || this.default_translations.actions['msg-invalid-qb-xlsx-file-type']);
                 return; // 진행 중단
             }
             const buffer = await file.arrayBuffer();
@@ -4813,7 +4815,7 @@ class QuizWizApp {
             const file = await handle.getFile();
             if (!file.name.toLowerCase().endsWith('.sb.xlsx'))
             {
-                alert('올바른 파일 형식이 아닙니다.\n*.sb.xlsx 확장자를 가진 파일만 선택해 주세요.');
+                alert(this.translations.actions['msg-invalid-sb-xlsx-file-type'] || this.default_translations.actions['msg-invalid-sb-xlsx-file-type']);
                 return; // 진행 중단
             }
             const buffer = await file.arrayBuffer();

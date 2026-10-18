@@ -3755,6 +3755,8 @@ class QuizWizApp {
             { name: "cryptocol", license: "Apache 2.0 / MIT" },
             { name: "rusqlite", license: "MIT" },
             { name: "docx-rs", license: "MIT" },
+            { name: "calamine", license: "MIT" },
+            { name: "rust_xlsxwriter", license: "Apache 2.0 / MIT" },
             { name: "serde_json", license: "Apache 2.0 / MIT" },
             { name: "wasm-bindgen", license: "Apache 2.0 / MIT" },
             { name: "pdfmake", license: "MIT" }
@@ -3781,14 +3783,14 @@ class QuizWizApp {
         msgEl.innerHTML = `
             <div style="margin-bottom: 20px;">
                 <p style="font-weight: bold; margin-bottom: 5px;">${langData.actions['in-info-dev-tech-title'] || defaultLangData.actions['in-info-dev-tech-title']}</p>
-                <p style="margin: 0; padding-left: 10px;">HTML + CSS + TypeScript + WebAssembly + Rust</p>
+                <p style="margin: 0; padding-left: 10px;">HTML + CSS + TypeScript (JavaScript) + WebAssembly + Rust</p>
             </div>
             <div style="margin-bottom: 20px;">
                 <p style="font-weight: bold; margin-bottom: 5px;">${langData.actions['in-info-dev-roles-title'] || defaultLangData.actions['in-info-dev-roles-title']}</p>
                 <ul style="margin: 0; padding-left: 20px;">
                     <li><strong>HTML:</strong> ${langData.actions['in-info-dev-role-html'] || defaultLangData.actions['in-info-dev-role-html']}</li>
                     <li><strong>CSS:</strong> ${langData.actions['in-info-dev-role-css'] || defaultLangData.actions['in-info-dev-role-css']}</li>
-                    <li><strong>TypeScript:</strong> ${langData.actions['in-info-dev-role-ts'] || defaultLangData.actions['in-info-dev-role-ts']}</li>
+                    <li><strong>TypeScript (JavaScript):</strong> ${langData.actions['in-info-dev-role-ts'] || defaultLangData.actions['in-info-dev-role-ts']}</li>
                     <li><strong>Rust:</strong> ${langData.actions['in-info-dev-role-rust'] || defaultLangData.actions['in-info-dev-role-rust']}</li>
                     <li><strong>WebAssembly:</strong> ${langData.actions['in-info-dev-role-wasm'] || defaultLangData.actions['in-info-dev-role-wasm']}
                 </ul>
@@ -4039,6 +4041,9 @@ class QuizWizApp {
         }
         // 2단계: .qb.xlsx 파일로 변환 후 저장
         try {
+            // 1. WASM 엔진으로부터 Excel XLSX 포맷의 바이트 열 추출
+            const bytes = this.control_tower.write_qbank_to_bytes_of_excel_for_conversion();
+            // 2. 저장할 파일 위치 선택
             const descriptions = this.translations.actions['dlgbx-qb-xlsx-file-type-description']
                 || this.default_translations.actions['dlgbx-qb-xlsx-file-type-description']
                 || 'Excel Question Bank';
@@ -4049,13 +4054,11 @@ class QuizWizApp {
                         accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.qb.xlsx'] }
                     }]
             });
-            // 1. WASM 엔진으로부터 Excel XLSX 포맷의 바이트 열 추출
-            const bytes = this.control_tower.write_qbank_to_bytes_of_excel_for_conversion();
-            // 2. 파일 시스템 writable을 사용하여 데이터 저장
+            // 3. 파일 시스템 writable을 사용하여 데이터 저장
             const writable = await handle.createWritable();
             await writable.write(bytes);
             await writable.close();
-            console.log("문제은행 저장 완료:", handle.name);
+            console.log("문제 은행 저장 완료:", handle.name);
         }
         catch (err) {
             if (err.name !== 'AbortError') {
@@ -4063,18 +4066,203 @@ class QuizWizApp {
                 alert((this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err));
             }
         }
+        finally {
+            this.control_tower.clear_qbank_for_conversion();
+        }
         console.log("도구 실행: .qbdb -> .qb.xlsx 변환");
     }
     /** .qb.xlsx -> .qbdb 변환 */
     async convertQbXlsxToQbdb() {
+        let namein = '';
+        // 1단계: .qb.xlsx 파일 열기
+        try {
+            const descriptions = this.translations.actions['dlgbx-qb-xlsx-file-type-description']
+                || this.default_translations.actions['dlgbx-qb-xlsx-file-type-description']
+                || 'Excel Question Bank (*.qb.xlsx)';
+            const [handle] = await window.showOpenFilePicker({
+                types: [{
+                        description: descriptions,
+                        accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.qb.xlsx'] }
+                    }],
+                excludeAcceptAllOption: true,
+                multiple: false
+            });
+            namein = handle.name;
+            const file = await handle.getFile();
+            if (!file.name.toLowerCase().endsWith('.qb.xlsx')) {
+                alert(this.translations.actions['msg-invalid-qb-xlsx-file-type'] || this.default_translations.actions['msg-invalid-qb-xlsx-file-type']);
+                return; // 진행 중단
+            }
+            const buffer = await file.arrayBuffer();
+            // WASM 엔진에 데이터 전달 (qb.xlsx 형식)
+            this.control_tower.set_qbank_from_bytes_of_excel_for_conversion(new Uint8Array(buffer));
+        }
+        catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error("문제 은행 xlsx 파일 열기 중 오류 발생:", err);
+                if (err === 0)
+                    alert(this.translations.actions['msg-invalid-version-error'] || this.default_translations.actions['msg-invalid-version-error']);
+                else
+                    alert((this.translations.actions['msg-file-open-error'] || this.default_translations.actions['msg-file-open-error']).replace('{error}', err.message || err));
+            }
+            return; // 파일 열기 실패 또는 취소 시 저장 단계로 진입하지 않음
+        }
+        // 2단계: .qbdb 파일로 변환 후 저장
+        try {
+            // 1. WASM 엔진으로부터 Excel XLSX 포맷의 바이트 열 추출
+            const bytes = this.control_tower.write_qbank_to_bytes_of_sqlite_for_conversion();
+            // 2. 저장할 파일 위치 선택
+            const descriptions = this.translations.actions['dlgbx-qb-file-type-description'] || 'SQLite Question Bank Database';
+            const handle = await window.showSaveFilePicker({
+                suggestedName: namein.replace('.qb.xlsx', '.qbdb') || 'untitled.qbdb',
+                types: [{
+                        description: descriptions,
+                        accept: { 'application/x-sqlite3': ['.qbdb'] }
+                    }]
+            });
+            // 3. 파일 시스템 writable을 사용하여 데이터 저장
+            const writable = await handle.createWritable();
+            await writable.write(bytes);
+            await writable.close();
+            console.log("문제 은행 저장 완료:", handle.name);
+        }
+        catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error("저장 처리 중 오류 발생:", err);
+                alert((this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err));
+            }
+        }
+        finally {
+            this.control_tower.clear_qbank_for_conversion();
+        }
         console.log("도구 실행: .qb.xlsx -> .qbdb 변환");
     }
     /** .sbdb -> .sb.xlsx 변환 */
     async convertSbdbToSbXlsx() {
+        let namein = '';
+        // 1단계: .sbdb 파일 열기
+        try {
+            const descriptions = this.translations.actions['dlgbx-sb-file-type-description'] || 'SQLite Student List Database';
+            const [handle] = await window.showOpenFilePicker({
+                types: [{
+                        description: descriptions,
+                        accept: { 'application/x-sqlite3': ['.sbdb'] }
+                    }],
+                excludeAcceptAllOption: true,
+                multiple: false
+            });
+            namein = handle.name;
+            const file = await handle.getFile();
+            const buffer = await file.arrayBuffer();
+            // WASM 엔진에 데이터 전달 (SQLite 형식)
+            this.control_tower.set_sbank_from_bytes_of_sqlite_for_conversion(new Uint8Array(buffer));
+        }
+        catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error("학생 명단 파일 열기 중 오류 발생:", err);
+                if (err === 0)
+                    alert(this.translations.actions['msg-invalid-version-error'] || this.default_translations.actions['msg-invalid-version-error']);
+                else
+                    alert((this.translations.actions['msg-file-open-error'] || this.default_translations.actions['msg-file-open-error']).replace('{error}', err.message || err));
+            }
+            return; // 파일 열기 실패 또는 취소 시 저장 단계로 진입하지 않음
+        }
+        // 2단계: .sb.xlsx 파일로 변환 후 저장
+        try {
+            // 1. WASM 엔진으로부터 Excel XLSX 포맷의 바이트 열 추출
+            const bytes = this.control_tower.write_sbank_to_bytes_of_excel_for_conversion();
+            // 2. 저장할 파일 위치 선택
+            const descriptions = this.translations.actions['dlgbx-sb-xlsx-file-type-description']
+                || this.default_translations.actions['dlgbx-sb-xlsx-file-type-description']
+                || 'Excel Question Bank';
+            const handle = await window.showSaveFilePicker({
+                suggestedName: namein.replace('.sbdb', '.sb.xlsx') || 'untitled.sb.xlsx',
+                types: [{
+                        description: descriptions,
+                        accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.sb.xlsx'] }
+                    }]
+            });
+            // 3. 파일 시스템 writable을 사용하여 데이터 저장
+            const writable = await handle.createWritable();
+            await writable.write(bytes);
+            await writable.close();
+            console.log("학생 명단 저장 완료:", handle.name);
+        }
+        catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error("저장 처리 중 오류 발생:", err);
+                alert((this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err));
+            }
+        }
+        finally {
+            this.control_tower.clear_qbank_for_conversion();
+        }
         console.log("도구 실행: .sbdb -> .sb.xlsx 변환");
     }
     /** .sb.xlsx -> .sbdb 변환 */
     async convertSbXlsxToSbdb() {
+        let namein = '';
+        // 1단계: .sb.xlsx 파일 열기
+        try {
+            const descriptions = this.translations.actions['dlgbx-sb-xlsx-file-type-description']
+                || this.default_translations.actions['dlgbx-sb-xlsx-file-type-description']
+                || 'Excel Question Bank (*.sb.xlsx)';
+            const [handle] = await window.showOpenFilePicker({
+                types: [{
+                        description: descriptions,
+                        accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.sb.xlsx'] }
+                    }],
+                excludeAcceptAllOption: true,
+                multiple: false
+            });
+            namein = handle.name;
+            const file = await handle.getFile();
+            if (!file.name.toLowerCase().endsWith('.sb.xlsx')) {
+                alert(this.translations.actions['msg-invalid-sb-xlsx-file-type'] || this.default_translations.actions['msg-invalid-sb-xlsx-file-type']);
+                return; // 진행 중단
+            }
+            const buffer = await file.arrayBuffer();
+            // WASM 엔진에 데이터 전달 (qb.xlsx 형식)
+            this.control_tower.set_sbank_from_bytes_of_excel_for_conversion(new Uint8Array(buffer));
+        }
+        catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error("학생 명단 xlsx 파일 열기 중 오류 발생:", err);
+                if (err === 0)
+                    alert(this.translations.actions['msg-invalid-version-error'] || this.default_translations.actions['msg-invalid-version-error']);
+                else
+                    alert((this.translations.actions['msg-file-open-error'] || this.default_translations.actions['msg-file-open-error']).replace('{error}', err.message || err));
+            }
+            return; // 파일 열기 실패 또는 취소 시 저장 단계로 진입하지 않음
+        }
+        // 2단계: .sbdb 파일로 변환 후 저장
+        try {
+            // 1. WASM 엔진으로부터 Excel XLSX 포맷의 바이트 열 추출
+            const bytes = this.control_tower.write_sbank_to_bytes_of_sqlite_for_conversion();
+            // 2. 저장할 파일 위치 선택
+            const descriptions = this.translations.actions['dlgbx-sb-file-type-description'] || 'SQLite Question Bank Database';
+            const handle = await window.showSaveFilePicker({
+                suggestedName: namein.replace('.sb.xlsx', '.sbdb') || 'untitled.sbdb',
+                types: [{
+                        description: descriptions,
+                        accept: { 'application/x-sqlite3': ['.sbdb'] }
+                    }]
+            });
+            // 3. 파일 시스템 writable을 사용하여 데이터 저장
+            const writable = await handle.createWritable();
+            await writable.write(bytes);
+            await writable.close();
+            console.log("학생 명단 저장 완료:", handle.name);
+        }
+        catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error("저장 처리 중 오류 발생:", err);
+                alert((this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err));
+            }
+        }
+        finally {
+            this.control_tower.clear_sbank_for_conversion();
+        }
         console.log("도구 실행: .sb.xlsx -> .sbdb 변환");
     }
     refreshCurrentViewTitle() {
