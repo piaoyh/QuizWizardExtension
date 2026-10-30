@@ -1740,6 +1740,7 @@ class QuizWizApp {
             btn.addEventListener('click', (e) => {
                 const idx = parseInt(e.target.dataset.index || '1');
                 this.moveQuestionDown(idx);
+                this.optimizeQuestionBank();
             });
         });
         // 입력창 동기화 로직 및 버튼 이벤트 바인딩 (모드에 따라 다름)
@@ -2897,9 +2898,8 @@ class QuizWizApp {
             this.control_tower.set_question(qIdx, q.text ?? '');
             this.control_tower.set_group(qIdx, parseInt(q.group) || (i + 1));
             // 선택지 추가 (비어있으면 기본 4개의 빈 선택지 추가)
-            const choices = (q.choices && q.choices.length > 0)
-                ? q.choices
-                : Array.from({ length: 4 }, () => ({ text: '', correct: false }));
+            const choices = (q.choices && q.choices.length > 0) ? q.choices : [];
+            // : Array.from({ length: 4 }, () => ({ text: '', correct: false }));
             for (let j = 0; j < choices.length; j++) {
                 const c = choices[j];
                 if (!c)

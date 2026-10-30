@@ -1913,6 +1913,7 @@ class QuizWizApp {
             {
                 const idx = parseInt((e.target as HTMLElement).dataset.index || '1');
                 this.moveQuestionDown(idx);
+                this.optimizeQuestionBank();
             });
         });
 
@@ -2655,8 +2656,11 @@ class QuizWizApp {
     }
 
     /** 지정된 위치의 문제를 한 칸 위로 올립니다. */
-    private moveQuestionUp(index: number) {
-        if (index <= 1) return;
+    private moveQuestionUp(index: number)
+    {
+        if (index <= 1)
+            return;
+
         // 현재 화면의 변경사항을 먼저 반영
         this.saveCurrentQuestionsToState();
         
@@ -2666,7 +2670,8 @@ class QuizWizApp {
         const qCurrent = this.questionsData[i];
         const qAbove = this.questionsData[j];
 
-        if (qCurrent && qAbove) {
+        if (qCurrent && qAbove)
+        {
             // [추가] 현재 스크롤 위치 저장
             const listContainer = document.getElementById('student-list');
             const savedScrollTop = listContainer ? listContainer.scrollTop : 0;
@@ -2684,7 +2689,8 @@ class QuizWizApp {
             
             // [수정] 스크롤 위치 복구 후 부드럽게 이동
             const newList = document.getElementById('student-list');
-            if (newList) {
+            if (newList)
+            {
                 newList.scrollTop = savedScrollTop;
                 (newList.children[j] as HTMLElement)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
@@ -3262,9 +3268,8 @@ class QuizWizApp {
             this.control_tower.set_group(qIdx, parseInt(q.group) || (i + 1));
 
             // 선택지 추가 (비어있으면 기본 4개의 빈 선택지 추가)
-            const choices = (q.choices && q.choices.length > 0)
-                ? q.choices
-                : Array.from({ length: 4 }, () => ({ text: '', correct: false }));
+            const choices = (q.choices && q.choices.length > 0) ? q.choices : [];
+                // : Array.from({ length: 4 }, () => ({ text: '', correct: false }));
 
             for (let j = 0; j < choices.length; j++) {
                 const c = choices[j];
