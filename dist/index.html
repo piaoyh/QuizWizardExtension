@@ -103,6 +103,7 @@ except according to those terms.
                         <div class="submenu-item" data-action="st-theme"></div>
                         <div class="submenu-item" data-action="st-font"></div>
                         <div class="submenu-item" data-action="st-lang"></div>
+                        <div class="submenu-item" data-action="st-choice"></div>
                     </div>
                 </div>
 
@@ -124,7 +125,7 @@ except according to those terms.
         <main id="view-container"></main>
     </div>
 
-    <!-- 채점 방식 설정 대화상자 추가 -->
+    <!-- 채점 방식 설정 대화상자 -->
     <dialog id="scoring-dialog" class="modal">
         <div class="modal-content">
             <h3 id="scoring-dialog-title">채점 방식 설정</h3>
@@ -138,7 +139,7 @@ except according to those terms.
         </div>
     </dialog>
 
-    <!-- 글꼴 설정 대화상자 추가 -->
+    <!-- 글꼴 설정 대화상자 -->
     <dialog id="font-dialog" class="modal">
         <div class="modal-content">
             <h3 id="font-dialog-title">글꼴 설정 / Font Settings</h3>
@@ -162,7 +163,7 @@ except according to those terms.
         </div>
     </dialog>
 
-    <!-- 언어 설정 대화상자 추가 -->
+    <!-- 언어 설정 대화상자 -->
     <dialog id="lang-dialog" class="modal">
         <div class="modal-content">
             <h3 id="lang-dialog-title">언어 설정 / Language Settings</h3>
@@ -179,7 +180,7 @@ except according to those terms.
         </div>
     </dialog>
 
-    <!-- 테마 설정 대화상자 추가 -->
+    <!-- 테마 설정 대화상자 -->
     <dialog id="theme-dialog" class="modal">
         <div class="modal-content">
             <h3 id="theme-dialog-title">테마 설정 / Theme Settings</h3>
@@ -195,7 +196,25 @@ except according to those terms.
         </div>
     </dialog>
 
-    <!-- 답안지 제출 확인 대화상자 추가 -->
+    <!-- 선택지 기본개수 설정 대화상자 -->
+    <dialog id="choice-dialog" class="modal">
+        <div class="modal-content">
+            <h3 id="choice-dialog-title">선택지 기본 개수 설정</h3>
+            <div style="margin-bottom: 15px; font-size: 13px;">
+                <p id="choice-guide">선택지의 기본 개수를 정해 주세요.</p>
+            </div>
+            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 5px;">
+                <label id="choice-count-label" for="choice-count">선택지의 기본 개수:</label>
+                <input type="number" id="choice-count" style="width: 3.5em; text-align: center;" min="0">
+            </div>
+            <div class="modal-actions">
+                <button id="choice-cancel-btn">취소</button>
+                <button id="choice-confirm-btn">확인</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 답안지 제출 확인 대화상자 -->
     <dialog id="submit-confirm-dialog" class="modal">
         <div class="modal-content">
             <h3 id="submit-dialog-title">답안지 제출 / Submit Exam</h3>
@@ -207,7 +226,7 @@ except according to those terms.
         </div>
     </dialog>
 
-    <!-- 채점 결과 대화상자 추가 -->
+    <!-- 채점 결과 대화상자 -->
     <dialog id="score-result-dialog" class="modal">
         <div class="modal-content">
             <h3 id="score-dialog-title">시험 결과 / Exam Result</h3>
@@ -221,7 +240,7 @@ except according to those terms.
         </div>
     </dialog>
 
-    <!-- 통계 결과 대화상자 추가 -->
+    <!-- 통계 결과 대화상자 -->
     <dialog id="stat-result-dialog" class="modal">
         <div class="modal-content" style="max-width: 500px;">
             <h3 id="stat-dialog-title"></h3>
@@ -236,7 +255,7 @@ except according to those terms.
         </div>
     </dialog>
 
-    <!-- 새 문제은행 생성 확인 대화상자 추가 -->
+    <!-- 새 문제은행 생성 확인 대화상자 -->
     <dialog id="confirm-new-qb-dialog" class="modal">
         <div class="modal-content">
             <h3 id="qb-new-confirm-title"></h3>
@@ -248,7 +267,7 @@ except according to those terms.
         </div>
     </dialog>
 
-    <!-- 새 학생명단 생성 확인 대화상자 추가 -->
+    <!-- 새 학생명단 생성 확인 대화상자 -->
     <dialog id="confirm-new-sl-dialog" class="modal">
         <div class="modal-content">
             <h3 id="sl-confirm-new-title"></h3>
@@ -260,7 +279,7 @@ except according to those terms.
         </div>
     </dialog>
 
-    <!-- 범위 설정 대화상자 추가 -->
+    <!-- 범위 설정 대화상자 -->
     <dialog id="scope-dialog" class="modal">
         <div class="modal-content">
             <h3 id="scope-dialog-title">범위 설정</h3>

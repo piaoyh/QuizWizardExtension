@@ -25,6 +25,7 @@ class QuizWizApp {
     scope_end = 0;
     scope_count = 0;
     scope_strict = false;
+    default_number_of_choices = 4;
     // [추가] 선택된 문제은행 파일의 경로를 저장할 필드
     question_bank_file_name = '';
     question_bank_file_handle = null; // [추가] 문제은행 파일 핸들 저장
@@ -108,7 +109,7 @@ class QuizWizApp {
             console.error("Wasm 로드 실패:", e);
         }
         // 3. 기존 로직들
-        const data = await chrome.storage.local.get(['theme', 'lang', 'font']);
+        const data = await chrome.storage.local.get(['theme', 'lang', 'font', 'choice']);
         // 언어 설정 감지 (저장된 설정 -> 브라우저 언어 -> 영어)
         let lang;
         if (data.lang) {
@@ -128,13 +129,15 @@ class QuizWizApp {
         let savedTheme = data.theme;
         this.currentTheme = savedTheme || 'theme-blue';
         this.currentFont = data.font || '"Segoe UI", sans-serif';
+        this.default_number_of_choices = data.choice || 4;
         document.body.className = this.currentTheme;
         document.documentElement.style.setProperty('--app-font', this.currentFont);
         this.updateUILanguage();
         this.bindEvents();
-        this.initLanguageDialog(); // 대화상자 이벤트 초기화
+        this.initLanguageDialog(); // 언어 대화상자 이벤트 초기화
         this.initThemeDialog(); // 테마 대화상자 이벤트 초기화
         this.initFontDialog(); // 글꼴 대화상자 이벤트 초기화
+        this.initChoiceDialog(); // 선택지 개수 대화상자 이벤트 초기화
         this.initScoringDialog(); // 채점 방식 대화상자 이벤트 초기화
         this.initSubmitDialog(); // 제출 확인 대화상자 이벤트 초기화
         this.initScoreResultDialog(); // 채점 결과 대화상자 이벤트 초기화
@@ -453,6 +456,15 @@ class QuizWizApp {
             dialog.close();
             this.renderView(this.currentMenu);
         });
+    }
+    /**
+     * 언어를 적용하고 설정을 저장한 뒤 UI를 갱신합니다.
+     */
+    async applyDefaultNumberChoices(defaultNumberChoices) {
+        if (defaultNumberChoices && defaultNumberChoices !== this.default_number_of_choices) {
+            this.default_number_of_choices = defaultNumberChoices;
+            chrome.storage.local.set({ choice: this.default_number_of_choices });
+        }
     }
     /**
      * 채점 방식 설정 대화상자의 버튼 이벤트를 초기화합니다.
@@ -1128,6 +1140,15 @@ class QuizWizApp {
             fontLabel.textContent = langData.actions['st-font-label'] || defaultLangData.actions['st-font-label'];
         if (fontGuide)
             fontGuide.textContent = langData.actions['st-font-guide'] || defaultLangData.actions['st-font-guide'];
+        const choiceDialogTitle = document.getElementById('choice-dialog-title');
+        const choiceLabel = document.getElementById('choice-count-label');
+        const choiceGuide = document.getElementById('choice-guide');
+        if (choiceDialogTitle)
+            choiceDialogTitle.textContent = langData.actions['st-choice-dialog-title'] || defaultLangData.actions['st-choice-dialog-title'];
+        if (choiceLabel)
+            choiceLabel.textContent = langData.actions['st-choice-label'] || defaultLangData.actions['st-choice-label'];
+        if (choiceGuide)
+            choiceGuide.textContent = langData.actions['st-choice-guide'] || defaultLangData.actions['st-choice-guide'];
         const submitTitle = document.getElementById('submit-dialog-title');
         if (submitTitle)
             submitTitle.textContent = langData.actions['ss-submit-paper'] || defaultLangData.actions['ss-submit-paper'];
@@ -1413,7 +1434,7 @@ class QuizWizApp {
                 // [수정] 대화상자만 띄우는 액션들은 뷰 전환을 건너뜁니다.
                 if (action === 'in-info-soft' || action === 'in-info-copy' ||
                     action === 'in-info-license' || action === 'in-info-development' ||
-                    action === 'st-theme' || action === 'st-lang') {
+                    action === 'st-theme' || action === 'st-font' || action === 'st-lang' || action === 'st-choice') {
                     break;
                 }
                 if (this.currentMenu !== menu) {
@@ -1537,6 +1558,14 @@ class QuizWizApp {
                     this.setLanguage();
                 }
                 break;
+            case 'st-choice':
+                if (value) {
+                    this.applyDefaultNumberChoices(Number.parseInt(value));
+                }
+                else {
+                    this.setDefaultNumberChoices();
+                }
+                break;
             /* --- Information (정보) --- */
             case 'in-help':
                 this.openHelpTab();
@@ -1604,7 +1633,7 @@ class QuizWizApp {
             this.questionsData = Array.from({ length: 10 }, (_, idx) => ({
                 group: (idx + 1).toString(), // 그룹에는 문제 번호 자동 입력
                 text: '', // 문제는 비워둠
-                choices: Array.from({ length: 4 }, () => ({ text: '', correct: false }))
+                choices: Array.from({ length: this.default_number_of_choices }, () => ({ text: '', correct: false }))
             }));
             this.question_bank_file_name = ''; // 새 파일이므로 이름 초기화
             // 헤더 및 문제은행 데이터 초기화를 위해 WASM QBank를 비움
@@ -1620,7 +1649,7 @@ class QuizWizApp {
             this.questionsData = [{
                     group: '1',
                     text: '',
-                    choices: Array.from({ length: 4 }, () => ({ text: '', correct: false }))
+                    choices: Array.from({ length: this.default_number_of_choices }, () => ({ text: '', correct: false }))
                 }];
         }
         const langData = this.translations;
@@ -1630,7 +1659,7 @@ class QuizWizApp {
             ? `<span class="file-info-label">[ ${this.question_bank_file_name} ]</span>`
             : '';
         // 버튼 텍스트 및 모드별 버튼 구성
-        const toggleBtnText = langData.actions['qb-toggle'] || '토글';
+        const toggleBtnText = langData.actions['qb-toggle'] || defaultLangData.actions['qb-toggle'];
         const toggleBtnTooltip = langData.actions['qb-toggle-tooltip'] || defaultLangData.actions['qb-toggle-tooltip'];
         const insertQPosTooltip = langData.actions['qb-insert-q-pos-tooltip'] || defaultLangData.actions['qb-insert-q-pos-tooltip'];
         const insertCPosTooltip = langData.actions['qb-insert-c-pos-tooltip'] || defaultLangData.actions['qb-insert-c-pos-tooltip'];
@@ -2315,7 +2344,7 @@ class QuizWizApp {
         const newQuestion = {
             group: nextIndex.toString(),
             text: '', // 문제 내용은 비워둠
-            choices: Array.from({ length: 4 }, () => ({ text: '', correct: false }))
+            choices: Array.from({ length: this.default_number_of_choices }, () => ({ text: '', correct: false }))
         };
         // 3. 배열에 추가
         this.questionsData.push(newQuestion);
@@ -2351,7 +2380,7 @@ class QuizWizApp {
         const newQuestion = {
             group: targetPos.toString(),
             text: '',
-            choices: Array.from({ length: 4 }, () => ({ text: '', correct: false }))
+            choices: Array.from({ length: this.default_number_of_choices }, () => ({ text: '', correct: false }))
         };
         this.questionsData.splice(targetPos - 1, 0, newQuestion);
         this.isDirtyQB = true;
@@ -2883,7 +2912,7 @@ class QuizWizApp {
             dataToSync = [{
                     group: '1',
                     text: '',
-                    choices: Array.from({ length: 4 }, () => ({ text: '', correct: false }))
+                    choices: Array.from({ length: this.default_number_of_choices }, () => ({ text: '', correct: false }))
                 }];
         }
         // 3. dataToSync 배열의 순서대로 문제를 새로 추가
@@ -2899,7 +2928,6 @@ class QuizWizApp {
             this.control_tower.set_group(qIdx, parseInt(q.group) || (i + 1));
             // 선택지 추가 (비어있으면 기본 4개의 빈 선택지 추가)
             const choices = (q.choices && q.choices.length > 0) ? q.choices : [];
-            // : Array.from({ length: 4 }, () => ({ text: '', correct: false }));
             for (let j = 0; j < choices.length; j++) {
                 const c = choices[j];
                 if (!c)
@@ -2939,7 +2967,7 @@ class QuizWizApp {
             this.questionsData = [{
                     group: '1',
                     text: '',
-                    choices: Array.from({ length: 4 }, () => ({ text: '', correct: false }))
+                    choices: Array.from({ length: this.default_number_of_choices }, () => ({ text: '', correct: false }))
                 }];
         }
         // 4. WASM 엔진 데이터 갱신
@@ -3588,6 +3616,23 @@ class QuizWizApp {
             dialog.close();
         });
     }
+    initChoiceDialog() {
+        const dialog = document.getElementById('choice-dialog');
+        const confirmBtn = document.getElementById('choice-confirm-btn');
+        const cancelBtn = document.getElementById('choice-cancel-btn');
+        const countInput = document.getElementById('choice-count');
+        if (!dialog || !confirmBtn || !cancelBtn || !countInput)
+            return;
+        // 확인 버튼 클릭 시 데이터 저장 및 닫기
+        confirmBtn.addEventListener('click', () => {
+            const choice = parseInt(countInput.value) || 0;
+            this.default_number_of_choices = choice;
+            dialog.close();
+            chrome.storage.local.set({ choice: choice });
+            this.initializeQuestionBankWorkspace();
+        });
+        cancelBtn.addEventListener('click', () => { dialog.close(); });
+    }
     /** 언어 설정 대화상자를 엽니다. */
     setLanguage() {
         const dialog = document.getElementById('lang-dialog');
@@ -3624,6 +3669,17 @@ class QuizWizApp {
             label.innerHTML = `<input type="radio" name="lang" value="${lang.value}" ${this.currentLang === lang.value ? 'checked' : ''}> ${lang.label}`;
             group.appendChild(label);
         });
+        dialog.showModal();
+    }
+    setDefaultNumberChoices() {
+        const dialog = document.getElementById('choice-dialog');
+        if (!dialog)
+            return;
+        const choiceInput = document.getElementById('choice-count');
+        if (!choiceInput)
+            return;
+        // 초기값 설정 (현재 설정값 또는 기본값)
+        choiceInput.value = this.default_number_of_choices.toString();
         dialog.showModal();
     }
     /**
@@ -3855,6 +3911,7 @@ class QuizWizApp {
             const themeTitle = langData.actions['st-theme'] || defaultLangData.actions['st-theme'];
             const fontTitle = langData.actions['st-font'] || defaultLangData.actions['st-font'];
             const langTitle = langData.actions['st-lang'] || defaultLangData.actions['st-lang'];
+            const choiceTitle = langData.actions['st-choice'] || defaultLangData.actions['st-choice'];
             const theme_str = langData.actions['theme-labels'] || defaultLangData.actions['theme-labels'];
             const font_str = langData.actions['settings-fonts'] || defaultLangData.actions['settings-fonts'];
             this.container.innerHTML = `
@@ -3912,6 +3969,36 @@ class QuizWizApp {
                             </div>
                             <div class="setting-item" data-action="st-lang" data-value="ky">
                                 <div class="lang-text">Кыргызча (Kyrgyz)</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="settings-section" style="margin-top: 20px;">
+                        <h3>${choiceTitle}</h3>
+                        <div class="settings-options lang-options">
+                            <div class="setting-item" data-action="st-choice" data-value="0">
+                                <div class="choice-text">0</div>
+                            </div>
+                            <div class="setting-item" data-action="st-choice" data-value="1">
+                                <div class="choice-text">1</div>
+                            </div>
+                            <div class="setting-item" data-action="st-choice" data-value="2">
+                                <div class="choice-text">2</div>
+                            </div>
+                            <div class="setting-item" data-action="st-choice" data-value="3">
+                                <div class="choice-text">3</div>
+                            </div>
+                            <div class="setting-item" data-action="st-choice" data-value="4">
+                                <div class="choice-text">4</div>
+                            </div>
+                            <div class="setting-item" data-action="st-choice" data-value="5">
+                                <div class="choice-text">5</div>
+                            </div>
+                            <div class="setting-item" data-action="st-choice" data-value="6">
+                                <div class="choice-text">6</div>
+                            </div>
+                            <div class="setting-item" data-action="st-choice" data-value="7">
+                                <div class="choice-text">7</div>
                             </div>
                         </div>
                     </section>
