@@ -6,3 +6,6 @@ This is the font for the QuizWiz interface. It searches for fonts installed on t
 
 ### 3. Language
 Currently, **Korean**, **English**, **Russian**, and **Kyrgyz** are supported. The advantage is that you can set the language of QuizWiz independently of the operating system's language.
+
+### 4. Default Number of Choices
+For example, if you set the default number of choices to 4, every time you add a question while editing the question bank, 4 choices will be created. If you set the default number of choices to 5, every time you add a question while editing the question bank, 5 choices will be created.
