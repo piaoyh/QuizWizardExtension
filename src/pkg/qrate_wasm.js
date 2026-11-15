@@ -89,9 +89,10 @@ export class ChoiceMark {
      * @param {boolean} is_correct
      */
     constructor(text, is_correct) {
+        const val2 = +is_correct;
         const ptr0 = passStringToWasm0(text, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.choicemark_new(ptr0, len0, is_correct);
+        const ret = wasm.choicemark_new(ptr0, len0, val2);
         this.__wbg_ptr = ret;
         ChoiceMarkFinalization.register(this, this.__wbg_ptr, this);
         return this;
@@ -227,6 +228,142 @@ export class ControlTower {
         return ret !== 0;
     }
     /**
+     * Exports the loaded QBank in DOCX format.
+     *
+     * This method creates a `QBankExporter` instance using the loaded QBank
+     * and calls its `export_qbank_in_docx()` method to export the QBank in DOCX format. The exported data is returned as a byte vector.
+     *
+     * If the QBank is not loaded or the export fails, it returns an error.
+     *
+     * # Arguments
+     * * `is_with_answer_sheet` - A boolean indicating whether to include
+     *   the answer sheet in the export.
+     * * `answer_sheet_title` - The title to be used for the answer sheet
+     *   in the exported QBank.
+     *
+     * # Returns
+     * - `Ok(Vec<u8>)` containing the exported QBank in DOCX format
+     *   if the QBank is loaded and the export is successful.
+     * - `Err(JsValue)` with an error message if the QBank is not loaded or the export fails.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * match control_tower.export_qbank_in_docx(true)
+     * {
+     *     Ok(data) => println!("QBank exported successfully, size: {}", data.len()),
+     *     Err(e) => println!("Failed to export QBank: {}", e.as_string().unwrap_or_else(|| "Unknown error".to_string())),
+     * }
+     * ```
+     * @param {boolean} is_with_answer_sheet
+     * @param {string} answer_sheet_title
+     * @returns {Uint8Array}
+     */
+    export_qbank_in_docx(is_with_answer_sheet, answer_sheet_title) {
+        const val2 = +is_with_answer_sheet;
+        const ptr0 = passStringToWasm0(answer_sheet_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_export_qbank_in_docx(this.__wbg_ptr, val2, ptr0, len0);
+        if (ret[3]) {
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v3;
+    }
+    /**
+     * Exports the loaded QBank in PDF format.
+     *
+     * This method creates a `QBankExporter` instance using the loaded QBank
+     * and calls its `export_qbank_in_pdf()` method to export the QBank in PDF format. The exported data is returned as a byte vector.
+     *
+     * If the QBank is not loaded or the export fails, it returns an error.
+     *
+     * # Arguments
+     * * `is_with_answer_sheet` - A boolean indicating whether to include
+     *   the answer sheet in the export.
+     * * `answer_sheet_title` - The title to be used for the answer sheet
+     *   in the exported QBank.
+     *
+     * # Returns
+     * - `Ok(Vec<u8>)` containing the exported QBank in PDF format
+     *   if the QBank is loaded and the export is successful.
+     * - `Err(JsValue)` with an error message if the QBank is not loaded or the export fails.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * match control_tower.export_qbank_in_pdf(true)
+     * {
+     *     Ok(data) => println!("QBank exported successfully, size: {}", data.len()),
+     *     Err(e) => println!("Failed to export QBank: {}", e.as_string().unwrap_or_else(|| "Unknown error".to_string())),
+     * }
+     * ```
+     * @param {boolean} is_with_answer_sheet
+     * @param {string} answer_sheet_title
+     * @returns {Uint8Array}
+     */
+    export_qbank_in_pdf(is_with_answer_sheet, answer_sheet_title) {
+        const val2 = +is_with_answer_sheet;
+        const ptr0 = passStringToWasm0(answer_sheet_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_export_qbank_in_pdf(this.__wbg_ptr, val2, ptr0, len0);
+        if (ret[3]) {
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v3;
+    }
+    /**
+     * Exports the loaded QBank in plain text format.
+     *
+     * This method creates a `QBankExporter` instance using the loaded QBank
+     * and calls its `export_qbank_in_txt()` method to export the QBank in
+     * plain text format. The exported data is returned as a byte vector.
+     *
+     * If the QBank is not loaded, it returns an error.
+     *
+     * # Arguments
+     * * `is_with_answer_sheet` - A boolean indicating whether to include
+     *   the answer sheet in the export.
+     * * `answer_sheet_title` - The title to be used for the answer sheet
+     *   in the exported QBank.
+     *
+     * # Returns
+     * - `Ok(Vec<u8>)` containing the exported QBank in plain text format
+     *   if the QBank is loaded.
+     * - `Err(JsValue)` with an error message if the QBank is not loaded.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * match control_tower.export_qbank_in_txt(true)
+     * {
+     *     Ok(data) => println!("QBank exported successfully, size: {}", data.len()),
+     *     Err(e) => println!("Failed to export QBank: {}", e.as_string().unwrap_or_else(|| "Unknown error".to_string())),
+     * }
+     * ```
+     * @param {boolean} is_with_answer_sheet
+     * @param {string} answer_sheet_title
+     * @returns {Uint8Array}
+     */
+    export_qbank_in_txt(is_with_answer_sheet, answer_sheet_title) {
+        const val2 = +is_with_answer_sheet;
+        const ptr0 = passStringToWasm0(answer_sheet_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_export_qbank_in_txt(this.__wbg_ptr, val2, ptr0, len0);
+        if (ret[3]) {
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v3;
+    }
+    /**
      * Generates a shuffled exam in DOCX format based on the questions
      * in the QBank and the students in the SBank.
      *
@@ -268,21 +405,32 @@ export class ControlTower {
      * @param {number} number_of_questions
      * @param {boolean} strict
      * @param {string} answer_sheet_title
-     * @param {BigUint64Array} seeds
+     * @param {BigUint64Array | bigint[]} seeds
      * @returns {Uint8Array}
      */
     generate_exam_in_docx(start, end, number_of_questions, strict, answer_sheet_title, seeds) {
-        const ptr0 = passStringToWasm0(answer_sheet_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.controltower_generate_exam_in_docx(this.__wbg_ptr, start, end, number_of_questions, strict, ptr0, len0, ptr1, len1);
+        const val3 = +start;
+        const val4 = +end;
+        const val5 = +number_of_questions;
+        const val6 = +strict;
+        let ptr0, len0, ptr1, len1;
+        try {
+            ptr0 = passStringToWasm0(answer_sheet_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            len0 = WASM_VECTOR_LEN;
+            ptr1 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
+            len1 = WASM_VECTOR_LEN;
+        } catch (e) {
+            if (ptr1) { wasm.__wbindgen_free(ptr1, len1 * 8, 8); }
+            if (ptr0) { wasm.__wbindgen_free(ptr0, len0 * 1, 1); }
+            throw e;
+        }
+        const ret = wasm.controltower_generate_exam_in_docx(this.__wbg_ptr, val3, val4, val5, val6, ptr0, len0, ptr1, len1);
         if (ret[3]) {
             throw takeFromExternrefTable0(ret[2]);
         }
-        var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        var v7 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
         wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-        return v3;
+        return v7;
     }
     /**
      * Generates a shuffled exam in PDF format based on the questions
@@ -326,21 +474,32 @@ export class ControlTower {
      * @param {number} number_of_questions
      * @param {boolean} strict
      * @param {string} answer_sheet_title
-     * @param {BigUint64Array} seeds
+     * @param {BigUint64Array | bigint[]} seeds
      * @returns {Uint8Array}
      */
     generate_exam_in_pdf(start, end, number_of_questions, strict, answer_sheet_title, seeds) {
-        const ptr0 = passStringToWasm0(answer_sheet_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.controltower_generate_exam_in_pdf(this.__wbg_ptr, start, end, number_of_questions, strict, ptr0, len0, ptr1, len1);
+        const val3 = +start;
+        const val4 = +end;
+        const val5 = +number_of_questions;
+        const val6 = +strict;
+        let ptr0, len0, ptr1, len1;
+        try {
+            ptr0 = passStringToWasm0(answer_sheet_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            len0 = WASM_VECTOR_LEN;
+            ptr1 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
+            len1 = WASM_VECTOR_LEN;
+        } catch (e) {
+            if (ptr1) { wasm.__wbindgen_free(ptr1, len1 * 8, 8); }
+            if (ptr0) { wasm.__wbindgen_free(ptr0, len0 * 1, 1); }
+            throw e;
+        }
+        const ret = wasm.controltower_generate_exam_in_pdf(this.__wbg_ptr, val3, val4, val5, val6, ptr0, len0, ptr1, len1);
         if (ret[3]) {
             throw takeFromExternrefTable0(ret[2]);
         }
-        var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        var v7 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
         wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-        return v3;
+        return v7;
     }
     /**
      * Generates a shuffled exam in plain text format based on the questions
@@ -384,18 +543,29 @@ export class ControlTower {
      * @param {number} selected
      * @param {boolean} strict
      * @param {string} answer_sheet_title
-     * @param {BigUint64Array} seeds
+     * @param {BigUint64Array | bigint[]} seeds
      * @returns {Uint8Array}
      */
     generate_exam_in_txt(start, end, selected, strict, answer_sheet_title, seeds) {
-        const ptr0 = passStringToWasm0(answer_sheet_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.controltower_generate_exam_in_txt(this.__wbg_ptr, start, end, selected, strict, ptr0, len0, ptr1, len1);
-        var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        const val3 = +start;
+        const val4 = +end;
+        const val5 = +selected;
+        const val6 = +strict;
+        let ptr0, len0, ptr1, len1;
+        try {
+            ptr0 = passStringToWasm0(answer_sheet_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            len0 = WASM_VECTOR_LEN;
+            ptr1 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
+            len1 = WASM_VECTOR_LEN;
+        } catch (e) {
+            if (ptr1) { wasm.__wbindgen_free(ptr1, len1 * 8, 8); }
+            if (ptr0) { wasm.__wbindgen_free(ptr0, len0 * 1, 1); }
+            throw e;
+        }
+        const ret = wasm.controltower_generate_exam_in_txt(this.__wbg_ptr, val3, val4, val5, val6, ptr0, len0, ptr1, len1);
+        var v7 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
         wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-        return v3;
+        return v7;
     }
     /**
      * Retrieves the category number for a given question number from the QBank.
@@ -820,6 +990,33 @@ export class ControlTower {
         return ret === 0 ? undefined : QuestionData.__wrap(ret);
     }
     /**
+     * Returns the question data from question bank (QBank)
+     * for the specified question number.
+     *
+     * # Arguments
+     * * `num` - The question number to retrieve.
+     *
+     * # Returns
+     * - `Some(QuestionData)` if the question data is retrieved successfully.
+     * - `None` if the QBank is not loaded.
+     *
+     * # Examples
+     * ```
+     * use qrate::QBank;
+     * let qbank = QBank::new();
+     * if let Some(qdata) = qbank.get_question_data(1)
+     *     { println!("Question data retrieved successfully"); }
+     * else
+     *     { println!("Failed to retrieve question data"); }
+     * ```
+     * @param {number} num
+     * @returns {QuestionData | undefined}
+     */
+    get_question_data(num) {
+        const ret = wasm.controltower_get_question_data(this.__wbg_ptr, num);
+        return ret === 0 ? undefined : QuestionData.__wrap(ret);
+    }
+    /**
      * Retrieves the question text for a given question number from the QBank.
      *
      * If the QBank is not loaded or the question number is out of bounds,
@@ -856,33 +1053,6 @@ export class ControlTower {
         } finally {
             wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
         }
-    }
-    /**
-     * Returns the question data from question bank (QBank)
-     * for the specified question number.
-     *
-     * # Arguments
-     * * `num` - The question number to retrieve.
-     *
-     * # Returns
-     * - `Some(QuestionData)` if the question data is retrieved successfully.
-     * - `None` if the QBank is not loaded.
-     *
-     * # Examples
-     * ```
-     * use qrate::QBank;
-     * let qbank = QBank::new();
-     * if let Some(qdata) = qbank.get_question_data(1)
-     *     { println!("Question data retrieved successfully"); }
-     * else
-     *     { println!("Failed to retrieve question data"); }
-     * ```
-     * @param {number} num
-     * @returns {QuestionData | undefined}
-     */
-    get_question_data(num) {
-        const ret = wasm.controltower_get_question_data(this.__wbg_ptr, num);
-        return ret === 0 ? undefined : QuestionData.__wrap(ret);
     }
     /**
      * Returns the number of questions in the question bank (QBank).
@@ -1186,9 +1356,11 @@ export class ControlTower {
      * @returns {boolean}
      */
     push_choice(question_number, choice, answer) {
+        const val2 = +question_number;
+        const val3 = +answer;
         const ptr0 = passStringToWasm0(choice, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.controltower_push_choice(this.__wbg_ptr, question_number, ptr0, len0, answer);
+        const ret = wasm.controltower_push_choice(this.__wbg_ptr, val2, ptr0, len0, val3);
         return ret !== 0;
     }
     /**
@@ -1362,9 +1534,11 @@ export class ControlTower {
      * @returns {boolean}
      */
     set_choice(question_number, choice_number, choice_answer) {
+        const val2 = +question_number;
+        const val3 = +choice_number;
         _assertClass(choice_answer, ChoiceMark);
         var ptr0 = choice_answer.__destroy_into_raw();
-        const ret = wasm.controltower_set_choice(this.__wbg_ptr, question_number, choice_number, ptr0);
+        const ret = wasm.controltower_set_choice(this.__wbg_ptr, val2, val3, ptr0);
         return ret !== 0;
     }
     /**
@@ -1419,9 +1593,10 @@ export class ControlTower {
      * @param {string} category
      */
     set_header_category(index, category) {
+        const val2 = +index;
         const ptr0 = passStringToWasm0(category, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        wasm.controltower_set_header_category(this.__wbg_ptr, index, ptr0, len0);
+        wasm.controltower_set_header_category(this.__wbg_ptr, val2, ptr0, len0);
     }
     /**
      * Sets the ID of the QBank.
@@ -1526,7 +1701,7 @@ export class ControlTower {
      *     Err(e) => println!("Failed to load QBank: {:?}", e),
      * }
      * ```
-     * @param {Uint8Array} data
+     * @param {Uint8Array | number[]} data
      */
     set_qbank_from_bytes_of_excel_for_conversion(data) {
         const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
@@ -1569,7 +1744,7 @@ export class ControlTower {
      *     Err(e) => println!("Failed to load QBank: {:?}", e),
      * }
      * ```
-     * @param {Uint8Array} data
+     * @param {Uint8Array | number[]} data
      */
     set_qbank_from_bytes_of_sqlite(data) {
         const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
@@ -1613,7 +1788,7 @@ export class ControlTower {
      *     Err(e) => println!("Failed to load QBank: {:?}", e),
      * }
      * ```
-     * @param {Uint8Array} data
+     * @param {Uint8Array | number[]} data
      */
     set_qbank_from_bytes_of_sqlite_for_conversion(data) {
         const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
@@ -1649,9 +1824,10 @@ export class ControlTower {
      * @returns {boolean}
      */
     set_question(question_number, txt) {
+        const val2 = +question_number;
         const ptr0 = passStringToWasm0(txt, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.controltower_set_question(this.__wbg_ptr, question_number, ptr0, len0);
+        const ret = wasm.controltower_set_question(this.__wbg_ptr, val2, ptr0, len0);
         return ret !== 0;
     }
     /**
@@ -1689,7 +1865,7 @@ export class ControlTower {
      *     Err(e) => println!("Failed to load SBank: {:?}", e),
      * }
      * ```
-     * @param {Uint8Array} data
+     * @param {Uint8Array | number[]} data
      */
     set_sbank_from_bytes_of_excel_for_conversion(data) {
         const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
@@ -1734,7 +1910,7 @@ export class ControlTower {
      *     Err(e) => println!("Failed to load SBank: {:?}", e),
      * }
      * ```
-     * @param {Uint8Array} data
+     * @param {Uint8Array | number[]} data
      */
     set_sbank_from_bytes_of_sqlite(data) {
         const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
@@ -1779,7 +1955,7 @@ export class ControlTower {
      *     Err(e) => println!("Failed to load SBank: {:?}", e),
      * }
      * ```
-     * @param {Uint8Array} data
+     * @param {Uint8Array | number[]} data
      */
     set_sbank_from_bytes_of_sqlite_for_conversion(data) {
         const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
@@ -1813,12 +1989,13 @@ export class ControlTower {
      * control_tower.set_self_study_choices_answer(2, vec![0, 1, 0]);
      * ```
      * @param {number} num
-     * @param {Uint8Array} answers
+     * @param {Uint8Array | number[]} answers
      */
     set_self_study_choices_answer(num, answers) {
+        const val2 = +num;
         const ptr0 = passArray8ToWasm0(answers, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        wasm.controltower_set_self_study_choices_answer(this.__wbg_ptr, num, ptr0, len0);
+        wasm.controltower_set_self_study_choices_answer(this.__wbg_ptr, val2, ptr0, len0);
     }
     /**
      * Sets the scoring rule for the self-study session.
@@ -1871,9 +2048,10 @@ export class ControlTower {
      * @param {string} answer
      */
     set_self_study_short_answer(num, answer) {
+        const val2 = +num;
         const ptr0 = passStringToWasm0(answer, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        wasm.controltower_set_self_study_short_answer(this.__wbg_ptr, num, ptr0, len0);
+        wasm.controltower_set_self_study_short_answer(this.__wbg_ptr, val2, ptr0, len0);
     }
     /**
      * Sets the name and ID of a student by their 1-based index in the SBank.
@@ -1902,9 +2080,10 @@ export class ControlTower {
      * @returns {boolean}
      */
     set_student(student_number, name_id) {
+        const val2 = +student_number;
         _assertClass(name_id, NameId);
         var ptr0 = name_id.__destroy_into_raw();
-        const ret = wasm.controltower_set_student(this.__wbg_ptr, student_number, ptr0);
+        const ret = wasm.controltower_set_student(this.__wbg_ptr, val2, ptr0);
         return ret !== 0;
     }
     /**
@@ -1951,13 +2130,16 @@ export class ControlTower {
      * @param {number} start
      * @param {number} end
      * @param {number} number_of_questions
-     * @param {BigUint64Array} seeds
+     * @param {BigUint64Array | bigint[]} seeds
      * @returns {boolean}
      */
     start_self_study(start, end, number_of_questions, seeds) {
+        const val2 = +start;
+        const val3 = +end;
+        const val4 = +number_of_questions;
         const ptr0 = passArray64ToWasm0(seeds, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.controltower_start_self_study(this.__wbg_ptr, start, end, number_of_questions, ptr0, len0);
+        const ret = wasm.controltower_start_self_study(this.__wbg_ptr, val2, val3, val4, ptr0, len0);
         return ret !== 0;
     }
     /**
@@ -2400,10 +2582,17 @@ export class NameId {
      * @param {string} id
      */
     constructor(name, id) {
-        const ptr0 = passStringToWasm0(name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
+        let ptr0, len0, ptr1, len1;
+        try {
+            ptr0 = passStringToWasm0(name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            len0 = WASM_VECTOR_LEN;
+            ptr1 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            len1 = WASM_VECTOR_LEN;
+        } catch (e) {
+            if (ptr1) { wasm.__wbindgen_free(ptr1, len1 * 1, 1); }
+            if (ptr0) { wasm.__wbindgen_free(ptr0, len0 * 1, 1); }
+            throw e;
+        }
         const ret = wasm.nameid_new(ptr0, len0, ptr1, len1);
         this.__wbg_ptr = ret;
         NameIdFinalization.register(this, this.__wbg_ptr, this);
@@ -2610,11 +2799,20 @@ export class QuestionData {
      * @param {string} question
      */
     constructor(num, category_id, category_str, question) {
-        const ptr0 = passStringToWasm0(category_str, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passStringToWasm0(question, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.questiondata_new(num, category_id, ptr0, len0, ptr1, len1);
+        const val3 = +num;
+        const val4 = +category_id;
+        let ptr0, len0, ptr1, len1;
+        try {
+            ptr0 = passStringToWasm0(category_str, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            len0 = WASM_VECTOR_LEN;
+            ptr1 = passStringToWasm0(question, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            len1 = WASM_VECTOR_LEN;
+        } catch (e) {
+            if (ptr1) { wasm.__wbindgen_free(ptr1, len1 * 1, 1); }
+            if (ptr0) { wasm.__wbindgen_free(ptr0, len0 * 1, 1); }
+            throw e;
+        }
+        const ret = wasm.questiondata_new(val3, val4, ptr0, len0, ptr1, len1);
         this.__wbg_ptr = ret;
         QuestionDataFinalization.register(this, this.__wbg_ptr, this);
         return this;
@@ -2660,86 +2858,88 @@ export function generate_exam_wasm(input_data) {
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
-        __wbg___wbindgen_throw_1506f2235d1bdba0: function(arg0, arg1) {
+        __wbg___wbindgen_throw_4c88d8bf264fd984: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
-        __wbg_getDate_3d2f964145b3449d: function(arg0) {
+        __wbg_getDate_a44b5f4a8c42a3c3: function(arg0) {
             const ret = arg0.getDate();
             return ret;
         },
-        __wbg_getDay_36952f7a4e4bf5c2: function(arg0) {
+        __wbg_getDay_0ea3aef4bf721d1c: function(arg0) {
             const ret = arg0.getDay();
             return ret;
         },
-        __wbg_getFullYear_8b1ba9a648a4de7f: function(arg0) {
+        __wbg_getFullYear_94114da14f235fca: function(arg0) {
             const ret = arg0.getFullYear();
             return ret;
         },
-        __wbg_getHours_91ac680ae491b8ea: function(arg0) {
+        __wbg_getHours_d55d13f9f95415bb: function(arg0) {
             const ret = arg0.getHours();
             return ret;
         },
-        __wbg_getMinutes_c1c2573becc0c7b5: function(arg0) {
+        __wbg_getMinutes_d0d71c490ef83b47: function(arg0) {
             const ret = arg0.getMinutes();
             return ret;
         },
-        __wbg_getMonth_44bdf67c99f2ed79: function(arg0) {
+        __wbg_getMonth_a4698d688e95d9bd: function(arg0) {
             const ret = arg0.getMonth();
             return ret;
         },
-        __wbg_getRandomValues_8c4660d7727bfad0: function() { return handleError(function (arg0, arg1) {
+        __wbg_getRandomValues_8b6f1f663e6f188d: function() { return handleError(function (arg0, arg1) {
             globalThis.crypto.getRandomValues(getArrayU8FromWasm0(arg0, arg1));
         }, arguments); },
-        __wbg_getSeconds_2716239745eecd0a: function(arg0) {
+        __wbg_getRandomValues_d16c5fe16b757932: function() { return handleError(function (arg0, arg1) {
+            globalThis.crypto.getRandomValues(getArrayU8FromWasm0(arg0, arg1));
+        }, arguments); },
+        __wbg_getSeconds_7143dabeecfaf7d1: function(arg0) {
             const ret = arg0.getSeconds();
             return ret;
         },
-        __wbg_getTime_00b3f7db575e4ef5: function(arg0) {
+        __wbg_getTime_edc91481cbc4cd78: function(arg0) {
             const ret = arg0.getTime();
             return ret;
         },
-        __wbg_getTimezoneOffset_08e2892156231088: function(arg0) {
+        __wbg_getTimezoneOffset_87127d92c2c117e9: function(arg0) {
             const ret = arg0.getTimezoneOffset();
             return ret;
         },
-        __wbg_new_0_445c13a750296eb6: function() {
+        __wbg_new_0_36d738a0c8cfac43: function() {
             const ret = new Date();
             return ret;
         },
-        __wbg_new_6d75fd236f920a62: function(arg0) {
+        __wbg_new_3e95cd7386bb9a6c: function(arg0) {
             const ret = new Date(arg0);
             return ret;
         },
-        __wbg_new_with_year_month_day_1c037825a6927e19: function(arg0, arg1, arg2) {
+        __wbg_new_with_year_month_day_2b03abbebcc8f077: function(arg0, arg1, arg2) {
             const ret = new Date(arg0 >>> 0, arg1, arg2);
             return ret;
         },
-        __wbg_now_190933fa139cc119: function() {
+        __wbg_now_463ac581d2fc7ea3: function() {
             const ret = Date.now();
             return ret;
         },
-        __wbg_random_33cfffca5c784d5e: function() {
+        __wbg_random_df36b90cd78a7d54: function() {
             const ret = Math.random();
             return ret;
         },
-        __wbindgen_cast_0000000000000001: function(arg0) {
+        __wbindgen_generic_0000000000000001: function(arg0) {
             // Cast intrinsic for `F64 -> Externref`.
             const ret = arg0;
             return ret;
         },
-        __wbindgen_cast_0000000000000002: function(arg0, arg1) {
+        __wbindgen_generic_0000000000000002: function(arg0, arg1) {
             // Cast intrinsic for `Ref(String) -> Externref`.
             const ret = getStringFromWasm0(arg0, arg1);
             return ret;
         },
         __wbindgen_init_externref_table: function() {
             const table = wasm.__wbindgen_externrefs;
-            const offset = table.grow(4);
             table.set(0, undefined);
-            table.set(offset + 0, undefined);
-            table.set(offset + 1, null);
-            table.set(offset + 2, true);
-            table.set(offset + 3, false);
+            table.set(1024, undefined);
+            table.set(1025, null);
+            table.set(1026, true);
+            table.set(1027, false);
         },
     };
     return {
@@ -2787,7 +2987,8 @@ function getBigUint64ArrayMemory0() {
 }
 
 function getStringFromWasm0(ptr, len) {
-    return decodeText(ptr >>> 0, len);
+    ptr = ptr >>> 0;
+    return decodeText(getUint8ArrayMemory0().subarray(ptr, ptr + len));
 }
 
 let cachedUint8ArrayMemory0 = null;
@@ -2864,18 +3065,18 @@ function takeFromExternrefTable0(idx) {
     return value;
 }
 
-let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true });
 cachedTextDecoder.decode();
 const MAX_SAFARI_DECODE_BYTES = 2146435072;
 let numBytesDecoded = 0;
-function decodeText(ptr, len) {
-    numBytesDecoded += len;
+function decodeText(bytes) {
+    numBytesDecoded += bytes.length;
     if (numBytesDecoded >= MAX_SAFARI_DECODE_BYTES) {
-        cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+        cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true });
         cachedTextDecoder.decode();
-        numBytesDecoded = len;
+        numBytesDecoded = bytes.length;
     }
-    return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
+    return cachedTextDecoder.decode(bytes);
 }
 
 const cachedTextEncoder = new TextEncoder();
@@ -2906,11 +3107,15 @@ function __wbg_finalize_init(instance, module) {
 
 async function __wbg_load(module, imports) {
     if (typeof Response === 'function' && module instanceof Response) {
+        if (!module.ok) {
+            throw new Error(`failed to fetch Wasm: ${module.status} ${module.statusText} fetching '${module.url}'`);
+        }
+
         if (typeof WebAssembly.instantiateStreaming === 'function') {
             try {
                 return await WebAssembly.instantiateStreaming(module, imports);
             } catch (e) {
-                const validResponse = module.ok && expectedResponseType(module.type);
+                const validResponse = expectedResponseType(module.type);
 
                 if (validResponse && module.headers.get('Content-Type') !== 'application/wasm') {
                     console.warn("`WebAssembly.instantiateStreaming` failed because your server does not serve Wasm with `application/wasm` MIME type. Falling back to `WebAssembly.instantiate` which is slower. Original error:\n", e);
@@ -2959,9 +3164,17 @@ function initSync(module) {
     return __wbg_finalize_init(instance, module);
 }
 
+let __wbg_init_promise;
 async function __wbg_init(module_or_path) {
     if (wasm !== undefined) return wasm;
+    if (__wbg_init_promise === undefined) {
+        __wbg_init_promise = __wbg_init_once(module_or_path);
+        __wbg_init_promise.catch(() => { __wbg_init_promise = undefined; });
+    }
+    return __wbg_init_promise;
+}
 
+async function __wbg_init_once(module_or_path) {
 
     if (module_or_path !== undefined) {
         if (Object.getPrototypeOf(module_or_path) === Object.prototype) {
