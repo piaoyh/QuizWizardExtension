@@ -207,6 +207,7 @@
         "msg-submit-success": "Жооптор тапшырылды!",
         "ss-score-result-title": "Экзамендин жыйынтыгы",
         "answer-sheet-title": "Туура жооптордун ачкычы",
+        "student-list-title": "Студенттердин тизмеси",
         "dlgbx-qb-file-type-description": "SQLite суроолор банкынын маалымат базасы",
         "dlgbx-sb-file-type-description": "SQLite студенттер тизмесинин маалымат базасы",
         "dlgbx-button-ok": "OK",

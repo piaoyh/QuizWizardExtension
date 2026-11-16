@@ -1667,9 +1667,6 @@ class QuizWizApp {
             case 'qb-open':         this.openQuestionBank(); break;
             case 'qb-save':         this.saveQuestionBank(); break;
             case 'qb-save-as':      this.saveAsQuestionBank(); break;
-            case 'qb-edit-question-bank': this.renderView('question-bank'); break;
-            case 'qb-optimize':     this.optimizeQuestionBank(); break;
-            case 'qb-stat':         this.statQuestionBank(); break;
             case 'qb-export-with-answer-sheet': this.exportQuestionBankWithAnswerSheet(); break;
             case 'qb-export-with-answer-sheet-docx': this.exportQuestionBankWithAnswerSheet('docx'); break;
             case 'qb-export-with-answer-sheet-pdf':  this.exportQuestionBankWithAnswerSheet('pdf'); break;
@@ -1678,6 +1675,9 @@ class QuizWizApp {
             case 'qb-export-without-answer-sheet-docx': this.exportQuestionBankWithoutAnswerSheet('docx'); break;
             case 'qb-export-without-answer-sheet-pdf':  this.exportQuestionBankWithoutAnswerSheet('pdf'); break;
             case 'qb-export-without-answer-sheet-txt':  this.exportQuestionBankWithoutAnswerSheet('txt'); break;
+            case 'qb-edit-question-bank': this.renderView('question-bank'); break;
+            case 'qb-optimize':     this.optimizeQuestionBank(); break;
+            case 'qb-stat':         this.statQuestionBank(); break;
             case 'qb-edit-header':  this.renderView('header-edit'); break;
 
             /* --- Exam Setting (시험 설정) --- */
@@ -1694,12 +1694,12 @@ class QuizWizApp {
             case 'sl-open':         this.openStudentList(); break;
             case 'sl-save':         this.saveStudentList(); break;
             case 'sl-save-as':      this.saveAsStudentList(); break;
+            case 'sl-export': this.exportStudentList(); break;
+            case 'sl-export-docx': this.exportStudentList('docx'); break;
+            case 'sl-export-pdf':  this.exportStudentList('pdf'); break;
+            case 'sl-export-txt':  this.exportStudentList('txt'); break;
             case 'sl-edit-student-list': this.renderView('student-list'); break;
             case 'sl-optimize':     this.optimizeStudentList(); break;
-            // case 'sl-export': this.exportStudentList(); break;
-            // case 'sl-export-docx': this.exportStudentList('docx'); break;
-            // case 'sl-export-pdf':  this.exportStudentList('pdf'); break;
-            // case 'sl-export-txt':  this.exportStudentList('txt'); break;
 
             /* --- Self-study (자기 주도 학습) --- */
             case 'ss-load-bank':    this.openQuestionBank(); break;
@@ -3284,6 +3284,214 @@ class QuizWizApp {
         }
     }
 
+
+    /* 문제 은행 내보내기 관련 함수군 */
+    /** 시스템 저장 대화상자를 호출하여 문제 은행을 저장합니다. */
+    private async exportQuestionBankWithAnswerSheet(fixedType?: 'docx' | 'pdf' | 'txt')
+    {
+        try
+        {
+            const allTypes = [
+                { description: 'MS Word Document', accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] } },
+                { description: 'PDF Document', accept: { 'application/pdf': ['.pdf'] } },
+                { description: 'Text File', accept: { 'text/plain': ['.txt'] } }
+            ];
+
+            let determined = false;
+            let types = allTypes;
+            if (fixedType) {
+                types = allTypes.filter(t => {
+                    const extensions = Object.values(t.accept)[0] as string[];
+                    return extensions.includes(`.${fixedType}`);
+                });
+                determined = true;
+            }
+            else
+            {
+                fixedType = 'docx';
+            }
+
+            let filename = this.question_bank_file_name || 'untitled';
+            if (filename.includes('.'))
+                filename = filename.replace(".qbdb", "");
+            filename += '.' + fixedType;
+
+            this.handle = await (window as any).showSaveFilePicker({
+                id: 'export-with-answer-sheet' + (fixedType ? '-' + fixedType : ''), // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
+                suggestedName: filename,
+                types: types
+            });
+
+            // 파일명에서 확장자 추출 (예: 'file.docx' -> 'docx')
+            this.doctype = this.handle.name.split('.').pop()?.toLowerCase() || '';
+            /////////////////////////////
+            // switch (this.handle.getFile().type)
+            // {
+            // case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': this.doctype = 'docx';   break;
+            // case 'text/plain':          this.doctype = 'txt';   break;
+            // case 'application/pdf':     this.doctype = 'pdf';   break;
+            // }
+
+            // alert(this.handle.getFile().type);
+            console.log("문제 은행 내보내기 설정 완료 - 핸들:", this.handle, "형식:", this.doctype);
+
+            let doctype = determined ? fixedType : this.doctype;
+            
+            // 고정된 형식이 지정된 경우, 해당 형식으로 바로 저장 실행
+            switch (doctype)
+            {
+            case 'docx':    await this.exportQuestionBankWithAnswerSheetAsDocx();   break;
+            case 'txt':     await this.exportQuestionBankWithAnswerSheetAsTxt();    break;
+            case 'pdf':     await this.exportQuestionBankWithAnswerSheetAsPdf();    break;
+            default:        {
+                    const msg = this.translations.actions['msg-unsupported-file-format'] || this.default_translations.actions['msg-unsupported-file-format'];
+                    alert(msg);
+                }
+            }
+        }
+        catch (err: any)
+        {
+            if (err.name !== 'AbortError')
+            {
+                console.error("시험지 저장 중 오류:", err);
+                const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err);
+                alert(msg);
+            }
+        }
+    }
+
+    private async exportQuestionBankWithAnswerSheetAsDocx()
+    {
+        const answer_sheet_title = this.translations.actions['answer-sheet-title'] || 'Answer Sheet';
+        const bytes = this.control_tower.export_qbank_in_docx(true, answer_sheet_title);
+        this.saveFile(bytes);
+    }
+
+    private async exportQuestionBankWithAnswerSheetAsTxt()
+    {
+        const answer_sheet_title = this.translations.actions['answer-sheet-title'] || 'Answer Sheet';
+        const bytes = this.control_tower.export_qbank_in_txt(true, answer_sheet_title);
+        this.saveFile(bytes);
+    }
+
+    private async exportQuestionBankWithAnswerSheetAsPdf()
+    {
+        try
+        {
+            const answer_sheet_title = this.translations.actions['answer-sheet-title'] || 'Answer Sheet';
+            const bytes = this.control_tower.export_qbank_in_pdf(true, answer_sheet_title);
+            await this.savePdfFile(bytes);
+        }
+        catch (err: any)
+        {
+            console.error("PDF 생성 중 오류 발생:", err);
+            const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.toString());
+            alert(msg);
+        }
+    }
+
+    private async exportQuestionBankWithoutAnswerSheet(fixedType?: 'docx' | 'pdf' | 'txt') {
+        try {
+            this.generate_seeds();
+
+            const allTypes = [
+                { description: 'MS Word Document', accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] } },
+                { description: 'PDF Document', accept: { 'application/pdf': ['.pdf'] } },
+                { description: 'Text File', accept: { 'text/plain': ['.txt'] } }
+            ];
+
+            let determined = false;
+            let types = allTypes;
+            if (fixedType)
+            {
+                types = allTypes.filter(t => {
+                    const extensions = Object.values(t.accept)[0] as string[];
+                    return extensions.includes(`.${fixedType}`);
+                });
+                determined = true;
+            }
+            else
+            {
+                fixedType = 'docx';
+            }
+
+            let filename = this.question_bank_file_name || 'untitled';
+            if (filename.includes('.'))
+                filename = filename.replace(".qbdb", "");
+            filename += '.' + fixedType;
+
+            this.handle = await (window as any).showSaveFilePicker({
+                id: 'export-with-answer-sheet' + (fixedType ? '-' + fixedType : ''), // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
+                suggestedName: this.question_bank_file_name + (fixedType ? '.' + fixedType : ''),
+                types: types
+            });
+
+            // 파일명에서 확장자 추출 (예: 'file.docx' -> 'docx')
+            this.doctype = this.handle.name.split('.').pop()?.toLowerCase() || '';
+            /////////////////////////////
+            // switch (this.handle.getFile().type)
+            // {
+            // case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': this.doctype = 'docx';   break;
+            // case 'text/plain':          this.doctype = 'txt';   break;
+            // case 'application/pdf':     this.doctype = 'pdf';   break;
+            // }
+
+            // alert(this.handle.getFile().type);
+            console.log("문제 은행 내보내기 설정 완료 - 핸들:", this.handle, "형식:", this.doctype);
+
+            let doctype = determined ? fixedType : this.doctype;
+            
+            // 고정된 형식이 지정된 경우, 해당 형식으로 바로 저장 실행
+            switch (doctype)
+            {
+            case 'docx':    await this.exportQuestionBankWithoutAnswerSheetAsDocx();   break;
+            case 'txt':     await this.exportQuestionBankWithoutAnswerSheetAsTxt();    break;
+            case 'pdf':     await this.exportQuestionBankWithoutAnswerSheetAsPdf();    break;
+            default:        {
+                    const msg = this.translations.actions['msg-unsupported-file-format'] || this.default_translations.actions['msg-unsupported-file-format'];
+                    alert(msg);
+                }
+            }
+        }
+        catch (err: any)
+        {
+            if (err.name !== 'AbortError')
+            {
+                console.error("시험지 저장 중 오류:", err);
+                const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err);
+                alert(msg);
+            }
+        }
+    }
+
+    private async exportQuestionBankWithoutAnswerSheetAsDocx()
+    {
+        const bytes = this.control_tower.export_qbank_in_docx(false, '');
+        this.saveFile(bytes);
+    }
+
+    private async exportQuestionBankWithoutAnswerSheetAsTxt()
+    {
+        const bytes = this.control_tower.export_qbank_in_txt(false, '');
+        this.saveFile(bytes);
+    }
+
+    private async exportQuestionBankWithoutAnswerSheetAsPdf()
+    {
+        try
+        {
+            const bytes = this.control_tower.export_qbank_in_pdf(false, '');
+            await this.savePdfFile(bytes);
+        }
+        catch (err: any)
+        {
+            console.error("PDF 생성 중 오류 발생:", err);
+            const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.toString());
+            alert(msg);
+        }
+    }
+
+
     /** 현재 questionsData 배열의 내용을 WASM 엔진(ControlTower)에 동기화합니다. */
     private syncQuestionsToWasm()
     {
@@ -3386,201 +3594,6 @@ class QuizWizApp {
         this.putQuestionBankToWorkspace();
     }
 
-
-    /* 문제 은행 내보내기 관련 함수군 */
-    /** 시스템 저장 대화상자를 호출하여 문제 은행을 저장합니다. */
-    private async exportQuestionBankWithAnswerSheet(fixedType?: 'docx' | 'pdf' | 'txt')
-    {
-        try {
-            const allTypes = [
-                { description: 'MS Word Document', accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] } },
-                { description: 'PDF Document', accept: { 'application/pdf': ['.pdf'] } },
-                { description: 'Text File', accept: { 'text/plain': ['.txt'] } }
-            ];
-
-            let determined = false;
-            let types = allTypes;
-            if (fixedType) {
-                types = allTypes.filter(t => {
-                    const extensions = Object.values(t.accept)[0] as string[];
-                    return extensions.includes(`.${fixedType}`);
-                });
-                determined = true;
-            }
-            else
-            {
-                fixedType = 'docx';
-            }
-
-            this.handle = await (window as any).showSaveFilePicker({
-                id: 'export-with-answer-sheet' + (fixedType ? '-' + fixedType : ''), // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
-                suggestedName: this.question_bank_file_name + (fixedType ? '.' + fixedType : ''),
-                types: types
-            });
-
-            // 파일명에서 확장자 추출 (예: 'file.docx' -> 'docx')
-            this.doctype = this.handle.name.split('.').pop()?.toLowerCase() || '';
-            /////////////////////////////
-            // switch (this.handle.getFile().type)
-            // {
-            // case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': this.doctype = 'docx';   break;
-            // case 'text/plain':          this.doctype = 'txt';   break;
-            // case 'application/pdf':     this.doctype = 'pdf';   break;
-            // }
-
-            // alert(this.handle.getFile().type);
-            console.log("문제 은행 내보내기 설정 완료 - 핸들:", this.handle, "형식:", this.doctype);
-
-            let doctype = determined ? fixedType : this.doctype;
-            
-            // 고정된 형식이 지정된 경우, 해당 형식으로 바로 저장 실행
-            switch (doctype)
-            {
-            case 'docx':    await this.exportQuestionBankWithAnswerSheetAsDocx();   break;
-            case 'txt':     await this.exportQuestionBankWithAnswerSheetAsTxt();    break;
-            case 'pdf':     await this.exportQuestionBankWithAnswerSheetAsPdf();    break;
-            default:        {
-                    const msg = this.translations.actions['msg-unsupported-file-format'] || this.default_translations.actions['msg-unsupported-file-format'];
-                    alert(msg);
-                }
-            }
-        }
-        catch (err: any)
-        {
-            if (err.name !== 'AbortError')
-            {
-                console.error("시험지 저장 중 오류:", err);
-                const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err);
-                alert(msg);
-            }
-        }
-    }
-
-    private async exportQuestionBankWithAnswerSheetAsDocx()
-    {
-        const answer_sheet_title = this.translations.actions['answer-sheet-title'] || 'Answer Sheet';
-        const bytes = this.control_tower.export_qbank_in_docx(true, answer_sheet_title);
-        this.saveFile(bytes);
-    }
-
-    private async exportQuestionBankWithAnswerSheetAsTxt()
-    {
-        const answer_sheet_title = this.translations.actions['answer-sheet-title'] || 'Answer Sheet';
-        const bytes = this.control_tower.export_qbank_in_txt(true, answer_sheet_title);
-        this.saveFile(bytes);
-    }
-
-    private async exportQuestionBankWithAnswerSheetAsPdf()
-    {
-        try
-        {
-            const answer_sheet_title = this.translations.actions['answer-sheet-title'] || 'Answer Sheet';
-            const bytes = this.control_tower.export_qbank_in_pdf(true, answer_sheet_title);
-            await this.savePdfFile(bytes);
-        }
-        catch (err: any)
-        {
-            console.error("PDF 생성 중 오류 발생:", err);
-            const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.toString());
-            alert(msg);
-        }
-    }
-
-    private async exportQuestionBankWithoutAnswerSheet(fixedType?: 'docx' | 'pdf' | 'txt') {
-        try {
-            this.generate_seeds();
-
-            const allTypes = [
-                { description: 'MS Word Document', accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] } },
-                { description: 'PDF Document', accept: { 'application/pdf': ['.pdf'] } },
-                { description: 'Text File', accept: { 'text/plain': ['.txt'] } }
-            ];
-
-            let determined = false;
-            let types = allTypes;
-            if (fixedType)
-            {
-                types = allTypes.filter(t => {
-                    const extensions = Object.values(t.accept)[0] as string[];
-                    return extensions.includes(`.${fixedType}`);
-                });
-                determined = true;
-            }
-            else
-            {
-                fixedType = 'docx';
-            }
-
-            this.handle = await (window as any).showSaveFilePicker({
-                id: 'export-with-answer-sheet' + (fixedType ? '-' + fixedType : ''), // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
-                suggestedName: this.question_bank_file_name + (fixedType ? '.' + fixedType : ''),
-                types: types
-            });
-
-            // 파일명에서 확장자 추출 (예: 'file.docx' -> 'docx')
-            this.doctype = this.handle.name.split('.').pop()?.toLowerCase() || '';
-            /////////////////////////////
-            // switch (this.handle.getFile().type)
-            // {
-            // case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': this.doctype = 'docx';   break;
-            // case 'text/plain':          this.doctype = 'txt';   break;
-            // case 'application/pdf':     this.doctype = 'pdf';   break;
-            // }
-
-            // alert(this.handle.getFile().type);
-            console.log("문제 은행 내보내기 설정 완료 - 핸들:", this.handle, "형식:", this.doctype);
-
-            let doctype = determined ? fixedType : this.doctype;
-            
-            // 고정된 형식이 지정된 경우, 해당 형식으로 바로 저장 실행
-            switch (doctype)
-            {
-            case 'docx':    await this.exportQuestionBankWithoutAnswerSheetAsDocx();   break;
-            case 'txt':     await this.exportQuestionBankWithoutAnswerSheetAsTxt();    break;
-            case 'pdf':     await this.exportQuestionBankWithoutAnswerSheetAsPdf();    break;
-            default:        {
-                    const msg = this.translations.actions['msg-unsupported-file-format'] || this.default_translations.actions['msg-unsupported-file-format'];
-                    alert(msg);
-                }
-            }
-        }
-        catch (err: any)
-        {
-            if (err.name !== 'AbortError')
-            {
-                console.error("시험지 저장 중 오류:", err);
-                const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err);
-                alert(msg);
-            }
-        }
-    }
-
-    private async exportQuestionBankWithoutAnswerSheetAsDocx()
-    {
-        const bytes = this.control_tower.export_qbank_in_docx(false, '');
-        this.saveFile(bytes);
-    }
-
-    private async exportQuestionBankWithoutAnswerSheetAsTxt()
-    {
-        const bytes = this.control_tower.export_qbank_in_txt(false, '');
-        this.saveFile(bytes);
-    }
-
-    private async exportQuestionBankWithoutAnswerSheetAsPdf()
-    {
-        try
-        {
-            const bytes = this.control_tower.export_qbank_in_pdf(false, '');
-            await this.savePdfFile(bytes);
-        }
-        catch (err: any)
-        {
-            console.error("PDF 생성 중 오류 발생:", err);
-            const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.toString());
-            alert(msg);
-        }
-    }
 
     /* 학생 명단 관련 함수군 */
     private newStudentList() {
@@ -3824,6 +3837,112 @@ class QuizWizApp {
             if (err.name !== 'AbortError') {
                 console.error("다른 이름으로 저장 중 오류 발생:", err);
             }
+        }
+    }
+
+
+    /* 학생 목록 내보내기 관련 함수군 */
+    /** 시스템 저장 대화상자를 호출하여 학생 목록을 저장합니다. */
+    private async exportStudentList (fixedType?: 'docx' | 'pdf' | 'txt')
+    {
+        try
+        {
+            const allTypes = [
+                { description: 'MS Word Document', accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] } },
+                { description: 'PDF Document', accept: { 'application/pdf': ['.pdf'] } },
+                { description: 'Text File', accept: { 'text/plain': ['.txt'] } }
+            ];
+
+            let determined = false;
+            let types = allTypes;
+            if (fixedType) {
+                types = allTypes.filter(t => {
+                    const extensions = Object.values(t.accept)[0] as string[];
+                    return extensions.includes(`.${fixedType}`);
+                });
+                determined = true;
+            }
+            else
+            {
+                fixedType = 'docx';
+            }
+
+            let filename = this.student_list_file_name || 'untitled';
+            if (filename.includes('.'))
+                filename = filename.replace(".sbdb", "");
+            filename += '.' + fixedType;
+
+            this.handle = await (window as any).showSaveFilePicker({
+                id: 'export-with-answer-sheet' + (fixedType ? '-' + fixedType : ''), // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
+                suggestedName: filename,
+                types: types
+            });
+
+            // 파일명에서 확장자 추출 (예: 'file.docx' -> 'docx')
+            this.doctype = this.handle.name.split('.').pop()?.toLowerCase() || '';
+            /////////////////////////////
+            // switch (this.handle.getFile().type)
+            // {
+            // case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': this.doctype = 'docx';   break;
+            // case 'text/plain':          this.doctype = 'txt';   break;
+            // case 'application/pdf':     this.doctype = 'pdf';   break;
+            // }
+
+            // alert(this.handle.getFile().type);
+            console.log("학생 목록 내보내기 설정 완료 - 핸들:", this.handle, "형식:", this.doctype);
+
+            let doctype = determined ? fixedType : this.doctype;
+            
+            // 고정된 형식이 지정된 경우, 해당 형식으로 바로 저장 실행
+            switch (doctype)
+            {
+            case 'docx':    await this.exportStudentListAsDocx();   break;
+            case 'txt':     await this.exportStudentListAsTxt();    break;
+            case 'pdf':     await this.exportStudentListAsPdf();    break;
+            default:        {
+                    const msg = this.translations.actions['msg-unsupported-file-format'] || this.default_translations.actions['msg-unsupported-file-format'];
+                    alert(msg);
+                }
+            }
+        }
+        catch (err: any)
+        {
+            if (err.name !== 'AbortError')
+            {
+                console.error("시험지 저장 중 오류:", err);
+                const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err);
+                alert(msg);
+            }
+        }
+    }
+
+    private async exportStudentListAsDocx()
+    {
+        const student_list_title = this.translations.actions['student-list-title'] || 'Student List';
+        const bytes = this.control_tower.export_sbank_in_docx(student_list_title);
+        this.saveFile(bytes);
+    }
+
+    private async exportStudentListAsTxt()
+    {
+        const student_list_title = this.translations.actions['student-list-title'] || 'Student List';
+        const bytes = this.control_tower.export_sbank_in_txt(student_list_title);
+        this.saveFile(bytes);
+    }
+
+    private async exportStudentListAsPdf()
+    {
+        try
+        {
+            const student_list_title = this.translations.actions['student-list-title'] || 'Student List';
+            const bytes = this.control_tower.export_sbank_in_pdf(student_list_title);
+            await this.savePdfFile(bytes);
+        }
+        catch (err: any)
+        {
+            console.error("PDF 생성 중 오류 발생:", err);
+            const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.toString());
+            alert(msg);
         }
     }
 

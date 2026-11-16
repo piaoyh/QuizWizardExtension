@@ -1458,15 +1458,6 @@ class QuizWizApp {
             case 'qb-save-as':
                 this.saveAsQuestionBank();
                 break;
-            case 'qb-edit-question-bank':
-                this.renderView('question-bank');
-                break;
-            case 'qb-optimize':
-                this.optimizeQuestionBank();
-                break;
-            case 'qb-stat':
-                this.statQuestionBank();
-                break;
             case 'qb-export-with-answer-sheet':
                 this.exportQuestionBankWithAnswerSheet();
                 break;
@@ -1490,6 +1481,15 @@ class QuizWizApp {
                 break;
             case 'qb-export-without-answer-sheet-txt':
                 this.exportQuestionBankWithoutAnswerSheet('txt');
+                break;
+            case 'qb-edit-question-bank':
+                this.renderView('question-bank');
+                break;
+            case 'qb-optimize':
+                this.optimizeQuestionBank();
+                break;
+            case 'qb-stat':
+                this.statQuestionBank();
                 break;
             case 'qb-edit-header':
                 this.renderView('header-edit');
@@ -1529,16 +1529,24 @@ class QuizWizApp {
             case 'sl-save-as':
                 this.saveAsStudentList();
                 break;
+            case 'sl-export':
+                this.exportStudentList();
+                break;
+            case 'sl-export-docx':
+                this.exportStudentList('docx');
+                break;
+            case 'sl-export-pdf':
+                this.exportStudentList('pdf');
+                break;
+            case 'sl-export-txt':
+                this.exportStudentList('txt');
+                break;
             case 'sl-edit-student-list':
                 this.renderView('student-list');
                 break;
             case 'sl-optimize':
                 this.optimizeStudentList();
                 break;
-            // case 'sl-export': this.exportStudentList(); break;
-            // case 'sl-export-docx': this.exportStudentList('docx'); break;
-            // case 'sl-export-pdf':  this.exportStudentList('pdf'); break;
-            // case 'sl-export-txt':  this.exportStudentList('txt'); break;
             /* --- Self-study (자기 주도 학습) --- */
             case 'ss-load-bank':
                 this.openQuestionBank();
@@ -2925,85 +2933,6 @@ class QuizWizApp {
             throw err;
         }
     }
-    /** 현재 questionsData 배열의 내용을 WASM 엔진(ControlTower)에 동기화합니다. */
-    syncQuestionsToWasm() {
-        // 1. WASM 엔진의 기존 모든 문제 삭제 (뒤에서부터 삭제하여 인덱스 유지)
-        const oldQLen = this.control_tower.get_question_length();
-        for (let i = oldQLen; i >= 1; i--) {
-            this.control_tower.remove_question(i);
-        }
-        // 2. 만약 작업공간의 모든 문제가 비어있거나 문제가 0개이면 1개의 빈 문제만 널스트링으로 채워 동기화
-        let dataToSync = this.questionsData;
-        const isAllEmpty = dataToSync.length === 0 || dataToSync.every(q => (!q.text || q.text.trim() === '') && (!q.choices || q.choices.every(c => !c.text || c.text.trim() === '')));
-        if (isAllEmpty) {
-            dataToSync = [{
-                    group: '1',
-                    text: '',
-                    choices: Array.from({ length: this.default_number_of_choices }, () => ({ text: '', correct: false }))
-                }];
-        }
-        // 3. dataToSync 배열의 순서대로 문제를 새로 추가
-        const newQLen = dataToSync.length;
-        for (let i = 0; i < newQLen; i++) {
-            const q = dataToSync[i];
-            if (!q)
-                continue;
-            const qIdx = i + 1; // 1-based index
-            // 새 문제 생성 및 데이터 설정
-            this.control_tower.push_an_empty_question();
-            this.control_tower.set_question(qIdx, q.text ?? '');
-            this.control_tower.set_group(qIdx, parseInt(q.group) || (i + 1));
-            // 선택지 추가 (비어있으면 기본 4개의 빈 선택지 추가)
-            const choices = (q.choices && q.choices.length > 0) ? q.choices : [];
-            for (let j = 0; j < choices.length; j++) {
-                const c = choices[j];
-                if (!c)
-                    continue;
-                this.control_tower.push_choice(qIdx, c.text ?? '', Boolean(c.correct));
-            }
-            // 카테고리 결정
-            this.control_tower.determine_category(qIdx);
-        }
-    }
-    extractQuestionDataFromWorkspace() {
-        // 현재 화면의 데이터를 상태로 추출
-        if (this.currentMenu === 'header-edit')
-            this.saveCurrentHeaderToState();
-        else if (this.currentMenu === 'question-bank')
-            this.saveCurrentQuestionsToState();
-        // 헤더 카테고리가 비어있으면 널스트링으로 보장
-        for (let i = 1; i <= 4; i++) {
-            if (!this.control_tower.get_header_category(i)) {
-                this.control_tower.set_header_category(i, '');
-            }
-        }
-        this.syncQuestionsToWasm();
-    }
-    optimizeQuestionBank() {
-        // 1. 현재 화면 데이터 저장
-        if (this.currentMenu === 'question-bank') {
-            this.saveCurrentQuestionsToState();
-        }
-        else if (this.currentMenu === 'header-edit') {
-            this.saveCurrentHeaderToState();
-        }
-        // 2. 비어 있는 문제 필터링 (본문과 모든 선택지가 비어 있는 경우 제거)
-        this.questionsData = this.questionsData.filter(q => q.text.trim().length > 0 || q.choices.some(c => c.text.trim().length > 0));
-        // 3. 만약 모든 데이터가 비어 있다면 빈 카드 하나만 남김
-        if (this.questionsData.length === 0) {
-            this.questionsData = [{
-                    group: '1',
-                    text: '',
-                    choices: Array.from({ length: this.default_number_of_choices }, () => ({ text: '', correct: false }))
-                }];
-        }
-        // 4. WASM 엔진 데이터 갱신
-        this.syncQuestionsToWasm();
-        // 5. WASM 엔진 최적화
-        this.control_tower.optimize_qbank();
-        // 6. 결과 반영 (WASM에서 다시 읽어와서 UI 갱신)
-        this.putQuestionBankToWorkspace();
-    }
     /* 문제 은행 내보내기 관련 함수군 */
     /** 시스템 저장 대화상자를 호출하여 문제 은행을 저장합니다. */
     async exportQuestionBankWithAnswerSheet(fixedType) {
@@ -3025,9 +2954,13 @@ class QuizWizApp {
             else {
                 fixedType = 'docx';
             }
+            let filename = this.question_bank_file_name || 'untitled';
+            if (filename.includes('.'))
+                filename = filename.replace(".qbdb", "");
+            filename += '.' + fixedType;
             this.handle = await window.showSaveFilePicker({
                 id: 'export-with-answer-sheet' + (fixedType ? '-' + fixedType : ''), // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
-                suggestedName: this.question_bank_file_name + (fixedType ? '.' + fixedType : ''),
+                suggestedName: filename,
                 types: types
             });
             // 파일명에서 확장자 추출 (예: 'file.docx' -> 'docx')
@@ -3109,6 +3042,10 @@ class QuizWizApp {
             else {
                 fixedType = 'docx';
             }
+            let filename = this.question_bank_file_name || 'untitled';
+            if (filename.includes('.'))
+                filename = filename.replace(".qbdb", "");
+            filename += '.' + fixedType;
             this.handle = await window.showSaveFilePicker({
                 id: 'export-with-answer-sheet' + (fixedType ? '-' + fixedType : ''), // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
                 suggestedName: this.question_bank_file_name + (fixedType ? '.' + fixedType : ''),
@@ -3169,6 +3106,85 @@ class QuizWizApp {
             const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.toString());
             alert(msg);
         }
+    }
+    /** 현재 questionsData 배열의 내용을 WASM 엔진(ControlTower)에 동기화합니다. */
+    syncQuestionsToWasm() {
+        // 1. WASM 엔진의 기존 모든 문제 삭제 (뒤에서부터 삭제하여 인덱스 유지)
+        const oldQLen = this.control_tower.get_question_length();
+        for (let i = oldQLen; i >= 1; i--) {
+            this.control_tower.remove_question(i);
+        }
+        // 2. 만약 작업공간의 모든 문제가 비어있거나 문제가 0개이면 1개의 빈 문제만 널스트링으로 채워 동기화
+        let dataToSync = this.questionsData;
+        const isAllEmpty = dataToSync.length === 0 || dataToSync.every(q => (!q.text || q.text.trim() === '') && (!q.choices || q.choices.every(c => !c.text || c.text.trim() === '')));
+        if (isAllEmpty) {
+            dataToSync = [{
+                    group: '1',
+                    text: '',
+                    choices: Array.from({ length: this.default_number_of_choices }, () => ({ text: '', correct: false }))
+                }];
+        }
+        // 3. dataToSync 배열의 순서대로 문제를 새로 추가
+        const newQLen = dataToSync.length;
+        for (let i = 0; i < newQLen; i++) {
+            const q = dataToSync[i];
+            if (!q)
+                continue;
+            const qIdx = i + 1; // 1-based index
+            // 새 문제 생성 및 데이터 설정
+            this.control_tower.push_an_empty_question();
+            this.control_tower.set_question(qIdx, q.text ?? '');
+            this.control_tower.set_group(qIdx, parseInt(q.group) || (i + 1));
+            // 선택지 추가 (비어있으면 기본 4개의 빈 선택지 추가)
+            const choices = (q.choices && q.choices.length > 0) ? q.choices : [];
+            for (let j = 0; j < choices.length; j++) {
+                const c = choices[j];
+                if (!c)
+                    continue;
+                this.control_tower.push_choice(qIdx, c.text ?? '', Boolean(c.correct));
+            }
+            // 카테고리 결정
+            this.control_tower.determine_category(qIdx);
+        }
+    }
+    extractQuestionDataFromWorkspace() {
+        // 현재 화면의 데이터를 상태로 추출
+        if (this.currentMenu === 'header-edit')
+            this.saveCurrentHeaderToState();
+        else if (this.currentMenu === 'question-bank')
+            this.saveCurrentQuestionsToState();
+        // 헤더 카테고리가 비어있으면 널스트링으로 보장
+        for (let i = 1; i <= 4; i++) {
+            if (!this.control_tower.get_header_category(i)) {
+                this.control_tower.set_header_category(i, '');
+            }
+        }
+        this.syncQuestionsToWasm();
+    }
+    optimizeQuestionBank() {
+        // 1. 현재 화면 데이터 저장
+        if (this.currentMenu === 'question-bank') {
+            this.saveCurrentQuestionsToState();
+        }
+        else if (this.currentMenu === 'header-edit') {
+            this.saveCurrentHeaderToState();
+        }
+        // 2. 비어 있는 문제 필터링 (본문과 모든 선택지가 비어 있는 경우 제거)
+        this.questionsData = this.questionsData.filter(q => q.text.trim().length > 0 || q.choices.some(c => c.text.trim().length > 0));
+        // 3. 만약 모든 데이터가 비어 있다면 빈 카드 하나만 남김
+        if (this.questionsData.length === 0) {
+            this.questionsData = [{
+                    group: '1',
+                    text: '',
+                    choices: Array.from({ length: this.default_number_of_choices }, () => ({ text: '', correct: false }))
+                }];
+        }
+        // 4. WASM 엔진 데이터 갱신
+        this.syncQuestionsToWasm();
+        // 5. WASM 엔진 최적화
+        this.control_tower.optimize_qbank();
+        // 6. 결과 반영 (WASM에서 다시 읽어와서 UI 갱신)
+        this.putQuestionBankToWorkspace();
     }
     /* 학생 명단 관련 함수군 */
     newStudentList() {
@@ -3378,6 +3394,95 @@ class QuizWizApp {
             if (err.name !== 'AbortError') {
                 console.error("다른 이름으로 저장 중 오류 발생:", err);
             }
+        }
+    }
+    /* 학생 목록 내보내기 관련 함수군 */
+    /** 시스템 저장 대화상자를 호출하여 학생 목록을 저장합니다. */
+    async exportStudentList(fixedType) {
+        try {
+            const allTypes = [
+                { description: 'MS Word Document', accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] } },
+                { description: 'PDF Document', accept: { 'application/pdf': ['.pdf'] } },
+                { description: 'Text File', accept: { 'text/plain': ['.txt'] } }
+            ];
+            let determined = false;
+            let types = allTypes;
+            if (fixedType) {
+                types = allTypes.filter(t => {
+                    const extensions = Object.values(t.accept)[0];
+                    return extensions.includes(`.${fixedType}`);
+                });
+                determined = true;
+            }
+            else {
+                fixedType = 'docx';
+            }
+            let filename = this.student_list_file_name || 'untitled';
+            if (filename.includes('.'))
+                filename = filename.replace(".sbdb", "");
+            filename += '.' + fixedType;
+            this.handle = await window.showSaveFilePicker({
+                id: 'export-with-answer-sheet' + (fixedType ? '-' + fixedType : ''), // 브라우저가 이 ID를 기반으로 대화상자 위치/설정 기억
+                suggestedName: filename,
+                types: types
+            });
+            // 파일명에서 확장자 추출 (예: 'file.docx' -> 'docx')
+            this.doctype = this.handle.name.split('.').pop()?.toLowerCase() || '';
+            /////////////////////////////
+            // switch (this.handle.getFile().type)
+            // {
+            // case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': this.doctype = 'docx';   break;
+            // case 'text/plain':          this.doctype = 'txt';   break;
+            // case 'application/pdf':     this.doctype = 'pdf';   break;
+            // }
+            // alert(this.handle.getFile().type);
+            console.log("학생 목록 내보내기 설정 완료 - 핸들:", this.handle, "형식:", this.doctype);
+            let doctype = determined ? fixedType : this.doctype;
+            // 고정된 형식이 지정된 경우, 해당 형식으로 바로 저장 실행
+            switch (doctype) {
+                case 'docx':
+                    await this.exportStudentListAsDocx();
+                    break;
+                case 'txt':
+                    await this.exportStudentListAsTxt();
+                    break;
+                case 'pdf':
+                    await this.exportStudentListAsPdf();
+                    break;
+                default: {
+                    const msg = this.translations.actions['msg-unsupported-file-format'] || this.default_translations.actions['msg-unsupported-file-format'];
+                    alert(msg);
+                }
+            }
+        }
+        catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error("시험지 저장 중 오류:", err);
+                const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err);
+                alert(msg);
+            }
+        }
+    }
+    async exportStudentListAsDocx() {
+        const student_list_title = this.translations.actions['student-list-title'] || 'Student List';
+        const bytes = this.control_tower.export_sbank_in_docx(student_list_title);
+        this.saveFile(bytes);
+    }
+    async exportStudentListAsTxt() {
+        const student_list_title = this.translations.actions['student-list-title'] || 'Student List';
+        const bytes = this.control_tower.export_sbank_in_txt(student_list_title);
+        this.saveFile(bytes);
+    }
+    async exportStudentListAsPdf() {
+        try {
+            const student_list_title = this.translations.actions['student-list-title'] || 'Student List';
+            const bytes = this.control_tower.export_sbank_in_pdf(student_list_title);
+            await this.savePdfFile(bytes);
+        }
+        catch (err) {
+            console.error("PDF 생성 중 오류 발생:", err);
+            const msg = (this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.toString());
+            alert(msg);
         }
     }
     /* 시험 및 학습 관련 함수군 */

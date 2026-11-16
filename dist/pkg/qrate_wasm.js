@@ -364,6 +364,132 @@ export class ControlTower {
         return v3;
     }
     /**
+     * Exports the loaded SBank in DOCX format.
+     *
+     * This method creates a `SBankExporter` instance using the loaded SBank
+     * and calls its `export_sbank_in_docx()` method to export the SBank in DOCX format.
+     * The exported data is returned as a byte vector.
+     *
+     * If the SBank is not loaded or the export fails, it returns an error.
+     *
+     * # Arguments
+     * * `student_list_title` - The title to be used for the student list
+     *   in the exported SBank.
+     *
+     * # Returns
+     * - `Ok(Vec<u8>)` containing the exported SBank in DOCX format
+     *   if the SBank is loaded and the export is successful.
+     * - `Err(JsValue)` with an error message if the SBank is not loaded or the export fails.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * match control_tower.export_sbank_in_docx("Student List".to_string())
+     * {
+     *     Ok(data) => println!("SBank exported successfully, size: {}", data.len()),
+     *     Err(e) => println!("Failed to export SBank: {}", e.as_string().unwrap_or_else(|| "Unknown error".to_string())),
+     * }
+     * ```
+     * @param {string} student_list_title
+     * @returns {Uint8Array}
+     */
+    export_sbank_in_docx(student_list_title) {
+        const ptr0 = passStringToWasm0(student_list_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_export_sbank_in_docx(this.__wbg_ptr, ptr0, len0);
+        if (ret[3]) {
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v2;
+    }
+    /**
+     * Exports the loaded SBank in PDF format.
+     *
+     * This method creates a `SBankExporter` instance using the loaded SBank
+     * and calls its `export_sbank_in_pdf()` method to export the SBank in PDF format.
+     * The exported data is returned as a byte vector.
+     *
+     * If the SBank is not loaded or the export fails, it returns an error.
+     *
+     * # Arguments
+     * * `student_list_title` - The title to be used for the student list
+     *   in the exported SBank.
+     *
+     * # Returns
+     * - `Ok(Vec<u8>)` containing the exported SBank in PDF format
+     *   if the SBank is loaded and the export is successful.
+     * - `Err(JsValue)` with an error message if the SBank is not loaded or the export fails.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * match control_tower.export_sbank_in_pdf("Student List".to_string())
+     * {
+     *     Ok(data) => println!("SBank exported successfully, size: {}", data.len()),
+     *     Err(e) => println!("Failed to export SBank: {}", e.as_string().unwrap_or_else(|| "Unknown error".to_string())),
+     * }
+     * ```
+     * @param {string} student_list_title
+     * @returns {Uint8Array}
+     */
+    export_sbank_in_pdf(student_list_title) {
+        const ptr0 = passStringToWasm0(student_list_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_export_sbank_in_pdf(this.__wbg_ptr, ptr0, len0);
+        if (ret[3]) {
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v2;
+    }
+    /**
+     * Exports the loaded SBank in plain text format.
+     *
+     * This method creates a `SBankExporter` instance using the loaded QBank
+     * and calls its `export_sbank_in_txt()` method to export the SBank in
+     * plain text format. The exported data is returned as a byte vector.
+     *
+     * If the SBank is not loaded, it returns an error.
+     *
+     * # Arguments
+     * * `student_list_title` - The title to be used for the student list
+     *   in the exported SBank.
+     *
+     * # Returns
+     * - `Ok(Vec<u8>)` containing the exported SBank in plain text format
+     *   if the QBank is loaded.
+     * - `Err(JsValue)` with an error message if the QBank is not loaded.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * match control_tower.export_sbank_in_txt("Student List".to_string())
+     * {
+     *     Ok(data) => println!("SBank exported successfully, size: {}", data.len()),
+     *     Err(e) => println!("Failed to export SBank: {}", e.as_string().unwrap_or_else(|| "Unknown error".to_string())),
+     * }
+     * ```
+     * @param {string} student_list_title
+     * @returns {Uint8Array}
+     */
+    export_sbank_in_txt(student_list_title) {
+        const ptr0 = passStringToWasm0(student_list_title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_export_sbank_in_txt(this.__wbg_ptr, ptr0, len0);
+        if (ret[3]) {
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v2;
+    }
+    /**
      * Generates a shuffled exam in DOCX format based on the questions
      * in the QBank and the students in the SBank.
      *

@@ -214,6 +214,7 @@
         "msg-submit-success": "Ответы успешно сданы!",
         "ss-score-result-title": "Результат экзамена",
         "answer-sheet-title": "Ключи к тестам",
+        "student-list-title": "Спи́сок студе́нтов",
         "dlgbx-qb-file-type-description": "База данных банка вопросов SQLite",
         "dlgbx-sb-file-type-description": "База данных списка студентов SQLite",
         "dlgbx-button-ok": "OK",

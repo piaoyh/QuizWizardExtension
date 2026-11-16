@@ -215,6 +215,7 @@
         "msg-submit-success": "답안지가 성공적으로 제출되었습니다!",
         "ss-score-result-title": "시험 결과",
         "answer-sheet-title": "정답지",
+        "student-list-title": "학생 명단",
         "dlgbx-qb-file-type-description": "SQLite 문제 은행 데이터베이스",
         "dlgbx-sb-file-type-description": "SQLite 학생 명단 데이터베이스",
         "dlgbx-button-ok": "확인",

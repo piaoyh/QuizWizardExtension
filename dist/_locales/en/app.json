@@ -215,6 +215,7 @@
         "msg-submit-success": "Submitted successfully!",
         "ss-score-result-title": "Exam Result",
         "answer-sheet-title": "Answer Sheet",
+        "student-list-title": "Student List",
         "dlgbx-qb-file-type-description": "SQLite Question Bank Database",
         "dlgbx-sb-file-type-description": "SQLite Student List Database",
         "dlgbx-button-ok": "OK",
