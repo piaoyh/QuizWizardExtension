@@ -1710,8 +1710,12 @@ class QuizWizApp {
             /* --- Tools (도구) --- */
             case 'tl-qbdb-to-qb-xlsx': this.convertQbdbToQbXlsx(); break;
             case 'tl-qb-xlsx-to-qbdb': this.convertQbXlsxToQbdb(); break;
+            case 'tl-qbdb-to-qb-ods':  this.convertQbdbToQbOds(); break;
+            case 'tl-qb-ods-to-qbdb':  this.convertQbOdsToQbdb(); break;
             case 'tl-sbdb-to-sb-xlsx': this.convertSbdbToSbXlsx(); break;
             case 'tl-sb-xlsx-to-sbdb': this.convertSbXlsxToSbdb(); break;
+            case 'tl-sbdb-to-sb-ods':  this.convertSbdbToSbOds(); break;
+            case 'tl-sb-ods-to-sbdb':  this.convertSbOdsToSbdb(); break;
 
             /* --- Settings (설정) --- */
             case 'st-theme':        
@@ -4943,33 +4947,62 @@ class QuizWizApp {
         const qbXlsxToQbdb = langData.actions['tl-qb-xlsx-to-qbdb'] || defaultLangData.actions['tl-qb-xlsx-to-qbdb'] || '.qb.xlsx -> .qbdb 변환';
         const qbXlsxToQbdbTooltip = langData.actions['tl-qb-xlsx-to-qbdb-tooltip'] || defaultLangData.actions['tl-qb-xlsx-to-qbdb-tooltip'] || '';
 
+        const qbdbToQbOds = langData.actions['tl-qbdb-to-qb-ods'] || defaultLangData.actions['tl-qbdb-to-qb-ods'] || '.qbdb -> .qb.ods 변환';
+        const qbdbToQbOdsTooltip = langData.actions['tl-qbdb-to-qb-ods-tooltip'] || defaultLangData.actions['tl-qbdb-to-qb-ods-tooltip'] || '';
+
+        const qbOdsToQbdb = langData.actions['tl-qb-ods-to-qbdb'] || defaultLangData.actions['tl-qb-ods-to-qbdb'] || '.qb.ods -> .qbdb 변환';
+        const qbOdsToQbdbTooltip = langData.actions['tl-qb-ods-to-qbdb-tooltip'] || defaultLangData.actions['tl-qb-ods-to-qbdb-tooltip'] || '';
+
         const sbdbToSbXlsx = langData.actions['tl-sbdb-to-sb-xlsx'] || defaultLangData.actions['tl-sbdb-to-sb-xlsx'] || '.sbdb -> .sb.xlsx 변환';
         const sbdbToSbXlsxTooltip = langData.actions['tl-sbdb-to-sb-xlsx-tooltip'] || defaultLangData.actions['tl-sbdb-to-sb-xlsx-tooltip'] || '';
 
         const sbXlsxToSbdb = langData.actions['tl-sb-xlsx-to-sbdb'] || defaultLangData.actions['tl-sb-xlsx-to-sbdb'] || '.sb.xlsx -> .sbdb 변환';
         const sbXlsxToSbdbTooltip = langData.actions['tl-sb-xlsx-to-sbdb-tooltip'] || defaultLangData.actions['tl-sb-xlsx-to-sbdb-tooltip'] || '';
 
+        const sbdbToSbOds = langData.actions['tl-sbdb-to-sb-ods'] || defaultLangData.actions['tl-sbdb-to-sb-ods'] || '.sbdb -> .sb.ods 변환';
+        const sbdbToSbOdsTooltip = langData.actions['tl-sbdb-to-sb-ods-tooltip'] || defaultLangData.actions['tl-sbdb-to-sb-ods-tooltip'] || '';
+
+        const sbOdsToSbdb = langData.actions['tl-sb-ods-to-sbdb'] || defaultLangData.actions['tl-sb-ods-to-sbdb'] || '.sb.ods -> .sbdb 변환';
+        const sbOdsToSbdbTooltip = langData.actions['tl-sb-ods-to-sbdb-tooltip'] || defaultLangData.actions['tl-sb-ods-to-sbdb-tooltip'] || '';
+
+        // repeat(auto-fit, minmax(320px, 1fr))
         this.container.innerHTML = `
             <div class="view-header">
                 <h2>${title}</h2>
             </div>
             <div class="view-content tools-workspace" style="padding: 24px; max-width: 860px; margin: 0 auto;">
-                <div class="tools-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
-                    <div class="tool-card" data-action="tl-qbdb-to-qb-xlsx" style="padding: 20px; border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; cursor: pointer; background: var(--bg-card, #ffffff); box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.15s, box-shadow 0.15s;">
-                        <h3 style="margin: 0 0 8px 0; font-size: 16px; color: var(--primary-color, #1a73e8);">${qbdbToQbXlsx}</h3>
-                        <p style="margin: 0; font-size: 13px; color: var(--text-secondary, #666); line-height: 1.4;">${qbdbToQbXlsxTooltip}</p>
+                <div class="tools-grid">
+                    <div class="tool-card" data-action="tl-qbdb-to-qb-xlsx">
+                        <h3>${qbdbToQbXlsx}</h3>
+                        <p>${qbdbToQbXlsxTooltip}</p>
                     </div>
-                    <div class="tool-card" data-action="tl-qb-xlsx-to-qbdb" style="padding: 20px; border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; cursor: pointer; background: var(--bg-card, #ffffff); box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.15s, box-shadow 0.15s;">
-                        <h3 style="margin: 0 0 8px 0; font-size: 16px; color: var(--primary-color, #1a73e8);">${qbXlsxToQbdb}</h3>
-                        <p style="margin: 0; font-size: 13px; color: var(--text-secondary, #666); line-height: 1.4;">${qbXlsxToQbdbTooltip}</p>
+                    <div class="tool-card" data-action="tl-qb-xlsx-to-qbdb">
+                        <h3>${qbXlsxToQbdb}</h3>
+                        <p>${qbXlsxToQbdbTooltip}</p>
                     </div>
-                    <div class="tool-card" data-action="tl-sbdb-to-sb-xlsx" style="padding: 20px; border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; cursor: pointer; background: var(--bg-card, #ffffff); box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.15s, box-shadow 0.15s;">
-                        <h3 style="margin: 0 0 8px 0; font-size: 16px; color: var(--primary-color, #1a73e8);">${sbdbToSbXlsx}</h3>
-                        <p style="margin: 0; font-size: 13px; color: var(--text-secondary, #666); line-height: 1.4;">${sbdbToSbXlsxTooltip}</p>
+                    <div class="tool-card" data-action="tl-qbdb-to-qb-ods">
+                        <h3>${qbdbToQbOds}</h3>
+                        <p>${qbdbToQbOdsTooltip}</p>
                     </div>
-                    <div class="tool-card" data-action="tl-sb-xlsx-to-sbdb" style="padding: 20px; border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; cursor: pointer; background: var(--bg-card, #ffffff); box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.15s, box-shadow 0.15s;">
-                        <h3 style="margin: 0 0 8px 0; font-size: 16px; color: var(--primary-color, #1a73e8);">${sbXlsxToSbdb}</h3>
-                        <p style="margin: 0; font-size: 13px; color: var(--text-secondary, #666); line-height: 1.4;">${sbXlsxToSbdbTooltip}</p>
+                    <div class="tool-card" data-action="tl-qb-ods-to-qbdb">
+                        <h3>${qbOdsToQbdb}</h3>
+                        <p>${qbOdsToQbdbTooltip}</p>
+                    </div>
+                    <div class="tool-card" data-action="tl-sbdb-to-sb-xlsx"">
+                        <h3>${sbdbToSbXlsx}</h3>
+                        <p>${sbdbToSbXlsxTooltip}</p>
+                    </div>
+                    <div class="tool-card" data-action="tl-sb-xlsx-to-sbdb">
+                        <h3>${sbXlsxToSbdb}</h3>
+                        <p>${sbXlsxToSbdbTooltip}</p>
+                    </div>
+                    <div class="tool-card" data-action="tl-sbdb-to-sb-ods"">
+                        <h3>${sbdbToSbOds}</h3>
+                        <p>${sbdbToSbOdsTooltip}</p>
+                    </div>
+                    <div class="tool-card" data-action="tl-sb-ods-to-sbdb">
+                        <h3>${sbOdsToSbdb}</h3>
+                        <p>${sbOdsToSbdbTooltip}</p>
                     </div>
                 </div>
             </div>
@@ -5025,7 +5058,7 @@ class QuizWizApp {
         // 2단계: .qb.xlsx 파일로 변환 후 저장
         try
         {
-            // 1. WASM 엔진으로부터 Excel XLSX 포맷의 바이트 열 추출
+            // 1. Excel XLSX 포맷으로 변환
             const bytes = this.control_tower.write_qbank_to_bytes_of_excel_for_conversion();
 
             // 2. 저장할 파일 위치 선택
@@ -5110,7 +5143,7 @@ class QuizWizApp {
         // 2단계: .qbdb 파일로 변환 후 저장
         try
         {
-            // 1. WASM 엔진으로부터 Excel XLSX 포맷의 바이트 열 추출
+            // 1. SQLite (QBDB) 포맷으로 변환
             const bytes = this.control_tower.write_qbank_to_bytes_of_sqlite_for_conversion();
 
             // 2. 저장할 파일 위치 선택
@@ -5144,6 +5177,168 @@ class QuizWizApp {
             this.control_tower.clear_qbank_for_conversion();
         }
         console.log("도구 실행: .qb.xlsx -> .qbdb 변환");
+    }
+
+    /** .qbdb -> .qb.ods 변환 */
+    private async convertQbdbToQbOds()
+    {
+        let namein: string = '';
+
+        // 1단계: .qbdb 파일 열기
+        try
+        {
+            const descriptions = this.translations.actions['dlgbx-qb-file-type-description'] || 'SQLite Question Bank Database';
+            const [handle] = await (window as any).showOpenFilePicker({
+                types: [{
+                    description: descriptions,
+                    accept: { 'application/x-sqlite3': ['.qbdb'] }
+                }],
+                excludeAcceptAllOption: true,
+                multiple: false
+            });
+
+            namein = handle.name;
+            const file = await handle.getFile();
+            const buffer = await file.arrayBuffer();
+            
+            // WASM 엔진에 데이터 전달 (SQLite 형식)
+            this.control_tower.set_qbank_from_bytes_of_sqlite_for_conversion(new Uint8Array(buffer));
+        }
+        catch (err: any)
+        {
+            if (err.name !== 'AbortError')
+            {
+                console.error("문제 은행 파일 열기 중 오류 발생:", err);
+                if (err === 0)
+                    alert(this.translations.actions['msg-invalid-version-error'] || this.default_translations.actions['msg-invalid-version-error']);
+                else
+                    alert((this.translations.actions['msg-file-open-error'] || this.default_translations.actions['msg-file-open-error']).replace('{error}', err.message || err));
+            }
+            return; // 파일 열기 실패 또는 취소 시 저장 단계로 진입하지 않음
+        }
+
+        // 2단계: .qb.ods 파일로 변환 후 저장
+        try
+        {
+            // 1. OpenDocument Spreadsheet (ODS) 포맷으로 변환
+            const bytes = this.control_tower.write_qbank_to_bytes_of_spreadsheet_for_conversion();
+
+            // 2. 저장할 파일 위치 선택
+            const descriptions = this.translations.actions['dlgbx-qb-ods-file-type-description']
+                               || this.default_translations.actions['dlgbx-qb-ods-file-type-description']
+                               || 'OpenDocument Spreadsheet';
+            const handle = await (window as any).showSaveFilePicker({
+                suggestedName: namein.replace('.qbdb', '.qb.ods') || 'untitled.qb.ods',
+                types: [{
+                    description: descriptions,
+                    accept: { 'application/vnd.oasis.opendocument.spreadsheet': ['.qb.ods'] }
+                }]
+            });
+
+            // 3. 파일 시스템 writable을 사용하여 데이터 저장
+            const writable = await handle.createWritable();
+            await writable.write(bytes);
+            await writable.close();
+            
+            console.log("문제 은행 저장 완료:", handle.name);
+        }
+        catch (err: any)
+        {
+            if (err.name !== 'AbortError')
+            {
+                console.error("저장 처리 중 오류 발생:", err);
+                alert((this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err));
+            }
+        }
+        finally
+        {
+            this.control_tower.clear_qbank_for_conversion();
+        }
+        console.log("도구 실행: .qbdb -> .qb.ods 변환");
+    }
+
+    /** .qb.ods -> .qbdb 변환 */
+    private async convertQbOdsToQbdb()
+    {
+        let namein: string = '';
+
+        // 1단계: .qb.ods 파일 열기
+        try
+        {
+            const descriptions = this.translations.actions['dlgbx-qb-ods-file-type-description']
+                               || this.default_translations.actions['dlgbx-qb-ods-file-type-description']
+                               || 'OpenDocument Spreadsheet (*.qb.ods)';
+            const [handle] = await (window as any).showOpenFilePicker({
+                types: [{
+                    description: descriptions,
+                    accept: { 'application/vnd.oasis.opendocument.spreadsheet': ['.qb.ods'] }
+                }],
+                excludeAcceptAllOption: true,
+                multiple: false
+            });
+
+            namein = handle.name;
+            const file = await handle.getFile();
+            if (!file.name.toLowerCase().endsWith('.qb.ods'))
+            {
+                alert(this.translations.actions['msg-invalid-qb-ods-file-type'] || this.default_translations.actions['msg-invalid-qb-ods-file-type']);
+                return; // 진행 중단
+            }
+            const buffer = await file.arrayBuffer();
+            
+            // WASM 엔진에 데이터 전달 (qb.ods 형식)
+            this.control_tower.set_qbank_from_bytes_of_spreadsheet_for_conversion(new Uint8Array(buffer));
+        }
+        catch (err: any)
+        {
+            if (err.name !== 'AbortError')
+            {
+                console.error("문제 은행 ods 파일 열기 중 오류 발생:", err);
+                if (err === 0)
+                    alert(this.translations.actions['msg-invalid-version-error'] || this.default_translations.actions['msg-invalid-version-error']);
+                else
+                    alert((this.translations.actions['msg-file-open-error'] || this.default_translations.actions['msg-file-open-error']).replace('{error}', err.message || err));
+            }
+            return; // 파일 열기 실패 또는 취소 시 저장 단계로 진입하지 않음
+        }
+
+        // 2단계: .qbdb 파일로 변환 후 저장
+        try
+        {
+            // 1. SQLite (QBDB) 포맷으로 변환
+            const bytes = this.control_tower.write_qbank_to_bytes_of_sqlite_for_conversion();
+
+            // 2. 저장할 파일 위치 선택
+            const descriptions = this.translations.actions['dlgbx-qb-file-type-description'] || 'SQLite Question Bank Database';
+            
+            const handle = await (window as any).showSaveFilePicker({
+                suggestedName: namein.replace('.qb.ods', '.qbdb') || 'untitled.qbdb',
+                types: [{
+                    description: descriptions,
+                    accept: { 'application/x-sqlite3': ['.qbdb'] }
+                }]
+            });
+
+            // 3. 파일 시스템 writable을 사용하여 데이터 저장
+            const writable = await handle.createWritable();
+            await writable.write(bytes);
+            await writable.close();
+            
+            console.log("문제 은행 저장 완료:", handle.name);
+        }
+        catch (err: any)
+        {
+            if (err.name !== 'AbortError')
+            {
+                console.error("저장 처리 중 오류 발생:", err);
+                alert((this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err));
+            }
+        }
+        finally
+        {
+            this.control_tower.clear_qbank_for_conversion();
+        }
+        console.log("도구 실행: .qb.ods -> .qbdb 변환");
     }
 
     /** .sbdb -> .sb.xlsx 변환 */
@@ -5187,7 +5382,7 @@ class QuizWizApp {
         // 2단계: .sb.xlsx 파일로 변환 후 저장
         try
         {
-            // 1. WASM 엔진으로부터 Excel XLSX 포맷의 바이트 열 추출
+            // 1. Excel (XLSX) 포맷으로 변환
             const bytes = this.control_tower.write_sbank_to_bytes_of_excel_for_conversion();
 
             // 2. 저장할 파일 위치 선택
@@ -5272,7 +5467,169 @@ class QuizWizApp {
         // 2단계: .sbdb 파일로 변환 후 저장
         try
         {
-            // 1. WASM 엔진으로부터 Excel XLSX 포맷의 바이트 열 추출
+            // 1. SQLite (SBDB) 포맷으로 변환
+            const bytes = this.control_tower.write_sbank_to_bytes_of_sqlite_for_conversion();
+
+            // 2. 저장할 파일 위치 선택
+            const descriptions = this.translations.actions['dlgbx-sb-file-type-description'] || 'SQLite Question Bank Database';
+            
+            const handle = await (window as any).showSaveFilePicker({
+                suggestedName: namein.replace('.sb.xlsx', '.sbdb') || 'untitled.sbdb',
+                types: [{
+                    description: descriptions,
+                    accept: { 'application/x-sqlite3': ['.sbdb'] }
+                }]
+            });
+
+            // 3. 파일 시스템 writable을 사용하여 데이터 저장
+            const writable = await handle.createWritable();
+            await writable.write(bytes);
+            await writable.close();
+            
+            console.log("학생 명단 저장 완료:", handle.name);
+        }
+        catch (err: any)
+        {
+            if (err.name !== 'AbortError')
+            {
+                console.error("저장 처리 중 오류 발생:", err);
+                alert((this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err));
+            }
+        }
+        finally
+        {
+            this.control_tower.clear_sbank_for_conversion();
+        }
+        console.log("도구 실행: .sb.xlsx -> .sbdb 변환");
+    }
+
+    /** .sbdb -> .sb.ods 변환 */
+    private async convertSbdbToSbOds()
+    {
+        let namein: string = '';
+
+        // 1단계: .sbdb 파일 열기
+        try
+        {
+            const descriptions = this.translations.actions['dlgbx-sb-file-type-description'] || 'SQLite Student List Database';
+            const [handle] = await (window as any).showOpenFilePicker({
+                types: [{
+                    description: descriptions,
+                    accept: { 'application/x-sqlite3': ['.sbdb'] }
+                }],
+                excludeAcceptAllOption: true,
+                multiple: false
+            });
+
+            namein = handle.name;
+            const file = await handle.getFile();
+            const buffer = await file.arrayBuffer();
+            
+            // WASM 엔진에 데이터 전달 (SQLite 형식)
+            this.control_tower.set_sbank_from_bytes_of_sqlite_for_conversion(new Uint8Array(buffer));
+        }
+        catch (err: any)
+        {
+            if (err.name !== 'AbortError')
+            {
+                console.error("학생 명단 파일 열기 중 오류 발생:", err);
+                if (err === 0)
+                    alert(this.translations.actions['msg-invalid-version-error'] || this.default_translations.actions['msg-invalid-version-error']);
+                else
+                    alert((this.translations.actions['msg-file-open-error'] || this.default_translations.actions['msg-file-open-error']).replace('{error}', err.message || err));
+            }
+            return; // 파일 열기 실패 또는 취소 시 저장 단계로 진입하지 않음
+        }
+
+        // 2단계: .sb.ods 파일로 변환 후 저장
+        try
+        {
+            // 1. OpenDocument Spreadsheet (ODS) 포맷으로 변환
+            const bytes = this.control_tower.write_sbank_to_bytes_of_spreadsheet_for_conversion();
+
+            // 2. 저장할 파일 위치 선택
+            const descriptions = this.translations.actions['dlgbx-sb-ods-file-type-description']
+                               || this.default_translations.actions['dlgbx-sb-ods-file-type-description']
+                               || 'OpenDocument Spreadsheet';
+            const handle = await (window as any).showSaveFilePicker({
+                suggestedName: namein.replace('.sbdb', '.sb.ods') || 'untitled.sb.ods',
+                types: [{
+                    description: descriptions,
+                    accept: { 'application/vnd.oasis.opendocument.spreadsheet': ['.sb.ods'] }
+                }]
+            });
+
+            // 3. 파일 시스템 writable을 사용하여 데이터 저장
+            const writable = await handle.createWritable();
+            await writable.write(bytes);
+            await writable.close();
+            
+            console.log("학생 명단 저장 완료:", handle.name);
+        }
+        catch (err: any)
+        {
+            if (err.name !== 'AbortError')
+            {
+                console.error("저장 처리 중 오류 발생:", err);
+                alert((this.translations.actions['msg-file-save-error'] || this.default_translations.actions['msg-file-save-error']).replace('{error}', err.message || err));
+            }
+        }
+        finally
+        {
+            this.control_tower.clear_qbank_for_conversion();
+        }
+        console.log("도구 실행: .sbdb -> .sb.ods 변환");
+    }
+
+    /** .sb.ods -> .sbdb 변환 */
+    private async convertSbOdsToSbdb()
+    {
+        let namein: string = '';
+
+        // 1단계: .sb.ods 파일 열기
+        try
+        {
+            const descriptions = this.translations.actions['dlgbx-sb-ods-file-type-description']
+                               || this.default_translations.actions['dlgbx-sb-ods-file-type-description']
+                               || 'OpenDocument Spreadsheet (*.sb.ods)';
+            const [handle] = await (window as any).showOpenFilePicker({
+                types: [{
+                    description: descriptions,
+                    accept: { 'application/vnd.oasis.opendocument.spreadsheet': ['.sb.ods'] }
+                }],
+                excludeAcceptAllOption: true,
+                multiple: false
+            });
+
+            namein = handle.name;
+            const file = await handle.getFile();
+            if (!file.name.toLowerCase().endsWith('.sb.ods'))
+            {
+                alert(this.translations.actions['msg-invalid-sb-ods-file-type'] || this.default_translations.actions['msg-invalid-sb-ods-file-type']);
+                return; // 진행 중단
+            }
+            const buffer = await file.arrayBuffer();
+            
+            // WASM 엔진에 데이터 전달 (qb.ods 형식)
+            this.control_tower.set_sbank_from_bytes_of_spreadsheet_for_conversion(new Uint8Array(buffer));
+        }
+        catch (err: any)
+        {
+            if (err.name !== 'AbortError')
+            {
+                console.error("학생 명단 ods 파일 열기 중 오류 발생:", err);
+                if (err === 0)
+                    alert(this.translations.actions['msg-invalid-version-error'] || this.default_translations.actions['msg-invalid-version-error']);
+                else
+                    alert((this.translations.actions['msg-file-open-error'] || this.default_translations.actions['msg-file-open-error']).replace('{error}', err.message || err));
+            }
+            return; // 파일 열기 실패 또는 취소 시 저장 단계로 진입하지 않음
+        }
+
+        // 2단계: .sbdb 파일로 변환 후 저장
+        try
+        {
+            // 1. SQLite (SBDB) 포맷으로 변환
             const bytes = this.control_tower.write_sbank_to_bytes_of_sqlite_for_conversion();
 
             // 2. 저장할 파일 위치 선택

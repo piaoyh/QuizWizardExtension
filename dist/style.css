@@ -946,3 +946,101 @@ body.theme-blue #font-dropdown-btn {
     color: #666;
     line-height: 1.4;
 }
+
+/* ==========================================================================
+   Tools Workspace Styles (Added)
+   ========================================================================== */
+.tools-workspace {
+    padding: 24px;
+    max-width: 860px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+/* 창 너비가 500px 이하일 때 1열로 전환 */
+@media (max-width: 500px) {
+    .tools-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.tool-card {
+    padding: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: var(--active-bg);
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.2s, background-color 0.2s;
+    box-sizing: border-box;
+}
+
+.tool-card h3 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.tool-card p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-secondary, #666);
+    line-height: 1.4;
+    opacity: 0.85;
+}
+
+/* --------------------------------------------------------------------------
+   테마별 세부 조화 (theme-light / theme-blue / theme-dark)
+   -------------------------------------------------------------------------- */
+
+/* 1. Light 테마: 기존 .question-item.focused 스타일(#0078d4) 반영 */
+body.theme-light .tool-card:hover {
+    transform: translateY(-2px);
+    border-color: #0078d4;
+    box-shadow: 0 0 8px rgba(0, 120, 212, 0.3);
+}
+
+/* 2. Blue 테마: --active-bg가 #3498db이므로 카드 배경을 흰색으로 유지하고 테두리·호버 강조 */
+body.theme-blue .tool-card {
+    background-color: #ffffff;
+}
+
+body.theme-blue .tool-card h3 {
+    color: var(--primary-color, #1a73e8);
+}
+
+body.theme-blue .tool-card:hover {
+    transform: translateY(-2px);
+    border-color: #0d47a1;
+    box-shadow: 0 0 8px rgba(13, 71, 161, 0.4);
+}
+
+body.theme-blue .tool-card:hover h3 {
+    color: #0d47a1;
+}
+
+/* 3. Dark 테마: 기존 body.theme-dark .question-item 스타일과 동일하게 적용 */
+body.theme-dark .tool-card {
+    background-color: var(--active-bg);
+    border: 1px solid var(--border-color);
+}
+
+body.theme-dark .tool-card h3 {
+    color: #ffffff;
+}
+
+body.theme-dark .tool-card p {
+    color: #cccccc;
+}
+
+body.theme-dark .tool-card:hover {
+    transform: translateY(-2px);
+    border-color: #0078d4;
+    box-shadow: 0 0 8px rgba(0, 120, 212, 0.5);
+}

@@ -1116,33 +1116,6 @@ export class ControlTower {
         return ret === 0 ? undefined : QuestionData.__wrap(ret);
     }
     /**
-     * Returns the question data from question bank (QBank)
-     * for the specified question number.
-     *
-     * # Arguments
-     * * `num` - The question number to retrieve.
-     *
-     * # Returns
-     * - `Some(QuestionData)` if the question data is retrieved successfully.
-     * - `None` if the QBank is not loaded.
-     *
-     * # Examples
-     * ```
-     * use qrate::QBank;
-     * let qbank = QBank::new();
-     * if let Some(qdata) = qbank.get_question_data(1)
-     *     { println!("Question data retrieved successfully"); }
-     * else
-     *     { println!("Failed to retrieve question data"); }
-     * ```
-     * @param {number} num
-     * @returns {QuestionData | undefined}
-     */
-    get_question_data(num) {
-        const ret = wasm.controltower_get_question_data(this.__wbg_ptr, num);
-        return ret === 0 ? undefined : QuestionData.__wrap(ret);
-    }
-    /**
      * Retrieves the question text for a given question number from the QBank.
      *
      * If the QBank is not loaded or the question number is out of bounds,
@@ -1179,6 +1152,33 @@ export class ControlTower {
         } finally {
             wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
         }
+    }
+    /**
+     * Returns the question data from question bank (QBank)
+     * for the specified question number.
+     *
+     * # Arguments
+     * * `num` - The question number to retrieve.
+     *
+     * # Returns
+     * - `Some(QuestionData)` if the question data is retrieved successfully.
+     * - `None` if the QBank is not loaded.
+     *
+     * # Examples
+     * ```
+     * use qrate::QBank;
+     * let qbank = QBank::new();
+     * if let Some(qdata) = qbank.get_question_data(1)
+     *     { println!("Question data retrieved successfully"); }
+     * else
+     *     { println!("Failed to retrieve question data"); }
+     * ```
+     * @param {number} num
+     * @returns {QuestionData | undefined}
+     */
+    get_question_data(num) {
+        const ret = wasm.controltower_get_question_data(this.__wbg_ptr, num);
+        return ret === 0 ? undefined : QuestionData.__wrap(ret);
     }
     /**
      * Returns the number of questions in the question bank (QBank).
@@ -1820,8 +1820,7 @@ export class ControlTower {
      *
      * let mut control_tower = ControlTower::new();
      * let data = fs::read("path_to_qbank.xlsx").expect("Failed to read file");
-     * let dbid = DBID::Excel;
-     * match control_tower.set_qbank_from_bytes_of_excel_for_conversion(&data, dbid)
+     * match control_tower.set_qbank_from_bytes_of_excel_for_conversion(&data)
      * {
      *     Ok(()) => println!("QBank loaded successfully"),
      *     Err(e) => println!("Failed to load QBank: {:?}", e),
@@ -1833,6 +1832,49 @@ export class ControlTower {
         const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.controltower_set_qbank_from_bytes_of_excel_for_conversion(this.__wbg_ptr, ptr0, len0);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+    /**
+     * Loads the question bank (QBank) from a byte slice containing
+     * Spreadsheet database data for conversion purposes.
+     *
+     * This method attempts to create an in-memory Spreadsheet database
+     * from the provided byte data and read the QBank from it.
+     *
+     * If successful, it sets the `qbank` field to the new Spreadsheet
+     * database and returns `Ok(())`.
+     * If it fails at any point, it returns an `Err` with an appropriate error.
+     *
+     * # Arguments
+     * * `data` - A byte slice containing the Spreadsheet database data
+     *   for the question bank
+     *
+     * # Returns
+     * - `Ok(())` on success
+     * - `Err(ErrorMessageForWASM)` describing the failure on error.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * use qrate::Spreadsheet;
+     * use std::fs;
+     *
+     * let mut control_tower = ControlTower::new();
+     * let data = fs::read("path_to_qbank.xlsx").expect("Failed to read file");
+     * match control_tower.set_qbank_from_bytes_of_spreadsheet_for_conversion(&data)
+     * {
+     *     Ok(()) => println!("QBank loaded successfully"),
+     *     Err(e) => println!("Failed to load QBank: {:?}", e),
+     * }
+     * ```
+     * @param {Uint8Array | number[]} data
+     */
+    set_qbank_from_bytes_of_spreadsheet_for_conversion(data) {
+        const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_set_qbank_from_bytes_of_spreadsheet_for_conversion(this.__wbg_ptr, ptr0, len0);
         if (ret[1]) {
             throw takeFromExternrefTable0(ret[0]);
         }
@@ -1997,6 +2039,51 @@ export class ControlTower {
         const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.controltower_set_sbank_from_bytes_of_excel_for_conversion(this.__wbg_ptr, ptr0, len0);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+    /**
+     * Loads the student bank (SBank) from a byte slice
+     * containing Spreadsheet data for conversion.
+     *
+     * This method attempts to create an in-memory Spreadsheet database
+     * from the provided byte data and read the SBank from it.
+     *
+     * If successful, it returns `Ok(())`.
+     * If it fails at any point, it returns an `Err` with an appropriate error.
+     *
+     * # Arguments
+     * * `data` - A byte slice containing the Spreadsheet database data
+     *   for the student bank
+     *
+     * # Returns
+     * * `Ok(())` on success,
+     * * `Err(ErrorMessageForWASM::InvalidVersion)` when SBank is
+     *   higher version,
+     * * `Err(ErrorMessageForWASM::FailedToReceiveSBankFromMemory)` when faild
+     *   in reading from memory.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * use qrate::Spreadsheet;
+     * use std::fs;
+     *
+     * let mut control_tower = ControlTower::new();
+     * let data = fs::read("path_to_sbank.xlsx").expect("Failed to read file");
+     * match control_tower.set_sbank_from_bytes_of_spreadsheet_for_conversion(&data)
+     * {
+     *     Ok(()) => println!("SBank loaded successfully"),
+     *     Err(e) => println!("Failed to load SBank: {:?}", e),
+     * }
+     * ```
+     * @param {Uint8Array | number[]} data
+     */
+    set_sbank_from_bytes_of_spreadsheet_for_conversion(data) {
+        const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.controltower_set_sbank_from_bytes_of_spreadsheet_for_conversion(this.__wbg_ptr, ptr0, len0);
         if (ret[1]) {
             throw takeFromExternrefTable0(ret[0]);
         }
@@ -2302,6 +2389,39 @@ export class ControlTower {
         return v1;
     }
     /**
+     * Writes the question bank (QBank) to a byte vector containing Spreadsheet ODS
+     * database data.
+     *
+     * This method creates an in-memory Spreadsheet ODS database, writes the QBank
+     * to it, and then saves the database to a byte vector.
+     *
+     * # Returns
+     * - `Ok(Vec<u8>)` containing the Spreadsheet ODS database data on success
+     * - `Err(ErrorMessageForWASM::FailedToWriteQBankToMemory)` describing
+     *   the failure on error.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * match control_tower.write_qbank_to_bytes_of_spreadsheet_for_conversion()
+     * {
+     *     Ok(data) => println!("QBank written to bytes successfully, size: {}", data.len()),
+     *     Err(e) => println!("Failed to write QBank to bytes: {:?}", e),
+     * }
+     * ```
+     * @returns {Uint8Array}
+     */
+    write_qbank_to_bytes_of_spreadsheet_for_conversion() {
+        const ret = wasm.controltower_write_qbank_to_bytes_of_spreadsheet_for_conversion(this.__wbg_ptr);
+        if (ret[3]) {
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v1;
+    }
+    /**
      * Writes the question bank (QBank) to a byte vector containing SQLite
      * database data.
      *
@@ -2400,6 +2520,39 @@ export class ControlTower {
         return v1;
     }
     /**
+     * Writes the student bank (SBank) to a byte vector containing Spreadsheet
+     * data.
+     *
+     * This method creates an in-memory Spreadsheet, writes the SBank to it,
+     * and then saves the spreadsheet to a byte vector.
+     *
+     * # Returns
+     * * `Ok(Vec<u8>)` containing the Spreadsheet data on success
+     * * `Err(ErrorMessageForWASM::FailedToWriteSBankToMemory)` describing
+     *   the failure on error.
+     *
+     * # Examples
+     * ```
+     * use qrate_wasm::ControlTower;
+     * let control_tower = ControlTower::new();
+     * match control_tower.write_sbank_to_bytes_of_spreadsheet_for_conversion()
+     * {
+     *     Ok(data) => println!("SBank written to bytes successfully, size: {}", data.len()),
+     *     Err(e) => println!("Failed to write SBank to bytes: {:?}", e),
+     * }
+     * ```
+     * @returns {Uint8Array}
+     */
+    write_sbank_to_bytes_of_spreadsheet_for_conversion() {
+        const ret = wasm.controltower_write_sbank_to_bytes_of_spreadsheet_for_conversion(this.__wbg_ptr);
+        if (ret[3]) {
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v1;
+    }
+    /**
      * Writes the student bank (SBank) to a byte vector containing SQLite
      * database data.
      *
@@ -2474,7 +2627,7 @@ if (Symbol.dispose) ControlTower.prototype[Symbol.dispose] = ControlTower.protot
  * be easily manipulated from TypeScript/JavaScript. Each variant represents a specific
  * error that may occur during the execution of the application, such as
  * issues with opening files, receiving data from memory,
- * @enum {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32}
+ * @enum {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36}
  */
 export const ErrorMessageForWASM = Object.freeze({
     /**
@@ -2590,25 +2743,41 @@ export const ErrorMessageForWASM = Object.freeze({
      */
     FailedToWriteSExcel: 27, "27": "FailedToWriteSExcel",
     /**
+     * Represents an error where the Spreadsheet file for `QBank` cannot be opened or read.
+     */
+    FailedToOpenQSpreadsheet: 28, "28": "FailedToOpenQSpreadsheet",
+    /**
+     * Represents an error where the `QBank` cannot be written to the Spreadsheet file.
+     */
+    FailedToWriteQSpreadsheet: 29, "29": "FailedToWriteQSpreadsheet",
+    /**
+     * Represents an error where the Spreadsheet file for `SBank` cannot be opened or read.
+     */
+    FailedToOpenSSpreadsheet: 30, "30": "FailedToOpenSSpreadsheet",
+    /**
+     * Represents an error where the `SBank` cannot be written to the Spreadsheet file.
+     */
+    FailedToWriteSSpreadsheet: 31, "31": "FailedToWriteSSpreadsheet",
+    /**
      * Represents an error where the `QBank` cannot be received from memory.
      */
-    FailedToReceiveQBankFromMemory: 28, "28": "FailedToReceiveQBankFromMemory",
+    FailedToReceiveQBankFromMemory: 32, "32": "FailedToReceiveQBankFromMemory",
     /**
      * Represents an error where the `QBank` cannot be written to memory.
      */
-    FailedToWriteQBankToMemory: 29, "29": "FailedToWriteQBankToMemory",
+    FailedToWriteQBankToMemory: 33, "33": "FailedToWriteQBankToMemory",
     /**
      * Represents an error where the `SBank` cannot be received from memory.
      */
-    FailedToReceiveSBankFromMemory: 30, "30": "FailedToReceiveSBankFromMemory",
+    FailedToReceiveSBankFromMemory: 34, "34": "FailedToReceiveSBankFromMemory",
     /**
      * Represents an error where the `SBank` cannot be written to memory.
      */
-    FailedToWriteSBankToMemory: 31, "31": "FailedToWriteSBankToMemory",
+    FailedToWriteSBankToMemory: 35, "35": "FailedToWriteSBankToMemory",
     /**
      * Represents an error where the exam cannot be generated.
      */
-    FailedToGenerateExam: 32, "32": "FailedToGenerateExam",
+    FailedToGenerateExam: 36, "36": "FailedToGenerateExam",
 });
 
 /**
